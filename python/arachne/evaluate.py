@@ -12,7 +12,7 @@ def evaluate(model, compiled_model_path, ds, hostname, port, target_device):
 
     if isinstance(model, tf.keras.Model):
         session = tvm.rpc.connect(hostname, port)
-        
+
         if target_device == "jetson-nano":
             dev = session.cpu()
 

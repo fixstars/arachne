@@ -33,10 +33,10 @@ def benchmark(model, compiled_model_path, hostname, port, target_device):
         # NOTE assume 1 input layer
         input_layer = model.get_layer(index=0)
         config = input_layer.get_config()
-        input_shape = tuple([1] + list(config['batch_input_shape'][1:]))
+        input_shape = tuple([1] + list(config["batch_input_shape"][1:]))
 
         for _ in range(0, 100):
-            input_tensor = np.random.uniform(-1, 1, size=input_shape).astype(config['dtype'])
+            input_tensor = np.random.uniform(-1, 1, size=input_shape).astype(config["dtype"])
             gmodule.set_input(0, input_tensor)
             gmodule.run()
 
