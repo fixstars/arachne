@@ -13,7 +13,11 @@ __pycache__
 
 prof/
 
+# Python
+arachne-*-py*.whl
+arachne-*.tar.gz
+__pycache__
+
 # VSCode
 .vscode
 .vscode-server
-
