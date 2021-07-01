@@ -1,0 +1,19 @@
+.cache/
+.artifacts/
+.dataset/
+.models/
+.keras/
+build*/
+__pycache__
+
+.sudo_as_admin_successful
+
+.bash_history
+.python_history
+
+prof/
+
+# VSCode
+.vscode
+.vscode-server
+
