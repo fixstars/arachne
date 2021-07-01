@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "arachne"
+version = "0.1.0"
+description = "A framework for compile and benchmark DNN inferences on the devices"
+authors = ["Akira Maruoka <akira.maruoka@fixstars.com>"]
+packages = [
+    { include = "python/arachne" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.6.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+flake8 = "^3.9.2"
+black = "^21.6b0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py36']
+include = '(\.pyi?$)'
+exclude = '''
+
+(
+  /(
+      \.github
+    | \.git
+    | \.vscode
+    | 3rdparty
+    | docker\/
+  )/
+)
+'''
