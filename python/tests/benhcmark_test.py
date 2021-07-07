@@ -11,7 +11,7 @@ from arachne.ishape import InputSpec
 def test_benchmark_for_pytorch():
     resnet18 = models.resnet18(pretrained=True)
     input_shape = (1, 3, 224, 224)
-    target_device = 'jetson-xavier-nx'
+    target_device = 'host'
     pipeline = 'tvm'
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -29,7 +29,7 @@ def test_benchmark_for_pytorch():
             resnet18,
             output_path,
             [InputSpec(input_shape, 'float32')],
-            'genesis-jetson-xavier-nx-00.fixstars.com',
+            '127.0.0.1',
             9090,
-            'host'
+            target_device
         )

@@ -20,11 +20,11 @@ from .ishape import InputSpec
 
 
 def benchmark_tvm_model(
-    compiled_model_path,
+    compiled_model_path: str,
     input_specs: List[InputSpec],
-    hostname,
-    port,
-    target_device
+    hostname: str,
+    port: int,
+    target_device: str
 ):
     session = tvm.rpc.connect(hostname, port)
 
@@ -97,7 +97,7 @@ def benchmark_for_pytorch(
     input_specs: List[InputSpec],
     hostname: str,
     port: str,
-    target_device: device.Device,
+    target_device: str,
 ):
     return benchmark_tvm_model(
         compiled_model_path,

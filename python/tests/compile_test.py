@@ -23,5 +23,3 @@ def test_compile_for_pytorch():
             pipeline,
             output_path
         )
-
-    return

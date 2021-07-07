@@ -12,6 +12,31 @@ from . import device
 from .ishape import InputSpec
 
 
+def compile_by_tvm(
+    model_path: str,
+    frontend: str,
+    input_shape_dict: Dict[str, Tuple],
+    target_device: str,
+    output_path: str
+):
+    dev = device.get_device(target_device)
+
+    tvm_model = tvmc.frontends.load_model(
+        model_path, frontend, input_shape_dict)
+
+    tvmc.compiler.compile_model(
+        tvm_model,
+        dev.target,
+        package_path=output_path,
+        cross=dev.cross_compiler,
+        dump_code='relay',
+        target_host=dev.target_host,
+        desired_layout=None
+    )
+
+    return (output_path, output_path + '.relay')
+
+
 def compile_for_pytorch(
     model: torch.nn.Module,
     input_spec: List[InputSpec],
@@ -59,28 +84,3 @@ def compile_for_keras(
         model.save(h5_path)
 
         return compile_by_tvm(h5_path, model_format, input_shape_dict, target_device, output_path)
-
-
-def compile_by_tvm(
-    model_path: str,
-    frontend: str,
-    input_shape_dict: Dict[str, Tuple],
-    target_device: str,
-    output_path: str
-):
-    dev = device.get_device(target_device)
-
-    tvm_model = tvmc.frontends.load_model(
-        model_path, frontend, input_shape_dict)
-
-    tvmc.compiler.compile_model(
-        tvm_model,
-        dev.target,
-        package_path=output_path,
-        cross=dev.cross_compiler,
-        dump_code='relay',
-        target_host=dev.target_host,
-        desired_layout=None
-    )
-
-    return (output_path, output_path + '.relay')
