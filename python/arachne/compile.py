@@ -11,6 +11,7 @@ import torch
 from . import device
 from .ishape import InputSpec
 
+
 def compile_for_pytorch(
     model: torch.nn.Module,
     input_spec: List[InputSpec],
@@ -21,7 +22,8 @@ def compile_for_pytorch(
     # TODO: support more compile pipelines
     assert(pipeline == 'tvm')
 
-    input_shape_dict = { f'input{n}': ispec.shape for n, ispec in enumerate(input_spec) }
+    input_shape_dict = {f'input{n}': ispec.shape for n,
+                        ispec in enumerate(input_spec)}
 
     inps = tuple(torch.zeros(shape) for shape in input_shape_dict.values())
 
@@ -34,6 +36,7 @@ def compile_for_pytorch(
         script_model.save(pt_script_path)
 
         return compile_by_tvm(pt_script_path, 'pytorch', input_shape_dict, target_device, output_path)
+
 
 def compile_for_keras(
     model: tf.keras.Model,
@@ -50,12 +53,13 @@ def compile_for_keras(
     config = input_layer.get_config()
     input_shape = tuple([1] + list(config["batch_input_shape"][1:]))
     input_shape_dict = {config["name"]: input_shape}
-    
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         h5_path = os.path.join(tmp_dir, model.name + ".h5")
         model.save(h5_path)
 
         return compile_by_tvm(h5_path, model_format, input_shape_dict, target_device, output_path)
+
 
 def compile_by_tvm(
     model_path: str,
@@ -66,7 +70,8 @@ def compile_by_tvm(
 ):
     dev = device.get_device(target_device)
 
-    tvm_model = tvmc.frontends.load_model(model_path, frontend, input_shape_dict)
+    tvm_model = tvmc.frontends.load_model(
+        model_path, frontend, input_shape_dict)
 
     tvmc.compiler.compile_model(
         tvm_model,

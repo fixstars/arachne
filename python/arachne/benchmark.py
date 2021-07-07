@@ -18,6 +18,7 @@ from tvm.driver import tvmc
 from . import device
 from .ishape import InputSpec
 
+
 def benchmark_tvm_model(
     compiled_model_path,
     input_specs: List[InputSpec],
@@ -35,18 +36,20 @@ def benchmark_tvm_model(
         t.extractall(tmp_dir)
 
         graph = open(os.path.join(tmp_dir, "mod.json")).read()
-        params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
+        params = bytearray(
+            open(os.path.join(tmp_dir, "mod.params"), "rb").read())
         session.upload(os.path.join(tmp_dir, "mod.so"))
         lib = session.load_module("mod.so")
 
     gmodule = tvm.contrib.graph_executor.create(graph, lib, dev)
     gmodule.load_params(params)
 
-    input_tensors = [np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype) for ispec in input_specs]
+    input_tensors = [
+        np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype) for ispec in input_specs]
 
     for i, tensor in enumerate(input_tensors):
         gmodule.set_input(i, tensor)
-    
+
     gmodule.run()
 
     timer = gmodule.module.time_evaluator("run", dev, 1, repeat=100)
@@ -64,6 +67,7 @@ def benchmark_tvm_model(
     # stat_table = result.format_times()
     # print(f"\n{stat_table}")
     return {"mean": mean_ts, "std": std_ts, "max": max_ts, "min": min_ts}
+
 
 def benchmark_for_keras(
     model: tf.keras.Model,
@@ -87,6 +91,7 @@ def benchmark_for_keras(
         port,
         target_device
     )
+
 
 def benchmark_for_pytorch(
     model: torch.nn.Module,
