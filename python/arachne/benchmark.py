@@ -28,8 +28,8 @@ def benchmark_tvm_model(
 ):
     session = tvm.rpc.connect(hostname, port)
 
-    # TODO: support more devices
-    dev = session.cpu(0)
+    dev = device.get_device(target_device)
+    tvmdev = device.create_tvmdev(dev.tvmdev, session)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         t = tarfile.open(compiled_model_path)
@@ -41,7 +41,7 @@ def benchmark_tvm_model(
         session.upload(os.path.join(tmp_dir, "mod.so"))
         lib = session.load_module("mod.so")
 
-    gmodule = tvm.contrib.graph_executor.create(graph, lib, dev)
+    gmodule = tvm.contrib.graph_executor.create(graph, lib, tvmdev)
     gmodule.load_params(params)
 
     input_tensors = [
@@ -52,7 +52,7 @@ def benchmark_tvm_model(
 
     gmodule.run()
 
-    timer = gmodule.module.time_evaluator("run", dev, 1, repeat=100)
+    timer = gmodule.module.time_evaluator("run", tvmdev, 1, repeat=100)
 
     prof_result = timer()
     times = prof_result.results
@@ -64,8 +64,6 @@ def benchmark_tvm_model(
     max_ts = np.max(result.times) * 1000
     min_ts = np.min(result.times) * 1000
 
-    # stat_table = result.format_times()
-    # print(f"\n{stat_table}")
     return {"mean": mean_ts, "std": std_ts, "max": max_ts, "min": min_ts}
 
 
