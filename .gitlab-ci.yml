@@ -76,9 +76,9 @@ build-tvm:
       - build_tvm
 
 #
-# 3.1. Test
+# 3. Test
 #
-.test: &test-base
+test:
   stage: test
   tags:
     - docker
@@ -89,136 +89,11 @@ build-tvm:
   before_script:
     - export PYTHONPATH=${ARACHNE_PYTHONPATH}:${TVM_PYTHONPATH}:$PYTHONPATH
   script:
-    - ci/evaluate.sh ${ARACHNE_CI_DEVICE} 100
-#  artifacts:
-#    paths:
-#      - .artifacts
-
-test-cpu:
-  <<: *test-base
-  except:
-    - master
-    - tags
-  variables:
-    ARACHNE_CI_DEVICE: host
-
-test-gpu:
-  <<: *test-base
-  except:
-    - master
-    - tags
-  variables:
-    ARACHNE_CI_DEVICE: host-gpu
-
-test-dpu:
-  <<: *test-base
-  variables:
-    VAI_CONTAINER_NAME: ${DOCKER_VAI_TEST_IMAGE}
-  except:
-    - master
-    - tags
-  script:
-    - ci/buildtest_dpu.sh ultra96
+    - pwd
+    - ci/test.sh
 
 #
-# 3.2. Evaluate
-#
-.evaluate: &evaluate-base
-  <<: *test-base
-  only:
-    - master
-    - tags
-  script:
-    - ci/evaluate.sh ${ARACHNE_CI_DEVICE}
-
-evaluate-cpu-int8:
-  <<: *evaluate-base
-  variables:
-    ARACHNE_CI_DEVICE: host
-
-evaluate-gpu-fp16:
-  <<: *evaluate-base
-  variables:
-    TVM_TENSORRT_USE_FP16: 1
-    ARACHNE_CI_DEVICE: host-gpu
-
-# Skip to shorten test
-# evaluate-gpu-fp32:
-#   <<: *evaluate-base
-#   variables:
-#     ARACHNE_CI_DEVICE: host-gpu
-
-
-#
-# 4. Benchmark
-#
-.benchmark: &benchmark-base
-  stage: benchmark
-  tags:
-    - docker
-    - dgx1
-  image: ${DOCKER_TEST_IMAGE}
-  dependencies:
-    - build-tvm
-  when: manual
-  before_script:
-    - export PYTHONPATH=${ARACHNE_PYTHONPATH}:${TVM_PYTHONPATH}:$PYTHONPATH
-  script:
-    - ci/benchmark.sh ${ARACHNE_CI_DEVICE}
-#  artifacts:
-#    paths:
-#      - .artifacts
-
-benchmark-raspi4:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: raspi4
-    ARACHNE_CI_RPC_KEY: raspi4
-
-benchmark-jetson-nano:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: jetson-nano
-    ARACHNE_CI_RPC_KEY: jetson-nano
-
-benchmark-jetson-tx2:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: jetson-tx2
-    ARACHNE_CI_RPC_KEY: jetson-tx2
-
-
-benchmark-jetson-xavier-nx:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: jetson-xavier-nx
-    ARACHNE_CI_RPC_KEY: jetson-xavier-nx
-
-benchmark-ultra96:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: ultra96
-    ARACHNE_CI_RPC_KEY: ultra96
-  script:
-   - ci/benchmark_ultra96.sh ${ARACHNE_CI_DEVICE}
-
-benchmark-kv260:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: kv260
-    ARACHNE_CI_RPC_KEY: kv260
-
-benchmark-coral:
-  <<: *benchmark-base
-  variables:
-    ARACHNE_CI_DEVICE: coral
-    ARACHNE_CI_RPC_KEY: coral
-  script:
-    - ci/benchmark_coral.sh ${ARACHNE_CI_DEVICE}
-
-
-#
-# 5. Release Image
+# 4. Release Image
 #
 .release-image: &release-image-base
   stage: release-image
@@ -254,7 +129,7 @@ release-image-tags:
 
 
 #
-# 6. cleanup
+# 5. cleanup
 #
 cleanup-image:
   stage: cleanup
