@@ -14,12 +14,14 @@ def test_benchmark_for_pytorch():
     target_device = 'host'
     pipeline = 'tvm'
 
+    input_spec = [InputSpec(input_shape, 'float32')]
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         output_path = os.path.join(tmp_dir, 'resent18.tar')
 
         arachne.compile.compile_for_pytorch(
             resnet18,
-            [InputSpec(input_shape, 'float32')],
+            input_spec,
             target_device,
             pipeline,
             output_path
@@ -28,8 +30,6 @@ def test_benchmark_for_pytorch():
         arachne.benchmark.benchmark_for_pytorch(
             resnet18,
             output_path,
-            [InputSpec(input_shape, 'float32')],
-            '127.0.0.1',
-            9090,
+            input_spec,
             target_device
         )
