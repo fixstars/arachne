@@ -2,22 +2,6 @@ from collections import OrderedDict
 from typing import List
 
 
-import tvm.rpc
-from tvm._ffi.runtime_ctypes import Device as TVMDevice
-
-
-def create_tvmdev(device: str, session: tvm.rpc.RPCSession) -> TVMDevice:
-    # TODO(Maruoka): Support more devices
-    if device == "cuda":
-        tvmdev = session.cuda()
-    elif device == "cl":
-        tvmdev = session.cl()
-    else:
-        assert device == "cpu"
-        tvmdev = session.cpu()
-    return tvmdev
-
-
 class Device(object):
     def __init__(
         self,

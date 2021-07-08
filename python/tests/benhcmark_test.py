@@ -31,5 +31,7 @@ def test_benchmark_for_pytorch():
             resnet18,
             output_path,
             input_spec,
+            None,
+            None,
             target_device
         )

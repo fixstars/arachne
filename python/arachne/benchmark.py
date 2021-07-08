@@ -17,19 +17,20 @@ from tvm.driver import tvmc
 
 from . import device
 from .ishape import InputSpec
+from . import common
 
 
 def benchmark_tvm_model(
     compiled_model_path: str,
     input_specs: List[InputSpec],
-    hostname: str,
-    port: int,
+    hostname: Optional[str],
+    rpc_key: Optional[str],
     target_device: str
 ):
-    session = tvm.rpc.connect(hostname, port)
+    session = common.create_session(hostname, rpc_key)
 
     dev = device.get_device(target_device)
-    tvmdev = device.create_tvmdev(dev.tvmdev, session)
+    tvmdev = common.create_tvmdev(dev.tvmdev, session)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         t = tarfile.open(compiled_model_path)
@@ -70,8 +71,8 @@ def benchmark_tvm_model(
 def benchmark_for_keras(
     model: tf.keras.Model,
     compiled_model_path: str,
-    hostname: str,
-    port: int,
+    hostname: Optional[str],
+    rpc_key: Optional[str],
     target_device: str,
 ):
     # TODO: support more inputs
@@ -86,7 +87,7 @@ def benchmark_for_keras(
         compiled_model_path,
         input_specs,
         hostname,
-        port,
+        rpc_key,
         target_device
     )
 
@@ -95,14 +96,14 @@ def benchmark_for_pytorch(
     model: torch.nn.Module,
     compiled_model_path: str,
     input_specs: List[InputSpec],
-    hostname: str,
-    port: str,
+    hostname: Optional[str],
+    rpc_key: Optional[str],
     target_device: str,
 ):
     return benchmark_tvm_model(
         compiled_model_path,
         input_specs,
         hostname,
-        port,
+        rpc_key,
         target_device
     )
