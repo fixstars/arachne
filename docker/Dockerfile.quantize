@@ -1,0 +1,26 @@
+
+FROM tensorflow/tensorflow:2.4.1-gpu
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install apt dependencies
+RUN apt-get update && apt-get install -y \
+  git \
+  gpg-agent \
+  python3-cairocffi \
+  protobuf-compiler \
+  python3-pil \
+  python3-lxml \
+  python3-tk \
+  sudo \
+  wget
+
+RUN python3 -m pip install -U pip
+RUN python3 -m pip install tensorflow_datasets
+
+ENV TF_CPP_MIN_LOG_LEVEL 3
+
+ARG workspace
+ENV workspace /workspace
+ENV PYTHONPATH $workspace/python:$PYTHONPATH
+WORKDIR $workspace
