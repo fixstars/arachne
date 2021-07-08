@@ -10,7 +10,6 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 import torch
-import pytorch_lightning as pl
 
 import tvm
 from tvm.driver import tvmc
