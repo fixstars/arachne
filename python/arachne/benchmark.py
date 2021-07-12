@@ -1,4 +1,3 @@
-import enum
 import os
 import tempfile
 import tarfile
@@ -24,7 +23,8 @@ def benchmark_tvm_model(
     input_specs: List[InputSpec],
     hostname: Optional[str],
     rpc_key: Optional[str],
-    target_device: str
+    target_device: str,
+    profile: bool
 ):
     session = common.create_session(hostname, rpc_key)
 
@@ -41,7 +41,11 @@ def benchmark_tvm_model(
         session.upload(os.path.join(tmp_dir, "mod.so"))
         lib = session.load_module("mod.so")
 
-    gmodule = tvm.contrib.graph_executor.create(graph, lib, tvmdev)
+    if profile:
+        gmodule = tvm.contrib.debugger.debug_executor.create(
+            graph, lib, tvmdev)
+    else:
+        gmodule = tvm.contrib.graph_executor.create(graph, lib, tvmdev)
     gmodule.load_params(params)
 
     input_tensors = [
@@ -50,9 +54,10 @@ def benchmark_tvm_model(
     for i, tensor in enumerate(input_tensors):
         gmodule.set_input(i, tensor)
 
-    gmodule.run()
-
     timer = gmodule.module.time_evaluator("run", tvmdev, 1, repeat=100)
+
+    # Profile using debug_runtime
+    gmodule.run()
 
     prof_result = timer()
     times = prof_result.results
@@ -73,6 +78,7 @@ def benchmark_for_keras(
     hostname: Optional[str],
     rpc_key: Optional[str],
     target_device: str,
+    profile: bool
 ):
     # TODO: support more inputs
     input_layer = model.get_layer(index=0)
@@ -87,7 +93,8 @@ def benchmark_for_keras(
         input_specs,
         hostname,
         rpc_key,
-        target_device
+        target_device,
+        profile
     )
 
 
@@ -98,11 +105,13 @@ def benchmark_for_pytorch(
     hostname: Optional[str],
     rpc_key: Optional[str],
     target_device: str,
+    profile: bool
 ):
     return benchmark_tvm_model(
         compiled_model_path,
         input_specs,
         hostname,
         rpc_key,
-        target_device
+        target_device,
+        profile
     )

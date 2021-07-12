@@ -33,5 +33,6 @@ def test_benchmark_for_pytorch():
             input_spec,
             None,
             None,
-            target_device
+            target_device,
+            True,
         )
