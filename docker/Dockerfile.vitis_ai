@@ -1,0 +1,62 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# use Vitis AI
+FROM xilinx/vitis-ai:latest
+
+RUN apt-get update --fix-missing
+
+COPY docker/install/install_core.sh /install/install_core.sh
+RUN bash /install/install_core.sh
+
+# Install Vitis-AI ubuntu dependencies
+COPY docker/install/install_vitis_ai_core.sh /install/install_vitis_ai_core.sh
+RUN bash /install/install_vitis_ai_core.sh
+
+COPY docker/install/install_python_vai.sh /install/install_python_vai.sh
+RUN bash /install/install_python_vai.sh
+
+COPY docker/install/install_python_package.sh /install/install_python_package.sh
+RUN bash /install/install_python_package.sh
+
+COPY docker/install/install_llvm.sh /install/install_llvm.sh
+RUN bash /install/install_llvm.sh
+
+# NNPACK deps
+COPY docker/install/install_nnpack.sh /install/install_nnpack.sh
+RUN bash /install/install_nnpack.sh
+
+ENV PATH $PATH:$CARGO_HOME/bin:/usr/lib/go-1.10/bin
+
+# ANTLR deps
+COPY docker/install/install_java.sh /install/install_java.sh
+RUN bash /install/install_java.sh
+
+# pyxir deps
+RUN apt-get -y install libhdf5-dev
+
+# Install dependencies inside vitis-ai-tensorflow conda
+COPY docker/install/install_pyxir.sh /install/install_pyxir.sh
+COPY 3rdparty/tvm /tvm
+COPY docker/install/install_tvm_vai.sh /install/install_tvm_vai.sh
+
+RUN . $VAI_ROOT/conda/etc/profile.d/conda.sh && \
+    conda activate vitis-ai-tensorflow && \
+    pip install --no-cache-dir antlr4-python3-runtime && bash /install/install_python_package.sh && pip install pydot==1.4.1 h5py==2.8.0 && \
+    bash /install/install_pyxir.sh && bash /install/install_tvm_vai.sh
+
+ENV TVM_LIBRARY_PATH=/tvm/

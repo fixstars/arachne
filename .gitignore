@@ -1,0 +1,23 @@
+.cache/
+.artifacts/
+.dataset/
+.models/
+.keras/
+build*/
+__pycache__
+
+.sudo_as_admin_successful
+
+.bash_history
+.python_history
+
+prof/
+
+# Python
+arachne-*-py*.whl
+arachne-*.tar.gz
+__pycache__
+
+# VSCode
+.vscode
+.vscode-server
