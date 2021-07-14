@@ -5,8 +5,6 @@ import shutil
 from typing import Dict, List, Tuple
 
 from tvm.driver import tvmc
-import tensorflow as tf
-import torch
 
 from . import device
 from .ishape import InputSpec
@@ -38,12 +36,13 @@ def compile_by_tvm(
 
 
 def compile_for_pytorch(
-    model: torch.nn.Module,
+    model, # torch.nn.Module
     input_spec: List[InputSpec],
     target_device: str,
     pipeline: str,
     output_path: str,
 ):
+    import torch
     # TODO: support more compile pipelines
     assert(pipeline == 'tvm')
 
@@ -64,7 +63,7 @@ def compile_for_pytorch(
 
 
 def compile_for_keras(
-    model: tf.keras.Model,
+    model, # tf.keras.Model
     target_device: str,
     pipeline: str,
     output_path: str
