@@ -23,3 +23,19 @@ def test_compile_for_pytorch():
             pipeline,
             output_path
         )
+
+def test_compile_for_keras():
+    import tensorflow as tf
+    mobilenet = tf.keras.applications.mobilenet.MobileNet()
+    target_device = 'host'
+    pipeline = 'tvm'
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        output_path = os.path.join(tmp_dir, 'keras-mobilenet.tar')
+
+        arachne.compile.compile_for_keras(
+            mobilenet,
+            target_device,
+            pipeline,
+            output_path
+        )
