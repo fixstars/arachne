@@ -110,3 +110,34 @@ def benchmark_for_pytorch(
         target_device,
         profile
     )
+
+
+def benchmark_for_tf_concrete_function(
+    concrete_func,
+    compiled_model_path: str,
+    hostname: Optional[str],
+    rpc_key: Optional[str],
+    target_device: str,
+    profile: bool
+):
+
+    from tensorflow.python.eager.function import ConcreteFunction
+    assert(isinstance(concrete_func, ConcreteFunction))
+
+    from tensorflow.python.framework.convert_to_constants import (
+        convert_variables_to_constants_v2_as_graph,
+    )
+    frozen_model, graph_def = convert_variables_to_constants_v2_as_graph(concrete_func)
+
+    input_specs = []
+    for input in frozen_model.inputs:
+        input_specs.append(InputSpec(input.shape, str(input.dtype.name)))
+
+    return benchmark_tvm_model(
+        compiled_model_path,
+        input_specs,
+        hostname,
+        rpc_key,
+        target_device,
+        profile
+    )

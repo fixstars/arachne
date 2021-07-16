@@ -61,3 +61,34 @@ def test_benchmark_for_keras():
             target_device,
             True,
         )
+
+def test_benchmark_for_tf_concrete_function():
+    import tensorflow as tf
+    mobilenet = tf.keras.applications.mobilenet.MobileNet()
+    target_device = 'host'
+    pipeline = 'tvm'
+
+    @tf.function(input_signature=[tf.TensorSpec(shape=[1, 224, 224, 3], dtype=tf.float32)])
+    def wrap(x):
+        return mobilenet(x)
+
+    concrete_func = wrap.get_concrete_function()
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        output_path = os.path.join(tmp_dir, 'tf-mobilenet-concrete-func.tar')
+
+        arachne.compile.compile_for_tf_concrete_function(
+            concrete_func,
+            target_device,
+            pipeline,
+            output_path
+        )
+
+        arachne.benchmark.benchmark_for_tf_concrete_function(
+            concrete_func,
+            output_path,
+            None,
+            None,
+            target_device,
+            True,
+        )
