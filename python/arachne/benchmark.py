@@ -5,11 +5,6 @@ from typing import List, Optional
 
 import numpy as np
 
-import tensorflow as tf
-import tensorflow_datasets as tfds
-
-import torch
-
 import tvm
 from tvm.driver import tvmc
 
@@ -73,7 +68,7 @@ def benchmark_tvm_model(
 
 
 def benchmark_for_keras(
-    model: tf.keras.Model,
+    model, # tf.keras.Model
     compiled_model_path: str,
     hostname: Optional[str],
     rpc_key: Optional[str],
@@ -99,7 +94,7 @@ def benchmark_for_keras(
 
 
 def benchmark_for_pytorch(
-    model: torch.nn.Module,
+    model, # torch.nn.Module
     compiled_model_path: str,
     input_specs: List[InputSpec],
     hostname: Optional[str],
