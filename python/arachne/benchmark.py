@@ -30,8 +30,8 @@ def benchmark_tvm_model(
 
         graph = open(os.path.join(tmp_dir, "mod.json")).read()
         params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
-        session.upload(os.path.join(tmp_dir, "mod.so"))
-        lib = session.load_module("mod.so")
+        session.upload(os.path.join(tmp_dir, "mod.tar"))
+        lib = session.load_module("mod.tar")
 
     if profile:
         gmodule = tvm.contrib.debugger.debug_executor.create(graph, lib, tvmdev)

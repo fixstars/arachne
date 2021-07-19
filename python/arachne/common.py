@@ -4,19 +4,18 @@ import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
 
+import tvm.driver.tvmc.common as tvmccommon
+import tvm.rpc
+from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.autotvm.measure import request_remote
 from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
-import tvm.driver.tvmc.common as tvmccommon
-import tvm.rpc
 from tvm.runtime.module import Module as TVMModule
-from tvm._ffi.runtime_ctypes import Device as TVMDevice
 
 from .device import Device
 from .logger import Logger
 from .module import RuntimeModule
 from .types import IndexedOrderedDict
-
 
 logger = Logger.logger()
 
@@ -56,46 +55,37 @@ def create_tvmdev(device: str, session: tvm.rpc.RPCSession) -> TVMDevice:
 
 
 def open_module_file(
-    file: Path,
-    session: tvm.rpc.RPCSession,
-    device: Device
+    file: Path, session: tvm.rpc.RPCSession, device: Device
 ) -> Tuple[str, bytearray, TVMModule]:
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.debug("extracting module file %s", file)
         t = tarfile.open(file)
         t.extractall(tmp_dir)
         graph = open(os.path.join(tmp_dir, "mod.json")).read()
-        params = bytearray(
-            open(os.path.join(tmp_dir, "mod.params"), "rb").read())
+        params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
 
-        session.upload(os.path.join(tmp_dir, "mod.so"))
-        lib = session.load_module("mod.so")
+        session.upload(os.path.join(tmp_dir, "mod.tar"))
+        lib = session.load_module("mod.tar")
 
     return graph, params, lib
 
 
 def create_runtime(
-    file: Path,
-    session: tvm.rpc.RPCSession,
-    device: Device,
-    tvmdev: TVMDevice,
-    profile: bool
+    file: Path, session: tvm.rpc.RPCSession, device: Device, tvmdev: TVMDevice, profile: bool
 ) -> RuntimeModule:
     if device.is_tflite:
         with open(file, "rb") as model_fin:
             module = tflite_runtime.create(model_fin.read(), tvmdev)
     elif device.is_edgetpu:
         with open(file, "rb") as model_fin:
-            module = tflite_runtime.create(
-                model_fin.read(), tvmdev, runtime_target="edge_tpu")
+            module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target="edge_tpu")
     else:
         graph, params, lib = open_module_file(file, session, device)
 
         if profile:
             logger.debug("creating runtime with profiling enabled")
             # TODO(Maruoka): Set dump_root into under '.artifacts/{experiment}'
-            module = debug_executor.create(
-                graph, lib, tvmdev, dump_root="./.prof")
+            module = debug_executor.create(graph, lib, tvmdev, dump_root="./.prof")
         else:
             logger.debug("creating runtime with profiling disabled")
             module = graph_executor.create(graph, lib, tvmdev)
@@ -111,7 +101,7 @@ def runner_init(
     device: Device,
     rpc_tracker: Optional[str] = None,
     rpc_key: Optional[str] = None,
-    profile: bool = False
+    profile: bool = False,
 ) -> Tuple[RuntimeModule, TVMDevice]:
     session = create_session(rpc_tracker, rpc_key)
 
@@ -126,7 +116,7 @@ def run_module(
     module: RuntimeModule,
     tvmdev: TVMDevice,
     inputs: IndexedOrderedDict,
-    output_info: IndexedOrderedDict
+    output_info: IndexedOrderedDict,
 ) -> IndexedOrderedDict:
     module.set_inputs(inputs, tvmdev)
     module.run()
