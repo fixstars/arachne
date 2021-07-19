@@ -11,7 +11,7 @@ def test_benchmark_for_pytorch():
     resnet18 = models.resnet18(pretrained=True)
     input_shape = (1, 3, 224, 224)
     target_device = "host"
-    compile_pipeline = "tvm_compiler"
+    compile_pipeline = [("tvm_compiler", {})]
 
     input_spec = [InputSpec(input_shape, "float32")]
 
@@ -38,7 +38,7 @@ def test_benchmark_for_keras():
 
     mobilenet = tf.keras.applications.mobilenet.MobileNet()
     target_device = "host"
-    compile_pipeline = "tvm_compiler"
+    compile_pipeline = [("tvm_compiler", {})]
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         compiled_model_path, _ = arachne.compile.compile_for_keras(
@@ -60,7 +60,7 @@ def test_benchmark_for_tf_concrete_function():
 
     mobilenet = tf.keras.applications.mobilenet.MobileNet()
     target_device = "host"
-    compile_pipeline = "tvm_compiler"
+    compile_pipeline = [("tvm_compiler", {})]
 
     @tf.function(input_signature=[tf.TensorSpec(shape=[1, 224, 224, 3], dtype=tf.float32)])
     def wrap(x):

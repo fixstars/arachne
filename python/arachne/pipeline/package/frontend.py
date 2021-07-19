@@ -54,11 +54,13 @@ def make_tf1_package_from_concrete_func(cfunc, output_dir: Path) -> Tf1Package:
 
     input_info = TensorInfoDict()
     for input in frozen_model.inputs:
-        input_info[input.name] = TensorInfo(shape=input.shape.as_list(), dtype=input.dtype.name)
+        name = input.name.replace(':0', '')
+        input_info[name] = TensorInfo(shape=input.shape.as_list(), dtype=input.dtype.name)
 
     output_info = TensorInfoDict()
     for output in frozen_model.outputs:
-        output_info[output.name] = TensorInfo(shape=output.shape.as_list(), dtype=output.dtype.name)
+        name = output.name.replace(':0', '')
+        output_info[name] = TensorInfo(shape=output.shape.as_list(), dtype=output.dtype.name)
 
     return Tf1Package(
         dir=output_dir,
@@ -106,7 +108,7 @@ def make_tf2_package_from_module(
 
 
 # NOTE: model should be a tf.Module
-def make_keras_package_from_module(model, output_dir: Path) -> Tf2Package:
+def make_keras_package_from_module(model, output_dir: Path) -> KerasPackage:
 
     h5_path = output_dir / (model.name + ".h5")
     model.save(h5_path)

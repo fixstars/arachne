@@ -1,13 +1,14 @@
 import tempfile
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 from arachne.device import get_device
 from arachne.pipeline.package.frontend import (
     make_keras_package_from_module, make_tf1_package_from_concrete_func,
     make_torchscript_package_from_script_module)
 from arachne.pipeline.runner import run_pipeline
-from arachne.pipeline.stage.registry import get_stage
+from arachne.pipeline.stage.registry import get_stage, stage_list, stage_candidate_list
+from arachne.pipeline.stage.stage import Parameter
 from arachne.types.indexed_ordered_dict import TensorInfoDict
 from arachne.types.tensor_info import TensorInfo
 
@@ -18,13 +19,16 @@ def compile_for_pytorch(
     model,  # torch.nn.Module
     input_spec: List[InputSpec],
     target_device: str,
-    pipeline: str,
+    pipeline: List[Tuple[str, Parameter]],
     output_dir: str,
 ):
     import torch
 
-    # TODO: support more compile pipelines
-    assert pipeline == "tvm_compiler"
+    assert isinstance(model, torch.nn.Module)
+
+    compile_pipeline = []
+    for stage in pipeline:
+        compile_pipeline.append((get_stage(stage[0]), stage[1]))
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         input_info = {
@@ -48,7 +52,6 @@ def compile_for_pytorch(
 
         # run pipeline
         device = get_device(target_device)
-        pipeline = [(get_stage(pipeline), {})]
 
         default_params = dict()
         default_params.update(
@@ -59,7 +62,7 @@ def compile_for_pytorch(
             }
         )
 
-        outputs = run_pipeline(pipeline, input_pkg, default_params, output_dir)
+        outputs = run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
 
         # TODO what should be returned by this function?
         last_output = outputs[-1]
@@ -68,14 +71,14 @@ def compile_for_pytorch(
 
 
 # NOTE: model should be a tf.keras.Model
-def compile_for_keras(model, target_device: str, pipeline: str, output_dir: str):
+def compile_for_keras(model, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str):
     import tensorflow as tf
 
     assert isinstance(model, tf.keras.Model)
 
-    # TODO: support more compile pipelines
-    # TODO: test tflite;tvm_compiler
-    assert pipeline == "tvm_compiler"
+    compile_pipeline = []
+    for stage in pipeline:
+        compile_pipeline.append((get_stage(stage[0]), stage[1]))
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         # construct state input (a package)
@@ -83,7 +86,6 @@ def compile_for_keras(model, target_device: str, pipeline: str, output_dir: str)
 
         # run pipeline
         device = get_device(target_device)
-        pipeline = [(get_stage(pipeline), {})]
 
         default_params = dict()
         default_params.update(
@@ -94,7 +96,7 @@ def compile_for_keras(model, target_device: str, pipeline: str, output_dir: str)
             }
         )
 
-        outputs = run_pipeline(pipeline, input_pkg, default_params, output_dir)
+        outputs = run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
 
         # TODO what should be returned by this function?
         last_output = outputs[-1]
@@ -103,16 +105,15 @@ def compile_for_keras(model, target_device: str, pipeline: str, output_dir: str)
 
 
 def compile_for_tf_concrete_function(
-    concrete_func, target_device: str, pipeline: str, output_dir: str
+    concrete_func, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str
 ):
 
     from tensorflow.python.eager.function import ConcreteFunction
-
     assert isinstance(concrete_func, ConcreteFunction)
 
-    # TODO: support more compile pipelines
-    # TODO: test tflite;tvm_compiler
-    assert pipeline == "tvm_compiler"
+    compile_pipeline = []
+    for stage in pipeline:
+        compile_pipeline.append((get_stage(stage[0]), stage[1]))
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         # construct state input (a package)
@@ -120,7 +121,6 @@ def compile_for_tf_concrete_function(
 
         # run pipeline
         device = get_device(target_device)
-        pipeline = [(get_stage(pipeline), {})]
 
         default_params = dict()
         default_params.update(
@@ -131,7 +131,7 @@ def compile_for_tf_concrete_function(
             }
         )
 
-        outputs = run_pipeline(pipeline, input_pkg, default_params, output_dir)
+        outputs = run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
 
         # TODO what should be returned by this function?
         last_output = outputs[-1]
