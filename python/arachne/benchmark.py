@@ -1,16 +1,14 @@
 import os
-import tempfile
 import tarfile
+import tempfile
 from typing import List, Optional
 
 import numpy as np
-
 import tvm
 from tvm.driver import tvmc
 
-from . import device
+from . import common, device
 from .ishape import InputSpec
-from . import common
 
 
 def benchmark_tvm_model(
@@ -19,7 +17,7 @@ def benchmark_tvm_model(
     hostname: Optional[str],
     rpc_key: Optional[str],
     target_device: str,
-    profile: bool
+    profile: bool,
 ):
     session = common.create_session(hostname, rpc_key)
 
@@ -31,20 +29,19 @@ def benchmark_tvm_model(
         t.extractall(tmp_dir)
 
         graph = open(os.path.join(tmp_dir, "mod.json")).read()
-        params = bytearray(
-            open(os.path.join(tmp_dir, "mod.params"), "rb").read())
+        params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
         session.upload(os.path.join(tmp_dir, "mod.so"))
         lib = session.load_module("mod.so")
 
     if profile:
-        gmodule = tvm.contrib.debugger.debug_executor.create(
-            graph, lib, tvmdev)
+        gmodule = tvm.contrib.debugger.debug_executor.create(graph, lib, tvmdev)
     else:
         gmodule = tvm.contrib.graph_executor.create(graph, lib, tvmdev)
     gmodule.load_params(params)
 
     input_tensors = [
-        np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype) for ispec in input_specs]
+        np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype) for ispec in input_specs
+    ]
 
     for i, tensor in enumerate(input_tensors):
         gmodule.set_input(i, tensor)
@@ -68,45 +65,62 @@ def benchmark_tvm_model(
 
 
 def benchmark_for_keras(
-    model, # tf.keras.Model
+    model,  # tf.keras.Model
     compiled_model_path: str,
     hostname: Optional[str],
     rpc_key: Optional[str],
     target_device: str,
-    profile: bool
+    profile: bool,
 ):
     # TODO: support more inputs
     input_layer = model.get_layer(index=0)
     config = input_layer.get_config()
-    input_shape = tuple([1] + list(config['batch_input_shape'][1:]))
-    dtype = config['dtype']
+    input_shape = tuple([1] + list(config["batch_input_shape"][1:]))
+    dtype = config["dtype"]
 
     input_specs = [InputSpec(input_shape, dtype)]
 
     return benchmark_tvm_model(
-        compiled_model_path,
-        input_specs,
-        hostname,
-        rpc_key,
-        target_device,
-        profile
+        compiled_model_path, input_specs, hostname, rpc_key, target_device, profile
     )
 
 
 def benchmark_for_pytorch(
-    model, # torch.nn.Module
+    model,  # torch.nn.Module
     compiled_model_path: str,
     input_specs: List[InputSpec],
     hostname: Optional[str],
     rpc_key: Optional[str],
     target_device: str,
-    profile: bool
+    profile: bool,
 ):
     return benchmark_tvm_model(
-        compiled_model_path,
-        input_specs,
-        hostname,
-        rpc_key,
-        target_device,
-        profile
+        compiled_model_path, input_specs, hostname, rpc_key, target_device, profile
+    )
+
+
+def benchmark_for_tf_concrete_function(
+    concrete_func,
+    compiled_model_path: str,
+    hostname: Optional[str],
+    rpc_key: Optional[str],
+    target_device: str,
+    profile: bool,
+):
+
+    from tensorflow.python.eager.function import ConcreteFunction
+
+    assert isinstance(concrete_func, ConcreteFunction)
+
+    from tensorflow.python.framework.convert_to_constants import \
+        convert_variables_to_constants_v2_as_graph
+
+    frozen_model, graph_def = convert_variables_to_constants_v2_as_graph(concrete_func)
+
+    input_specs = []
+    for input in frozen_model.inputs:
+        input_specs.append(InputSpec(input.shape, str(input.dtype.name)))
+
+    return benchmark_tvm_model(
+        compiled_model_path, input_specs, hostname, rpc_key, target_device, profile
     )
