@@ -39,7 +39,9 @@ In this tutorial, we try to compile SSD MobileNet V1 COCO pretrained model and b
 ### Compile a model for the device
 Compile the trained model.
 
-Please reference [compile test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/compile_test.py).
+Please reference [compile test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/compile_test.py).  
+
+TODO: More details
 
 ### Setup for benchmark performances of the model on the device
 By through TVM RPC execution, you can run benchmarks on remote devices from the host PC.
@@ -94,6 +96,12 @@ jetson-nano           1      1        0
 
 ### Benchmark performances of the model on the device
 Benchmark performances of the compiled model.
+
+Please reference [benchmark test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/benchmark_test.py).
+
+TODO: More details
+
+
 
 ```sh
 python3 python/arachne/benchmark.py --package=raspi4.tar.gz --device=raspi4 --rpc-tracker=localhost:8888 --rpc-key=raspi4
