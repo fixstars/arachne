@@ -3,11 +3,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-import torch
-import torchvision.transforms.functional
 from arachne.pipeline.package import (
     Package,
     PackageInfo,
+    KerasPackage,
+    KerasPackageInfo,
     Tf1Package,
     Tf1PackageInfo,
     Tf2Package,
@@ -41,7 +41,7 @@ class TfLiteConverter(Stage):
     @staticmethod
     def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         quantize_type = get_qtype_from_params(params)
-        if not isinstance(input, (Tf1PackageInfo, Tf2PackageInfo)):
+        if not isinstance(input, (Tf1PackageInfo, Tf2PackageInfo, KerasPackageInfo)):
             return None
         if quantize_type == QType.INT8_FULL:
             return None
@@ -80,19 +80,22 @@ class TfLiteConverter(Stage):
         set_shape = params["set_shape"]
 
         new_names = list(input.input_info.keys())
-        if isinstance(input, Tf1Package):
-            import tensorflow.compat.v1 as tf
+        import tensorflow as tf
+        if isinstance(input, KerasPackage):
+            h5_model_path = str(input.dir / input.model_file)
+            model = tf.keras.models.load_model(h5_model_path)
+            converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        elif isinstance(input, Tf1Package):
+            import tensorflow.compat.v1 as tf1
 
             input_tensors = {name: info.shape for (name, info) in input.input_info.items()}
-            converter = tf.lite.TFLiteConverter.from_frozen_graph(
+            converter = tf1.lite.TFLiteConverter.from_frozen_graph(
                 str(input.dir / input.model_file),
                 list(input.input_info.keys()),
                 list(input.output_info.keys()),
                 input_tensors,
             )
         elif isinstance(input, Tf2Package):
-            import tensorflow as tf
-
             saved_model_path = str(input.dir / input.model_dir)
             converter = None
             if set_shape is not SetShapeMode.OFF:
@@ -131,7 +134,7 @@ class TfLiteConverter(Stage):
             pass
         elif quantize_type is QType.FP16:
             converter.optimizations = [tf.lite.Optimize.DEFAULT]
-            converter.target_spec.supported_types = [tf.lite.constants.FLOAT16]
+            converter.target_spec.supported_types = [tf.float16]
         elif quantize_type is QType.INT8:
             make_dataset = params["make_dataset"]
             assert make_dataset is not None
@@ -141,11 +144,18 @@ class TfLiteConverter(Stage):
             assert preprocess is not None
 
             def representative_dataset_gen():
-                for image, _ in itertools.islice(dataset, samples):
-                    if not isinstance(image, torch.Tensor):
-                        image = torchvision.transforms.functional.to_tensor(image)
-                    preprocessed = preprocess(image, input.input_info)
-                    yield [preprocessed[input.input_info.get_by_index(0)[0]]]
+                if isinstance(dataset, tf.data.Dataset):
+                    for dat in dataset.take(samples):
+                        preprocessed = preprocess(dat['image'])
+                        yield [preprocessed]
+                else:
+                    import torch
+                    import torchvision.transforms.functional
+                    for image, _ in itertools.islice(dataset, samples):
+                        if not isinstance(image, torch.Tensor):
+                            image = torchvision.transforms.functional.to_tensor(image)
+                        preprocessed = preprocess(image, input.input_info)
+                        yield [preprocessed[input.input_info.get_by_index(0)[0]]]
 
             converter.optimizations = [tf.lite.Optimize.DEFAULT]
             converter.representative_dataset = representative_dataset_gen
