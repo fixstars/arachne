@@ -4,10 +4,12 @@ from typing import List, Tuple
 
 from arachne.device import get_device
 from arachne.pipeline.package.frontend import (
-    make_keras_package_from_module, make_tf1_package_from_concrete_func,
-    make_torchscript_package_from_script_module)
+    make_keras_package_from_module,
+    make_tf1_package_from_concrete_func,
+    make_torchscript_package_from_script_module,
+)
 from arachne.pipeline.runner import run_pipeline
-from arachne.pipeline.stage.registry import get_stage, stage_list, stage_candidate_list
+from arachne.pipeline.stage.registry import get_stage
 from arachne.pipeline.stage.stage import Parameter
 from arachne.types.indexed_ordered_dict import TensorInfoDict
 from arachne.types.tensor_info import TensorInfo
@@ -71,7 +73,9 @@ def compile_for_pytorch(
 
 
 # NOTE: model should be a tf.keras.Model
-def compile_for_keras(model, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str):
+def compile_for_keras(
+    model, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str
+):
     import tensorflow as tf
 
     assert isinstance(model, tf.keras.Model)
@@ -109,6 +113,7 @@ def compile_for_tf_concrete_function(
 ):
 
     from tensorflow.python.eager.function import ConcreteFunction
+
     assert isinstance(concrete_func, ConcreteFunction)
 
     compile_pipeline = []

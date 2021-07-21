@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import attr
+
 from arachne.types import TensorInfoDict
 from arachne.utils import make_artifact_dir
 

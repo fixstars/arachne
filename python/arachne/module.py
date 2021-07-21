@@ -1,17 +1,16 @@
 from typing import Callable, Union
 
+import tvm
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.contrib.graph_executor import GraphModule
 from tvm.contrib.tflite_runtime import TFLiteModule
-import tvm
 
 from .types import IndexedOrderedDict
 
 
 class RuntimeModule(object):
     def __init__(self, module: Union[GraphModule, TFLiteModule]):
-        assert isinstance(module, GraphModule) or isinstance(
-            module, TFLiteModule)
+        assert isinstance(module, GraphModule) or isinstance(module, TFLiteModule)
         self.module = module
 
     def set_inputs(self, inputs: IndexedOrderedDict, tvmdev: TVMDevice):
@@ -30,14 +29,10 @@ class RuntimeModule(object):
 
     def benchmark(self, tvmdev: TVMDevice, repeat: int) -> Callable:
         run_name = "invoke" if isinstance(self.module, TFLiteModule) else "run"
-        timer = self.module.module.time_evaluator(
-            run_name, tvmdev, 1, repeat=repeat)
+        timer = self.module.module.time_evaluator(run_name, tvmdev, 1, repeat=repeat)
         return timer
 
-    def get_outputs(
-        self,
-        output_info: IndexedOrderedDict
-    ) -> IndexedOrderedDict:
+    def get_outputs(self, output_info: IndexedOrderedDict) -> IndexedOrderedDict:
         outputs = IndexedOrderedDict()
         for i, name in enumerate(output_info.keys()):
             outputs[name] = self.module.get_output(i).asnumpy()

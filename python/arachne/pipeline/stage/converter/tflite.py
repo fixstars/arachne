@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Optional
 
 from arachne.pipeline.package import (
-    Package,
-    PackageInfo,
     KerasPackage,
     KerasPackageInfo,
+    Package,
+    PackageInfo,
     Tf1Package,
     Tf1PackageInfo,
     Tf2Package,
@@ -81,6 +81,7 @@ class TfLiteConverter(Stage):
 
         new_names = list(input.input_info.keys())
         import tensorflow as tf
+
         if isinstance(input, KerasPackage):
             h5_model_path = str(input.dir / input.model_file)
             model = tf.keras.models.load_model(h5_model_path)
@@ -146,11 +147,12 @@ class TfLiteConverter(Stage):
             def representative_dataset_gen():
                 if isinstance(dataset, tf.data.Dataset):
                     for dat in dataset.take(samples):
-                        preprocessed = preprocess(dat['image'])
+                        preprocessed = preprocess(dat["image"])
                         yield [preprocessed]
                 else:
                     import torch
                     import torchvision.transforms.functional
+
                     for image, _ in itertools.islice(dataset, samples):
                         if not isinstance(image, torch.Tensor):
                             image = torchvision.transforms.functional.to_tensor(image)

@@ -3,15 +3,26 @@ from typing import Optional
 
 import tvm.driver.tvmc as tvmc
 import tvm.driver.tvmc.frontends as tvmcfrontends
-from arachne.pipeline.package import (DarknetPackage, DarknetPackageInfo,
-                                      Package, PackageInfo, Tf1Package,
-                                      Tf1PackageInfo, TfLitePackage,
-                                      TfLitePackageInfo, TorchScriptPackage,
-                                      TorchScriptPackageInfo, TVMPackage,
-                                      TVMPackageInfo)
+
+from arachne.pipeline.package import (
+    DarknetPackage,
+    DarknetPackageInfo,
+    Package,
+    PackageInfo,
+    Tf1Package,
+    Tf1PackageInfo,
+    TfLitePackage,
+    TfLitePackageInfo,
+    TorchScriptPackage,
+    TorchScriptPackageInfo,
+    TVMPackage,
+    TVMPackageInfo,
+)
 from arachne.pipeline.package.keras import KerasPackage
-from arachne.pipeline.stage.utils import (get_target_from_params,
-                                          get_target_host_from_params)
+from arachne.pipeline.stage.utils import (
+    get_target_from_params,
+    get_target_host_from_params,
+)
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

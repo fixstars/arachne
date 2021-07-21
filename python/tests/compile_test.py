@@ -1,8 +1,9 @@
 import tempfile
 
+from torchvision import models
+
 import arachne.compile
 from arachne.ishape import InputSpec
-from torchvision import models
 
 
 def test_compile_for_pytorch():
@@ -16,6 +17,7 @@ def test_compile_for_pytorch():
             resnet18, [InputSpec(input_shape, "float32")], target_device, compile_pipeline, tmp_dir
         )
 
+
 def test_compile_for_keras():
     import tensorflow as tf
 
@@ -24,6 +26,7 @@ def test_compile_for_keras():
     compile_pipeline = [("tvm_compiler", {})]
     with tempfile.TemporaryDirectory() as tmp_dir:
         arachne.compile.compile_for_keras(mobilenet, target_device, compile_pipeline, tmp_dir)
+
 
 def test_compile_for_tf_concrete_function():
     import tensorflow as tf

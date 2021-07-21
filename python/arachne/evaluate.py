@@ -1,11 +1,11 @@
-import numpy as np
 import os
-import tempfile
 import tarfile
+import tempfile
+
+import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import tvm
-from tvm.driver import tvmc
 
 
 def evaluate(model, compiled_model_path, ds, hostname, port, target_device):
@@ -21,8 +21,7 @@ def evaluate(model, compiled_model_path, ds, hostname, port, target_device):
             t.extractall(tmp_dir)
 
             graph = open(os.path.join(tmp_dir, "mod.json")).read()
-            params = bytearray(
-                open(os.path.join(tmp_dir, "mod.params"), "rb").read())
+            params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
             session.upload(os.path.join(tmp_dir, "mod.so"))
             lib = session.load_module("mod.so")
 
@@ -35,5 +34,4 @@ def evaluate(model, compiled_model_path, ds, hostname, port, target_device):
             gmodule.set_input(0, input_tensor)
             gmodule.run()
             pred = gmodule.get_output(0)
-            model.compiled_metrics.metrics[0].update_state(
-                [label], pred.numpy())
+            model.compiled_metrics.metrics[0].update_state([label], pred.numpy())
