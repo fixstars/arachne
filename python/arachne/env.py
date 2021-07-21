@@ -11,6 +11,7 @@ class Env(object):
     MODEL_DIR = ROOT_DIR / ".models"
     BUILD_CACHE_DIR = ROOT_DIR / ".cache"
 
+
 if Env.ARTIFACT_DIR.exists():
     if Env.ARTIFACT_DIR.is_dir():
         shutil.rmtree(Env.ARTIFACT_DIR)

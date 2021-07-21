@@ -14,6 +14,7 @@ python = "^3.6.2"
 pytest = "^3.0"
 flake8 = "^3.9.2"
 black = "^21.6b0"
+pre-commit = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -35,3 +36,8 @@ exclude = '''
   )/
 )
 '''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["python/arachne"]

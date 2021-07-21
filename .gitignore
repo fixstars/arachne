@@ -5,6 +5,7 @@
 .keras/
 build*/
 __pycache__
+dist/
 
 .sudo_as_admin_successful
 
@@ -19,5 +20,4 @@ arachne-*.tar.gz
 __pycache__
 
 # VSCode
-.vscode
 .vscode-server

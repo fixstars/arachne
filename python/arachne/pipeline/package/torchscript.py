@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List
 
 import attr
+
 from arachne.types import QType
 
 from .package import Package, PackageInfo
