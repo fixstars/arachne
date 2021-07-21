@@ -4,18 +4,16 @@ version = "0.1.0"
 description = "A framework for compile and benchmark DNN inferences on the devices"
 authors = ["Akira Maruoka <akira.maruoka@fixstars.com>"]
 packages = [
-    { include = "python/arachne" },
+    { include = "arachne", from = "python"},
 ]
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
-torch = "^1.8.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 flake8 = "^3.9.2"
 black = "^21.6b0"
-torchvision = "^0.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

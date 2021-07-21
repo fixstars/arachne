@@ -39,7 +39,7 @@ In this tutorial, we try to compile SSD MobileNet V1 COCO pretrained model and b
 ### Compile a model for the device
 Compile the trained model.
 
-Please reference [compile test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/compile_test.py).  
+Please reference [compile test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/compile_test.py).
 
 TODO: More details
 
@@ -143,3 +143,20 @@ Execution time summary:
 ```
 </details>
 
+
+## Arachne pip package
+
+First, you have to create a persornal access token in https://gitlab.fixstars.com.
+Then, you can install/publish a python pkg by the following commands
+
+### Pip install
+
+```
+$ pip install arachne --index-url https://__token__:<your_personal_token>@gitlab.fixstars.com/api/v4/projects/1757/packages/pypi/simple
+```
+
+### Publish a new package
+
+```
+$ poetry publish --repository arachne -u <your_user_name> -p <your_access_token>
+```

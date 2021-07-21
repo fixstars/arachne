@@ -1,0 +1,3 @@
+[repositories]
+[repositories.arachne]
+url = "https://gitlab.fixstars.com/api/v4/projects/1757/packages/pypi"
