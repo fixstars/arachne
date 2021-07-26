@@ -4,7 +4,7 @@ from typing import List, Union
 from urllib.parse import urlparse
 
 from arachne.pipeline.package import (DarknetPackage, KerasPackage,
-                                      PyTorchPackage, Tf1Package, Tf2Package)
+                                      PyTorchPackage, Tf1Package, Tf2Package, TfLitePackage)
 from arachne.pipeline.package.torchscript import TorchScriptPackage
 from arachne.types.indexed_ordered_dict import TensorInfoDict
 from arachne.types.qtype import QType
@@ -104,6 +104,19 @@ def make_tf2_package_from_module(
         input_info=input_info,
         output_info=output_info,
         model_dir=Path(model_path.name),
+    )
+
+def make_tflite_package( model_url: str, input_info: TensorInfoDict, output_info: TensorInfoDict, output_dir: Path, qtype:QType, for_edgetpu:bool = False
+) -> TfLitePackage:
+    outputs = download(model_url, output_dir)
+
+    return TfLitePackage(
+        dir=output_dir,
+        input_info=input_info,
+        output_info=output_info,
+        model_file=Path(outputs[0].name),
+        qtype=qtype,
+        for_edgetpu=False
     )
 
 

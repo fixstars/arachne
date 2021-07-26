@@ -10,17 +10,19 @@ from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.autotvm.measure import request_remote
 from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
+from tvm.rpc.base import RPC_SESS_MASK
 from tvm.runtime.module import Module as TVMModule
 
-from .device import Device
-from .logger import Logger
-from .module import RuntimeModule
-from .types import IndexedOrderedDict
+from arachne.device import Device
+from arachne.logger import Logger
+from arachne.module import RuntimeModule
+from arachne.pipeline.package import Package, TfLitePackage, TVMPackage
+from arachne.types import IndexedOrderedDict
 
 logger = Logger.logger()
 
 
-def create_session(rpc_tracker: str, rpc_key: str) -> tvm.rpc.RPCSession:
+def create_session(rpc_tracker: Optional[str], rpc_key: Optional[str]) -> tvm.rpc.RPCSession:
     hostname, port = tvmccommon.tracker_host_port_from_cli(rpc_tracker)
 
     if hostname:
@@ -54,13 +56,11 @@ def create_tvmdev(device: str, session: tvm.rpc.RPCSession) -> TVMDevice:
     return tvmdev
 
 
-def open_module_file(
-    file: Path, session: tvm.rpc.RPCSession, device: Device
-) -> Tuple[str, bytearray, TVMModule]:
+def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[str, bytearray, TVMModule]:
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.debug("extracting module file %s", file)
-        t = tarfile.open(file)
-        t.extractall(tmp_dir)
+        with tarfile.open(file) as t:
+            t.extractall(tmp_dir)
         graph = open(os.path.join(tmp_dir, "mod.json")).read()
         params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
 
@@ -71,16 +71,24 @@ def open_module_file(
 
 
 def create_runtime(
-    file: Path, session: tvm.rpc.RPCSession, device: Device, tvmdev: TVMDevice, profile: bool
+    package: Package, session: tvm.rpc.RPCSession, device: Device, tvmdev: TVMDevice, profile: bool
 ) -> RuntimeModule:
-    if device.is_tflite:
-        with open(file, "rb") as model_fin:
-            module = tflite_runtime.create(model_fin.read(), tvmdev)
-    elif device.is_edgetpu:
-        with open(file, "rb") as model_fin:
-            module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target="edge_tpu")
-    else:
-        graph, params, lib = open_module_file(file, session, device)
+    if isinstance(package, TfLitePackage):
+        if (
+            tvmdev.device_type % RPC_SESS_MASK != 1 or package.for_edgetpu != device.is_edgetpu
+        ):  # device_type=1 is CPU
+            raise RuntimeError("This package cannot run on this device.")
+
+        runtime_target = "edge_tpu" if package.for_edgetpu else "cpu"
+        with open(package.dir / package.model_file, "rb") as model_fin:
+            module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target)
+    elif isinstance(package, TVMPackage):
+        if package.target != device.target:
+            logger.warn(
+                f"Package target({package.target}) and device target({device.target}) is mismatch."
+            )
+
+        graph, params, lib = open_module_file(package.dir / package.package_file, session)
 
         if profile:
             logger.debug("creating runtime with profiling enabled")
@@ -92,12 +100,14 @@ def create_runtime(
 
         logger.debug("load params into the runtime module")
         module.load_params(params)
+    else:
+        raise RuntimeError(f"This package ({package.__class__.__name__}) cannot run.")
 
     return RuntimeModule(module)
 
 
 def runner_init(
-    module_file: Path,
+    package: Package,
     device: Device,
     rpc_tracker: Optional[str] = None,
     rpc_key: Optional[str] = None,
@@ -107,7 +117,7 @@ def runner_init(
 
     tvmdev = create_tvmdev(device.tvmdev, session)
 
-    module = create_runtime(module_file, session, device, tvmdev, profile)
+    module = create_runtime(package, session, device, tvmdev, profile)
 
     return module, tvmdev
 
