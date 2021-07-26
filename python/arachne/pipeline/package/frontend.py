@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Union
 from urllib.parse import urlparse
 
-
 from tvm.contrib.download import download as tvm_download
 
 from arachne.pipeline.package import (
