@@ -124,7 +124,7 @@ def make_tflite_package( model_url: str, input_info: TensorInfoDict, output_info
         output_info=output_info,
         model_file=Path(outputs[0].name),
         qtype=qtype,
-        for_edgetpu=False
+        for_edgetpu=for_edgetpu
     )
 
 

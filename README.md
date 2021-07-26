@@ -1,8 +1,33 @@
-# Arachne
+# Arachne Core Python API
 
 A framework for compiling, evaluation and export DNN models for edge devices.
 
-## Dependencies
+## Structure of this Project
+
+### `python/`
+This directory contains core arachne apis that will be exported as a pip package.
+Test files for each api are also placed in this directory.
+
+### `examples/`
+To understand how to use arachne apis, we provide some example scripts in here.
+
+### `docker/`
+
+Note that, the arachne pip package iteself does not claim any dnn framework packages (such as tensorflow, torch, and so on) as requirements.
+This is because what dnn frameworks are needed is depend on the users.
+For example, a user who only use the tensorflow does not expect that a pytorch package will be installed by the arachne pip package.
+So, we assume that users of arachne have the required packages pre-installed.
+
+However, if you want a sandbox develop environment, you can use `docker/Dockerfile`.
+This file is used to build a docker image including all possible libraries/packages to be used by arachne apis.
+
+### `device/`
+
+This directory contains install & setup scripts for using the tvm runtime and rpc environment at edge devices
+
+## Using Arachne Apis in Docker Environment
+
+### Dependencies
 * Host
     * Ubuntu 18.04 64-bit
     * Docker >= 19.03
@@ -13,7 +38,7 @@ A framework for compiling, evaluation and export DNN models for edge devices.
     * Coral Dev Board
       * Mendel Linux == 5.2
 
-## Installation
+### Step 1: Docker Build & Install tvm
 ```sh
 cd {path-to-arachne-repository}
 docker build -t arachne:latest -f docker/Dockerfile docker
@@ -32,19 +57,11 @@ After this, check installing tvm
 python3 -c "import tvm"
 ```
 
-## Getting Started
-In this tutorial, we try to compile SSD MobileNet V1 COCO pretrained model and benchmark on RaspberryPi 4.
+Now, you are ready to run `examples/*.py` at the host PC.
 
+### Step 2: Setup RPC Environment (optional)
 
-### Compile a model for the device
-Compile the trained model.
-
-Please reference [compile test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/compile_test.py).
-
-TODO: More details
-
-### Setup for benchmark performances of the model on the device
-By through TVM RPC execution, you can run benchmarks on remote devices from the host PC.
+By through TVM RPC execution, you can run dnn models on remote devices from the host PC.
 Using TVM RPC execution, you needs several settings.
 
 #### Start RPC tracker in the host PC
@@ -64,7 +81,6 @@ source ./device/script/setup/setup_jetson_nano.sh
 ```
 
 #### Confirm regitrations RPC server into the RPC tracker
-Confirm the registration RPC server into the RPC tracker.
 
 Run the following command in the host.
 
@@ -94,57 +110,9 @@ jetson-nano           1      1        0
 ```
 </details>
 
-### Benchmark performances of the model on the device
-Benchmark performances of the compiled model.
-
-Please reference [benchmark test codes](https://gitlab.fixstars.com/arachne/arachne-mvp/-/blob/master/python/tests/benchmark_test.py).
-
-TODO: More details
-
-
-
-```sh
-python3 python/arachne/benchmark.py --package=raspi4.tar.gz --device=raspi4 --rpc-tracker=localhost:8888 --rpc-key=raspi4
-```
-
-<details>
-<summary>Output example running on Jetson Xavier NX</summary>
-
-```
-Node Name                            Ops                                  Time(us)  Time(%)  Shape          Inputs  Outputs
----------                            ---                                  --------  -------  -----          ------  -------
-tensorrt_0                           tensorrt_0                           7239.27   77.228   (1, 91, 1917)  1       2
-tensorrt_0                           tensorrt_0                           7239.27   77.228   (1, 1917, 4)   1       2
-fused_vision_multibox_transform_loc  fused_vision_multibox_transform_loc  946.83    10.101   (1, 1917, 6)   3       2
-fused_vision_multibox_transform_loc  fused_vision_multibox_transform_loc  946.83    10.101   (1,)           3       2
-tensorrt_97                          tensorrt_97                          318.178   3.394    (1, 10, 4)     4       1
-tensorrt_95                          tensorrt_95                          279.617   2.983    (1, 7668)      4       1
-tensorrt_96                          tensorrt_96                          149.562   1.596    (1, 10, 6)     1       1
-tensorrt_98                          tensorrt_98                          120.618   1.287    (1, 10)        1       1
-tensorrt_99                          tensorrt_99                          108.717   1.16     (1, 10)        1       1
-fused_vision_non_max_suppression     fused_vision_non_max_suppression     87.546    0.934    (1, 1917, 6)   4       1
-fused_split_2                        fused_split_2                        50.272    0.536    (1, 1917, 1)   2       4
-fused_split_2                        fused_split_2                        50.272    0.536    (1, 1917, 1)   2       4
-fused_split_2                        fused_split_2                        50.272    0.536    (1, 1917, 1)   2       4
-fused_split_2                        fused_split_2                        50.272    0.536    (1, 1917, 1)   2       4
-fused_vision_get_valid_counts        fused_vision_get_valid_counts        38.288    0.408    (1,)           2       3
-fused_vision_get_valid_counts        fused_vision_get_valid_counts        38.288    0.408    (1, 1917, 6)   2       3
-fused_vision_get_valid_counts        fused_vision_get_valid_counts        38.288    0.408    (1, 1917)      2       3
-fused_split_1                        fused_split_1                        35.04     0.374    (1, 10, 1)     1       6
-fused_split_1                        fused_split_1                        35.04     0.374    (1, 10, 1)     1       6
-fused_split_1                        fused_split_1                        35.04     0.374    (1, 10, 1)     1       6
-fused_split_1                        fused_split_1                        35.04     0.374    (1, 10, 1)     1       6
-fused_split_1                        fused_split_1                        35.04     0.374    (1, 10, 1)     1       6
-fused_split_1                        fused_split_1                        35.04     0.374    (1, 10, 1)     1       6
-Total_time                           -                                    9373.938  -        -              -       -
-Execution time summary:
- mean (s)   max (s)    min (s)    std (s)
- 0.00881    0.00918    0.00864    0.00016
-```
-</details>
-
-
-## Arachne pip package
+## Arachne pip package (WIP)
+NOTE: this project is under construct, so there is no a stable pip package yet.
+We recommend use arachne apis in the dockerized environment.
 
 First, you have to create a persornal access token in https://gitlab.fixstars.com.
 Then, you can install/publish a python pkg by the following commands
