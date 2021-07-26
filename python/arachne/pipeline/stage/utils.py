@@ -3,6 +3,7 @@ import importlib.util
 from typing import Any, Callable, List, Optional, Tuple
 
 import torch
+
 from arachne.types import ArachneDataset, IndexedOrderedDict, QType
 
 from .stage import Parameter

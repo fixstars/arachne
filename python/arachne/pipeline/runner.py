@@ -27,7 +27,10 @@ def validate_pipeline(
 
 
 def run_pipeline(
-    pipeline: Pipeline, input: Package, default_params: Parameter = {}, work_dir: str = None,
+    pipeline: Pipeline,
+    input: Package,
+    default_params: Parameter = {},
+    work_dir: str = None,
 ) -> List[Package]:
     if not validate_pipeline(pipeline, input, default_params):
         raise ValueError("Pipeline definition is invalid.")

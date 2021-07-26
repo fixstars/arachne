@@ -1,0 +1,29 @@
+// How to use
+// 1. Build and run from CLI
+// 2. Run VSCode command: "Remote-Containers: Attach to Runnning Container"
+// 3. Remote-Containers: Open Container Configuration File
+// 4. Paste this contents.
+{
+    "name": "arachne",
+    "workspaceFolder": "/workspace",
+    "remoteUser": "foo", // Please set your username
+    "forwardPorts": [
+        8888
+    ],
+    "extensions": [
+        "GitLab.gitlab-workflow",
+        "ms-azuretools.vscode-docker",
+        "MS-CEINTL.vscode-language-pack-ja",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "tqchen.ffi-navigator",
+        "twxs.cmake",
+        "yzhang.markdown-all-in-one"
+    ],
+    "settings": {
+        "terminal.integrated.shell.linux": "/usr/bin/zsh",
+    }
+}

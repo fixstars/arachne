@@ -9,6 +9,9 @@ import docker
 import numpy as np
 import torch
 import torchvision.transforms.functional
+import tvm.driver.tvmc.frontends as tvmcfrontends
+from docker.models.containers import ExecResult
+
 from arachne.logger import Logger
 from arachne.pipeline.package import (
     DarknetPackage,
@@ -31,9 +34,6 @@ from arachne.pipeline.stage.utils import (
     get_target_host_from_params,
 )
 from arachne.types import ArachneDataset, QType
-from docker.models.containers import ExecResult
-
-import tvm.driver.tvmc.frontends as tvmcfrontends
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
@@ -117,20 +117,18 @@ class VitisAICompiler(Stage):
 
     @staticmethod
     def _copy_files_from_docker_container(client, container, output_name, output_dir):
-        tarpath_in_container = VitisAICompiler._container_work_path + '/' + output_name
-        relaypath_in_conatiner = tarpath_in_container + '.relay'
+        tarpath_in_container = VitisAICompiler._container_work_path + "/" + output_name
+        relaypath_in_conatiner = tarpath_in_container + ".relay"
         for filepath_in_container in [tarpath_in_container, relaypath_in_conatiner]:
             with tempfile.TemporaryDirectory() as dname:
-                tarfilename = dname + 'get.tar'
-                f = open(tarfilename, 'wb')
-                bits, stat = client.api.get_archive(
-                    container.id, filepath_in_container)
+                tarfilename = dname + "get.tar"
+                f = open(tarfilename, "wb")
+                bits, stat = client.api.get_archive(container.id, filepath_in_container)
                 for chunk in bits:
                     f.write(chunk)
                 f.close()
-                with tarfile.open(tarfilename, mode='r') as tf:
+                with tarfile.open(tarfilename, mode="r") as tf:
                     tf.extractall(path=output_dir)
-        
 
     @staticmethod
     def _get_vitis_ai_command(target, target_host, q_samples, output_name, input_info):

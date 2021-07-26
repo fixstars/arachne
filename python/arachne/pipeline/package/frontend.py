@@ -3,13 +3,21 @@ from pathlib import Path
 from typing import List, Union
 from urllib.parse import urlparse
 
-from arachne.pipeline.package import (DarknetPackage, KerasPackage,
-                                      PyTorchPackage, Tf1Package, Tf2Package, TfLitePackage)
+
+from tvm.contrib.download import download as tvm_download
+
+from arachne.pipeline.package import (
+    DarknetPackage,
+    KerasPackage,
+    PyTorchPackage,
+    Tf1Package,
+    Tf2Package,
+    TfLitePackage,
+)
 from arachne.pipeline.package.torchscript import TorchScriptPackage
 from arachne.types.indexed_ordered_dict import TensorInfoDict
 from arachne.types.qtype import QType
 from arachne.types.tensor_info import TensorInfo
-from tvm.contrib.download import download as tvm_download
 
 
 def download(model_urls: Union[List[str], str], output_dir: Path) -> List[Path]:
@@ -40,8 +48,9 @@ def make_tf1_package(
 
 def make_tf1_package_from_concrete_func(cfunc, output_dir: Path) -> Tf1Package:
     import tensorflow as tf
-    from tensorflow.python.framework.convert_to_constants import \
-        convert_variables_to_constants_v2_as_graph
+    from tensorflow.python.framework.convert_to_constants import (
+        convert_variables_to_constants_v2_as_graph,
+    )
 
     frozen_model, graph_def = convert_variables_to_constants_v2_as_graph(cfunc)
 
@@ -54,12 +63,12 @@ def make_tf1_package_from_concrete_func(cfunc, output_dir: Path) -> Tf1Package:
 
     input_info = TensorInfoDict()
     for input in frozen_model.inputs:
-        name = input.name.replace(':0', '')
+        name = input.name.replace(":0", "")
         input_info[name] = TensorInfo(shape=input.shape.as_list(), dtype=input.dtype.name)
 
     output_info = TensorInfoDict()
     for output in frozen_model.outputs:
-        name = output.name.replace(':0', '')
+        name = output.name.replace(":0", "")
         output_info[name] = TensorInfo(shape=output.shape.as_list(), dtype=output.dtype.name)
 
     return Tf1Package(

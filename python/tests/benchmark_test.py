@@ -1,10 +1,10 @@
-import os
 import tempfile
+
+from torchvision import models
 
 import arachne.benchmark
 import arachne.compile
 from arachne.ishape import InputSpec
-from torchvision import models
 
 
 def test_benchmark_for_pytorch():

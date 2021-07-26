@@ -112,8 +112,9 @@ def benchmark_for_tf_concrete_function(
 
     assert isinstance(concrete_func, ConcreteFunction)
 
-    from tensorflow.python.framework.convert_to_constants import \
-        convert_variables_to_constants_v2_as_graph
+    from tensorflow.python.framework.convert_to_constants import (
+        convert_variables_to_constants_v2_as_graph,
+    )
 
     frozen_model, graph_def = convert_variables_to_constants_v2_as_graph(concrete_func)
 
