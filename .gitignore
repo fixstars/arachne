@@ -6,6 +6,7 @@
 build*/
 __pycache__
 dist/
+examples/out
 
 .sudo_as_admin_successful
 
