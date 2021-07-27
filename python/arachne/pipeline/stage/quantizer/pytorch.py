@@ -7,7 +7,6 @@ import torch.jit
 import torch.nn
 import torch.quantization
 import torchvision.transforms.functional
-
 from arachne.pipeline.package import (
     Package,
     PackageInfo,
@@ -54,12 +53,15 @@ class PyTorchQuantizer(Stage):
 
     @staticmethod
     def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        quantize_type = get_qtype_from_params(params)
+        params = PyTorchQuantizer.extract_parameters(params)
+        quantize_type = params["qtype"]
         if not isinstance(input, PyTorchPackageInfo):
             return None
         if quantize_type not in (QType.FP32, QType.INT8):
             return None
         if quantize_type == QType.INT8 and not input.quantizable:
+            return None
+        if params["make_dataset"] is None or params["preprocess"] is None:
             return None
 
         return TorchScriptPackageInfo(qtype=quantize_type)

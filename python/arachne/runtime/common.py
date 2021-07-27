@@ -10,14 +10,14 @@ from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.autotvm.measure import request_remote
 from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
-from tvm.rpc.base import RPC_SESS_MASK
+from tvm.driver.tvmc.common import parse_target
 from tvm.runtime.module import Module as TVMModule
 
-from arachne.device import Device
 from arachne.logger import Logger
-from arachne.module import RuntimeModule
-from arachne.pipeline.package import Package, TfLitePackage, TVMPackage
+from arachne.pipeline.package import Package, TFLitePackage, TVMPackage
 from arachne.types import IndexedOrderedDict
+
+from .module import RuntimeModule, TFLiteRuntimeModule, TVMRuntimeModule
 
 logger = Logger.logger()
 
@@ -44,16 +44,7 @@ def create_session(rpc_tracker: Optional[str], rpc_key: Optional[str]) -> tvm.rp
 def create_tvmdev(device: str, session: tvm.rpc.RPCSession) -> TVMDevice:
     logger.debug("device is %s", device)
 
-    # TODO(Maruoka): Support more devices
-    if device == "cuda":
-        tvmdev = session.cuda()
-    elif device == "cl":
-        tvmdev = session.cl()
-    else:
-        assert device == "cpu"
-        tvmdev = session.cpu()
-
-    return tvmdev
+    return session.device(device)
 
 
 def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[str, bytearray, TVMModule]:
@@ -70,24 +61,17 @@ def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[str, byte
     return graph, params, lib
 
 
-def create_runtime(
-    package: Package, session: tvm.rpc.RPCSession, device: Device, tvmdev: TVMDevice, profile: bool
-) -> RuntimeModule:
-    if isinstance(package, TfLitePackage):
-        if (
-            tvmdev.device_type % RPC_SESS_MASK != 1 or package.for_edgetpu != device.is_edgetpu
-        ):  # device_type=1 is CPU
-            raise RuntimeError("This package cannot run on this device.")
-
+def create_runtime(package: Package, session: tvm.rpc.RPCSession, profile: bool) -> RuntimeModule:
+    if isinstance(package, TFLitePackage):
+        tvmdev = create_tvmdev("cpu", session)
         runtime_target = "edge_tpu" if package.for_edgetpu else "cpu"
         with open(package.dir / package.model_file, "rb") as model_fin:
             module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target)
+        return TFLiteRuntimeModule(module, tvmdev, package)
     elif isinstance(package, TVMPackage):
-        if package.target != device.target:
-            logger.warn(
-                f"Package target({package.target}) and device target({device.target}) is mismatch."
-            )
-
+        targets = parse_target(package.target)
+        target = targets[-1]["raw"]
+        tvmdev = create_tvmdev(target, session)
         graph, params, lib = open_module_file(package.dir / package.package_file, session)
 
         if profile:
@@ -100,34 +84,29 @@ def create_runtime(
 
         logger.debug("load params into the runtime module")
         module.load_params(params)
+        return TVMRuntimeModule(module, tvmdev, package)
     else:
         raise RuntimeError(f"This package ({package.__class__.__name__}) cannot run.")
-
-    return RuntimeModule(module)
 
 
 def runner_init(
     package: Package,
-    device: Device,
     rpc_tracker: Optional[str] = None,
     rpc_key: Optional[str] = None,
     profile: bool = False,
-) -> Tuple[RuntimeModule, TVMDevice]:
+) -> RuntimeModule:
     session = create_session(rpc_tracker, rpc_key)
 
-    tvmdev = create_tvmdev(device.tvmdev, session)
+    module = create_runtime(package, session, profile)
 
-    module = create_runtime(package, session, device, tvmdev, profile)
-
-    return module, tvmdev
+    return module
 
 
 def run_module(
     module: RuntimeModule,
-    tvmdev: TVMDevice,
     inputs: IndexedOrderedDict,
     output_info: IndexedOrderedDict,
 ) -> IndexedOrderedDict:
-    module.set_inputs(inputs, tvmdev)
+    module.set_inputs(inputs)
     module.run()
     return module.get_outputs(output_info)

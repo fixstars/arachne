@@ -7,12 +7,12 @@ from .package import Package, PackageInfo
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class Tf1PackageInfo(PackageInfo):
+class TF1PackageInfo(PackageInfo):
     pass
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class Tf1Package(Tf1PackageInfo, Package):
+class TF1Package(TF1PackageInfo, Package):
     model_file: Path
 
     @property

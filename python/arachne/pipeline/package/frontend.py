@@ -9,12 +9,12 @@ from arachne.pipeline.package import (
     DarknetPackage,
     KerasPackage,
     PyTorchPackage,
-    Tf1Package,
-    Tf2Package,
-    TfLitePackage,
+    TF1Package,
+    TF2Package,
+    TFLitePackage,
 )
 from arachne.pipeline.package.torchscript import TorchScriptPackage
-from arachne.types.indexed_ordered_dict import TensorInfoDict
+from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.types.qtype import QType
 from arachne.types.tensor_info import TensorInfo
 
@@ -34,10 +34,10 @@ def download(model_urls: Union[List[str], str], output_dir: Path) -> List[Path]:
 
 def make_tf1_package(
     model_url: str, input_info: TensorInfoDict, output_info: TensorInfoDict, output_dir: Path
-) -> Tf1Package:
+) -> TF1Package:
     outputs = download(model_url, output_dir)
 
-    return Tf1Package(
+    return TF1Package(
         dir=output_dir,
         input_info=input_info,
         output_info=output_info,
@@ -45,7 +45,7 @@ def make_tf1_package(
     )
 
 
-def make_tf1_package_from_concrete_func(cfunc, output_dir: Path) -> Tf1Package:
+def make_tf1_package_from_concrete_func(cfunc, output_dir: Path) -> TF1Package:
     import tensorflow as tf
     from tensorflow.python.framework.convert_to_constants import (
         convert_variables_to_constants_v2_as_graph,
@@ -60,17 +60,17 @@ def make_tf1_package_from_concrete_func(cfunc, output_dir: Path) -> Tf1Package:
         as_text=False,
     )
 
-    input_info = TensorInfoDict()
+    input_info: TensorInfoDict = IndexedOrderedDict()
     for input in frozen_model.inputs:
         name = input.name.replace(":0", "")
         input_info[name] = TensorInfo(shape=input.shape.as_list(), dtype=input.dtype.name)
 
-    output_info = TensorInfoDict()
+    output_info: TensorInfoDict = IndexedOrderedDict()
     for output in frozen_model.outputs:
         name = output.name.replace(":0", "")
         output_info[name] = TensorInfo(shape=output.shape.as_list(), dtype=output.dtype.name)
 
-    return Tf1Package(
+    return TF1Package(
         dir=output_dir,
         input_info=input_info,
         output_info=output_info,
@@ -84,13 +84,13 @@ def make_tf2_package(
     output_info: TensorInfoDict,
     output_dir: Path,
     model_dir: str = "saved_model",
-) -> Tf2Package:
+) -> TF2Package:
     outputs = download(model_url, output_dir)
 
     with tarfile.open(outputs[0], "r:gz") as tar:
         tar.extractall(output_dir)
 
-    return Tf2Package(
+    return TF2Package(
         dir=output_dir,
         input_info=input_info,
         output_info=output_info,
@@ -101,30 +101,37 @@ def make_tf2_package(
 # NOTE: model should be a tf.Module
 def make_tf2_package_from_module(
     model, input_info: TensorInfoDict, output_info: TensorInfoDict, output_dir: Path
-) -> Tf2Package:
+) -> TF2Package:
     import tensorflow as tf
 
     model_path = output_dir / "saved_model"
     tf.saved_model.save(model, str(model_path))
 
-    return Tf2Package(
+    return TF2Package(
         dir=output_dir,
         input_info=input_info,
         output_info=output_info,
         model_dir=Path(model_path.name),
     )
 
-def make_tflite_package( model_url: str, input_info: TensorInfoDict, output_info: TensorInfoDict, output_dir: Path, qtype:QType, for_edgetpu:bool = False
-) -> TfLitePackage:
+
+def make_tflite_package(
+    model_url: str,
+    input_info: TensorInfoDict,
+    output_info: TensorInfoDict,
+    output_dir: Path,
+    qtype: QType,
+    for_edgetpu: bool = False,
+) -> TFLitePackage:
     outputs = download(model_url, output_dir)
 
-    return TfLitePackage(
+    return TFLitePackage(
         dir=output_dir,
         input_info=input_info,
         output_info=output_info,
         model_file=Path(outputs[0].name),
         qtype=qtype,
-        for_edgetpu=for_edgetpu
+        for_edgetpu=for_edgetpu,
     )
 
 
@@ -134,11 +141,11 @@ def make_keras_package_from_module(model, output_dir: Path) -> KerasPackage:
     h5_path = output_dir / (model.name + ".h5")
     model.save(h5_path)
 
-    input_info = TensorInfoDict()
+    input_info = IndexedOrderedDict()
     for inp in model.inputs:
         input_info[inp._name] = TensorInfo([1] + inp.shape.as_list()[1:])
 
-    output_info = TensorInfoDict()
+    output_info = IndexedOrderedDict()
     for out in model.outputs:
         output_info[out._name] = TensorInfo([1] + out.shape.as_list()[1:])
 

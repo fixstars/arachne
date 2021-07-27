@@ -60,3 +60,7 @@ RUN . $VAI_ROOT/conda/etc/profile.d/conda.sh && \
     bash /install/install_pyxir.sh && bash /install/install_tvm_vai.sh
 
 ENV TVM_LIBRARY_PATH=/tvm/
+
+# Disable cache (#81)
+ARG CACHEBUST=0
+RUN :

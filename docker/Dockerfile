@@ -74,3 +74,7 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/compact:${LD_LIBRARY_P
 ENV TVM_LIBRARY_PATH=${workspace}/build_tvm
 ENV TF_CPP_MIN_LOG_LEVEL 3
 ENV TVM_DARKNET_LIB_DIR=/usr/lib
+
+# Disable cache (#81)
+ARG CACHEBUST=0
+RUN :

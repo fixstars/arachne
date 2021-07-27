@@ -1,5 +1,6 @@
-from typing import List, Set, Type
+from typing import Iterable, List, Set, Type
 
+from arachne.device import Target, TVMCTarget
 from arachne.logger import Logger
 from arachne.utils import make_artifact_dir
 
@@ -48,35 +49,71 @@ def run_pipeline(
     return package_list
 
 
-def make_pipeline_candidate(
+def _make_pipeline_candidate(
     input: PackageInfo,
-    targets: List[PackageInfo],
-    base_params: Parameter = {},
+    target: Target,
+    override_params: Parameter = {},
     exclude: Set[Type[Stage]] = set(),
 ) -> List[Pipeline]:
-    def match_package(input: PackageInfo, targets: List[PackageInfo]) -> bool:
-        for target in targets:
-            if input == target:
-                return True
-        return False
-
-    result: List[Pipeline] = []
+    candidate: List[Pipeline] = []
     for stage, params in stage_candidate_list():
         if stage in exclude:
             continue
 
-        params = dict(base_params, **params)
+        params = {**params, **override_params}
         output = stage.get_output_info(input, params)
         if output is None:
             continue
 
         base_pipeline: Pipeline = [(stage, params)]
-        if match_package(output, targets):
-            result.append(base_pipeline)
+        if target.validate_package(output):
+            candidate.append(base_pipeline)
 
         exclude_ = exclude.copy()
         exclude_.add(stage)
-        for pipeline in make_pipeline_candidate(output, targets, base_params, exclude_):
-            result.append(base_pipeline + pipeline)
+        for pipeline in _make_pipeline_candidate(output, target, override_params, exclude_):
+            candidate.append(base_pipeline + pipeline)
 
-    return result
+    return candidate
+
+
+def make_params_for_target(target: Target) -> Parameter:
+    params: Parameter = {"_quantizer_qtype": target.default_qtype}
+    if isinstance(target, TVMCTarget):
+        params["_compiler_target"] = target.target
+        params["_compiler_target_host"] = target.target_host
+
+    return params
+
+
+# def make_base_params(
+#     preprocess: Callable[[torch.Tensor, IndexedOrderedDict], IndexedOrderedDict],
+#     make_dataset: Callable[[], ArachneDataset],
+# ) -> Parameter:
+#     return {"_quantizer_preprocess": preprocess, "_quantizer_make_dataset": make_dataset}
+
+
+def make_pipeline_candidate(
+    input: PackageInfo,
+    targets: Iterable[Target],
+    override_params: Parameter = {},
+    exclude: Set[Type[Stage]] = set(),
+) -> List[Pipeline]:
+    candidate: List[Pipeline] = []
+    for target in targets:
+        params = {**make_params_for_target(target), **override_params}
+        candidate += _make_pipeline_candidate(input, target, params, exclude)
+
+    # remove duplication
+    final_candidate: List[Pipeline] = []
+    extracted_pipeline_list: List[Pipeline] = []
+    for pipeline in candidate:
+        extracted_pipeline = [
+            (stage, stage.extract_parameters(params)) for stage, params in pipeline
+        ]
+        if extracted_pipeline in extracted_pipeline_list:
+            continue
+        final_candidate.append(pipeline)
+        extracted_pipeline_list.append(extracted_pipeline)
+
+    return final_candidate
