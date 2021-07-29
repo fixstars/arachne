@@ -7,8 +7,6 @@ from typing import Optional
 
 import docker
 import numpy as np
-import torch
-import torchvision.transforms.functional
 import tvm.driver.tvmc.frontends as tvmcfrontends
 from docker.models.containers import ExecResult
 
@@ -51,6 +49,9 @@ class VitisAICompiler(Stage):
 
     @staticmethod
     def _save_calib_inputs(dataset, preprocess, input_info, q_samples, output_dir):
+        import torch
+        import torchvision.transforms.functional
+
         # currently assume only one input
         data = []
         for image, _ in itertools.islice(dataset, q_samples):
