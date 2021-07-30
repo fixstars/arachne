@@ -9,13 +9,13 @@ from .package import Package, PackageInfo
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class TfLitePackageInfo(PackageInfo):
+class TFLitePackageInfo(PackageInfo):
     qtype: QType
     for_edgetpu: bool
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class TfLitePackage(TfLitePackageInfo, Package):
+class TFLitePackage(TFLitePackageInfo, Package):
     model_file: Path
 
     @property

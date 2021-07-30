@@ -8,12 +8,12 @@ from arachne.pipeline.package import (
     KerasPackageInfo,
     Package,
     PackageInfo,
-    Tf1Package,
-    Tf1PackageInfo,
-    Tf2Package,
-    Tf2PackageInfo,
-    TfLitePackage,
-    TfLitePackageInfo,
+    TF1Package,
+    TF1PackageInfo,
+    TF2Package,
+    TF2PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
 )
 from arachne.pipeline.stage.utils import (
     get_make_dataset_from_params,
@@ -33,20 +33,24 @@ class SetShapeMode(Enum):
     AUTO = "auto"
 
 
-class TfLiteConverter(Stage):
+class TFLiteConverter(Stage):
     @staticmethod
     def get_name() -> str:
         return "tflite_converter"
 
     @staticmethod
     def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        quantize_type = get_qtype_from_params(params)
-        if not isinstance(input, (Tf1PackageInfo, Tf2PackageInfo, KerasPackageInfo)):
+        params = TFLiteConverter.extract_parameters(params)
+        quantize_type = params["qtype"]
+        if not isinstance(input, (KerasPackageInfo, TF1PackageInfo, TF2PackageInfo)):
             return None
-        if quantize_type == QType.INT8_FULL:
+        if params["qtype"] == QType.INT8_FULL:
             return None
+        if params["qtype"] != QType.FP32:
+            if params["make_dataset"] is None or params["preprocess"] is None:
+                return None
 
-        return TfLitePackageInfo(qtype=quantize_type, for_edgetpu=False)
+        return TFLitePackageInfo(qtype=quantize_type, for_edgetpu=False)
 
     @staticmethod
     def extract_parameters(params: Parameter) -> Parameter:
@@ -74,7 +78,7 @@ class TfLiteConverter(Stage):
 
     @staticmethod
     def process(input: Package, params: Parameter, output_dir: Path) -> Package:
-        params = TfLiteConverter.extract_parameters(params)
+        params = TFLiteConverter.extract_parameters(params)
         quantize_type = params["qtype"]
         samples = params["qsample"]
         set_shape = params["set_shape"]
@@ -86,7 +90,7 @@ class TfLiteConverter(Stage):
             h5_model_path = str(input.dir / input.model_file)
             model = tf.keras.models.load_model(h5_model_path)
             converter = tf.lite.TFLiteConverter.from_keras_model(model)
-        elif isinstance(input, Tf1Package):
+        elif isinstance(input, TF1Package):
             import tensorflow.compat.v1 as tf1
 
             input_tensors = {name: info.shape for (name, info) in input.input_info.items()}
@@ -96,7 +100,7 @@ class TfLiteConverter(Stage):
                 list(input.output_info.keys()),
                 input_tensors,
             )
-        elif isinstance(input, Tf2Package):
+        elif isinstance(input, TF2Package):
             saved_model_path = str(input.dir / input.model_dir)
             converter = None
             if set_shape is not SetShapeMode.OFF:
@@ -126,7 +130,7 @@ class TfLiteConverter(Stage):
                 converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_path)
         else:
             raise RuntimeError(
-                f"The type of input package must be Tf1Package or Tf2Package, but it is {input.__class__.__name__}"
+                f"The type of input package must be TF1Package or TF2Package, but it is {input.__class__.__name__}"
             )
 
         converter.allow_custom_ops = True
@@ -180,7 +184,7 @@ class TfLiteConverter(Stage):
             [(new_name, info) for new_name, info in zip(new_names, input.input_info.values())]
         )
 
-        return TfLitePackage(
+        return TFLitePackage(
             dir=output_dir,
             input_info=new_input_info,
             output_info=input.output_info,
@@ -190,7 +194,7 @@ class TfLiteConverter(Stage):
         )
 
 
-register_stage(TfLiteConverter)
+register_stage(TFLiteConverter)
 
-register_stage_candidate(TfLiteConverter, {"qtype": "fp32"})
-register_stage_candidate(TfLiteConverter, {"qtype": "int8"})
+register_stage_candidate(TFLiteConverter, {"qtype": "fp32"})
+register_stage_candidate(TFLiteConverter, {"qtype": "int8"})

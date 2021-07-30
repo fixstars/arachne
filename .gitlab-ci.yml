@@ -29,7 +29,7 @@ build-image-base:
   before_script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
   script:
-    - docker build -t ${DOCKER_TEST_IMAGE} -f docker/Dockerfile docker
+    - docker build -t ${DOCKER_TEST_IMAGE} -f docker/Dockerfile --build-arg CACHEBUST=$(date +%s.%N) docker
     - docker push ${DOCKER_TEST_IMAGE}
 
 build-image-rpc-tracker:
@@ -54,7 +54,7 @@ build-image-vai:
   before_script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
   script:
-    - docker build -t ${DOCKER_VAI_TEST_IMAGE} -f docker/Dockerfile.vitis_ai .
+    - docker build -t ${DOCKER_VAI_TEST_IMAGE} -f docker/Dockerfile.vitis_ai --build-arg CACHEBUST=$(date +%s.%N) .
     - docker push ${DOCKER_VAI_TEST_IMAGE}
 #
 # 2. Build TVM

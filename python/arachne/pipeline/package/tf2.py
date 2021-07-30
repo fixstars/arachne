@@ -7,12 +7,12 @@ from .package import Package, PackageInfo
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class Tf2PackageInfo(PackageInfo):
+class TF2PackageInfo(PackageInfo):
     pass
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class Tf2Package(Tf2PackageInfo, Package):
+class TF2Package(TF2PackageInfo, Package):
     model_dir: Path
 
     @property
