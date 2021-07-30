@@ -2,11 +2,6 @@ import itertools
 from pathlib import Path
 from typing import Callable, Optional
 
-import torch
-import torch.jit
-import torch.nn
-import torch.quantization
-import torchvision.transforms.functional
 from arachne.pipeline.package import (
     Package,
     PackageInfo,
@@ -29,12 +24,16 @@ from ..stage import Parameter, Stage
 class PyTorchQuantizer(Stage):
     @staticmethod
     def _calibration(
-        qmodel: torch.nn.Module,
+        qmodel,
         dataset: ArachneDataset,
         preprocess: Callable,
         input_info: TensorInfoDict,
         calibrate_num: int,
     ):
+        import torch
+        import torch.nn
+        import torchvision.transforms.functional
+
         qmodel.eval()
         criterion = torch.nn.CrossEntropyLoss()
         with torch.no_grad():
@@ -94,6 +93,10 @@ class PyTorchQuantizer(Stage):
 
     @staticmethod
     def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+        import torch
+        import torch.nn
+        import torch.quantization
+
         params = PyTorchQuantizer.extract_parameters(params)
         quantize_type = params["qtype"]
         samples = params["qsample"]
