@@ -7,7 +7,7 @@ from arachne.pipeline.package.frontend import make_tflite_package
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import runner_init
-from arachne.types import QType, TensorInfo, TensorInfoDict
+from arachne.types import IndexedOrderedDict, QType, TensorInfo
 
 # ============================================================================================= #
 
@@ -18,8 +18,8 @@ from arachne.types import QType, TensorInfo, TensorInfoDict
 MODEL_URI = "https://ion-archives.s3.us-west-2.amazonaws.com/models/tflite/efficientdet-d0.tflite"
 
 # Model-specific input/output tensor information
-INPUT_INFO = TensorInfoDict([("image_arrays", TensorInfo(shape=[1, 512, 512, 3], dtype="uint8"))])
-OUTPUT_INFO = TensorInfoDict([("detections", TensorInfo(shape=[1, 100, 7], dtype="float32"))])
+INPUT_INFO = IndexedOrderedDict([("image_arrays", TensorInfo(shape=[1, 512, 512, 3], dtype="uint8"))])
+OUTPUT_INFO = IndexedOrderedDict([("detections", TensorInfo(shape=[1, 100, 7], dtype="float32"))])
 
 # An output directory for saving execution results
 OUTPUT_DIR = "./out"
@@ -62,8 +62,11 @@ default_params.update(
 )
 outputs = run_pipeline(compile_pipeline, pkg, default_params, OUTPUT_DIR)
 
+# Export an arachne package to a specified tar file
+# outputs[-1].export('exported.tar')
+
 # Init runtime module
-module = runner_init(outputs[-1])
+module = runner_init(package=outputs[-1], rpc_tracker=RPC_HOST, rpc_key=RPC_KEY, profile=False)
 
 # Benchmarking with dummy inputs
 
