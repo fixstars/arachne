@@ -48,7 +48,7 @@ def create_tvmdev(device: str, session: tvm.rpc.RPCSession) -> TVMDevice:
     return session.device(device)
 
 
-def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[str, bytearray, TVMModule]:
+def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[Optional[str], Optional[bytearray], TVMModule]:
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.debug("extracting module file %s", file)
         with tarfile.open(file) as t:
