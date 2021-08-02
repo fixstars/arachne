@@ -8,6 +8,7 @@ from tvm.contrib.download import download as tvm_download
 from arachne.pipeline.package import (
     DarknetPackage,
     KerasPackage,
+    ONNXPackage,
     PyTorchPackage,
     Tf1Package,
     Tf2Package,
@@ -147,6 +148,30 @@ def make_keras_package_from_module(model, output_dir: Path) -> KerasPackage:
         input_info=input_info,
         output_info=output_info,
         model_file=Path(h5_path),
+    )
+
+def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
+    import onnx
+    import onnxruntime
+    onnx_path = output_dir / 'model.onnx'
+    onnx.save_model(model, onnx_path)
+    
+    input_info = TensorInfoDict()
+    sess =  onnxruntime.InferenceSession(str(onnx_path))
+
+    inputs = sess.get_inputs()
+    for inp in sess.get_inputs():
+        input_info[inp.name] = TensorInfo([1] + inp.shape[1:])
+
+    output_info = TensorInfoDict()
+    for out in sess.get_outputs():
+        output_info[out.name] = TensorInfo([1] + out.shape[1:])
+
+    return ONNXPackage(
+        dir=output_dir,
+        input_info=input_info,
+        output_info=output_info,
+        model_file=Path(onnx_path),
     )
 
 

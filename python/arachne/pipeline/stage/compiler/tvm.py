@@ -1,5 +1,6 @@
+from abc import ABCMeta, abstractclassmethod, abstractmethod, abstractstaticmethod
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 import tvm.driver.tvmc as tvmc
 import tvm.driver.tvmc.frontends as tvmcfrontends
@@ -7,6 +8,8 @@ import tvm.driver.tvmc.frontends as tvmcfrontends
 from arachne.pipeline.package import (
     DarknetPackage,
     DarknetPackageInfo,
+    ONNXPackage,
+    ONNXPackageInfo,
     Package,
     PackageInfo,
     Tf1Package,
@@ -28,13 +31,24 @@ from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
 
 
-class TVMCompiler(Stage):
+class TVMCompilerBase(Stage, metaclass=ABCMeta):
     @staticmethod
+    @abstractmethod
     def get_name() -> str:
-        return "tvm_compiler"
+        raise NotImplementedError()
+    
+    @classmethod
+    @abstractmethod
+    def _OutputPackage(cls, **kwargs):
+        raise NotImplementedError()
+    
+    @classmethod
+    @abstractmethod
+    def _OutputPackageInfo(cls, **kwargs):
+        raise NotImplementedError()
 
-    @staticmethod
-    def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
+    @classmethod
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         target = get_target_from_params(params)
         target_host = get_target_host_from_params(params)
         if target is None:
@@ -49,13 +63,13 @@ class TVMCompiler(Stage):
                 DarknetPackageInfo,
                 Tf1PackageInfo,
                 KerasPackage,
+                ONNXPackageInfo
             ),
         ):
             return None
         if isinstance(input, TfLitePackageInfo) and input.for_edgetpu:
             return None
-
-        return TVMPackageInfo(target=target, target_host=target_host)
+        return cls._OutputPackageInfo(target=target, target_host=target_host)
 
     @staticmethod
     def extract_parameters(params: Parameter) -> Parameter:
@@ -65,7 +79,11 @@ class TVMCompiler(Stage):
         return {"target": target, "target_host": target_host}
 
     @staticmethod
-    def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+    def compile_model():
+        raise NotImplementedError()
+
+    @classmethod
+    def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         params = TVMCompiler.extract_parameters(params)
         target = params["target"]
         assert target is not None
@@ -73,14 +91,13 @@ class TVMCompiler(Stage):
 
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
         filename = "tvm_package.tar"
-        output_path = output_dir / filename
 
         assert isinstance(
-            input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, KerasPackage)
+            input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, KerasPackage, ONNXPackage)
         )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
-        elif isinstance(input, (TfLitePackage, TorchScriptPackage, Tf1Package, KerasPackage)):
+        elif isinstance(input, (TfLitePackage, TorchScriptPackage, Tf1Package, KerasPackage, ONNXPackage)):
             input_filename = input.model_file
 
         if isinstance(input, Tf1Package):
@@ -90,9 +107,45 @@ class TVMCompiler(Stage):
                 shape_dict=shape_dict,
                 outputs=input.output_info.keys(),
             )
+        elif isinstance(input, ONNXPackage):
+            model = tvmcfrontends.load_model(str(input.dir / input_filename), shape_dict=shape_dict, opset=11, freeze_params=True)
         else:
             model = tvmcfrontends.load_model(str(input.dir / input_filename), shape_dict=shape_dict)
+        
+        cls.compile_model(
+            model,
+            target,
+            target_host,
+            output_dir,
+            filename            
+        )
+        
+        return cls._OutputPackage(
+            dir=output_dir,
+            input_info=input.input_info,
+            output_info=input.output_info,
+            target=target,
+            target_host=target_host,
+            package_file=Path(filename),
+        )
+        
 
+class TVMCompiler(TVMCompilerBase):
+    @staticmethod
+    def get_name() -> str:
+        return "tvm_compiler"
+
+    @staticmethod
+    def _OutputPackage(**kwargs) -> TVMPackage:
+        return TVMPackage(**kwargs)
+    
+    @staticmethod
+    def _OutputPackageInfo(**kwargs) -> TVMPackageInfo:
+        return TVMPackageInfo(**kwargs)
+
+    @staticmethod
+    def compile_model(model, target: str, target_host: str, output_dir: Path, filename: str):
+        output_path = output_dir / filename
         tvmc.compiler.compile_model(
             model,
             target,
@@ -102,16 +155,7 @@ class TVMCompiler(Stage):
             target_host=target_host,
             desired_layout=None,
         )
-
-        return TVMPackage(
-            dir=output_dir,
-            input_info=input.input_info,
-            output_info=input.output_info,
-            target=target,
-            target_host=target_host,
-            package_file=Path(filename),
-        )
-
+        
 
 register_stage(TVMCompiler)
 

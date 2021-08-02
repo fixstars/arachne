@@ -63,6 +63,50 @@ def benchmark_tvm_model(
 
     return {"mean": mean_ts, "std": std_ts, "max": max_ts, "min": min_ts}
 
+def benchmark_tvm_vm_model(
+    compiled_model_path: str,
+    input_specs: List[InputSpec],
+    hostname: Optional[str],
+    rpc_key: Optional[str],
+    target_device: str,
+    profile: bool,
+):
+    session = common.create_session(hostname, rpc_key)
+
+    dev = device.get_device(target_device)
+    tvmdev = common.create_tvmdev(dev.tvmdev, session)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        t = tarfile.open(compiled_model_path)
+        t.extractall(tmp_dir)
+        session.upload(os.path.join(tmp_dir, "lib.tar"))
+        lib = session.load_module("lib.tar")
+    input_tensors = [
+        np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype) for ispec in input_specs
+    ]
+    input_tensors = [
+        tvm.nd.array(input_tensor, tvmdev) for input_tensor in input_tensors
+    ]
+    from tvm.runtime import vm as rt_vm
+    vm = rt_vm.VirtualMachine(lib, tvmdev)
+
+    import time
+    elapsed = []
+    for i in range(100):
+        t1 = time.perf_counter()
+        vm.invoke_stateful('main', input_tensors[0])
+        t2 = time.perf_counter()
+        elapsed.append(t2 - t1)
+    elapsed = np.array(elapsed)
+
+    first_ts = elapsed[0] * 1000
+    # because first execution is slow, calculate average time from the second execution
+    mean_ts = np.mean(elapsed[1:]) * 1000
+    std_ts = np.std(elapsed[1:]) * 1000
+    max_ts = np.max(elapsed[1:]) * 1000
+    min_ts = np.min(elapsed[1:]) * 1000
+
+    return {"first": first_ts, "mean_rest": mean_ts, "std_rest": std_ts, "max_rest": max_ts, "min_rest": min_ts}
 
 def benchmark_for_keras(
     model,  # tf.keras.Model
@@ -81,6 +125,29 @@ def benchmark_for_keras(
     input_specs = [InputSpec(input_shape, dtype)]
 
     return benchmark_tvm_model(
+        compiled_model_path, input_specs, hostname, rpc_key, target_device, profile
+    )
+
+
+def benchmark_for_onnx_vm(
+    model,  # onnx.onnx_ml_pb2.ModelProto
+    compiled_model_path: str,
+    hostname: Optional[str],
+    rpc_key: Optional[str],
+    target_device: str,
+    profile: bool,
+):
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        import onnx
+        import onnxruntime
+        tmp_model_path = tmp_dir + '/model.onnx'
+        onnx.save_model(model, tmp_model_path)
+        sess =  onnxruntime.InferenceSession(tmp_model_path)
+        inputs = sess.get_inputs()
+
+    input_specs = [InputSpec([1] + input_shape.shape[1:], 'float32') for input_shape in inputs]
+
+    return benchmark_tvm_vm_model(
         compiled_model_path, input_specs, hostname, rpc_key, target_device, profile
     )
 

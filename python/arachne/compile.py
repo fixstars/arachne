@@ -5,6 +5,7 @@ from typing import List, Tuple
 from arachne.device import get_device
 from arachne.pipeline.package.frontend import (
     make_keras_package_from_module,
+    make_onnx_package_from_module,
     make_tf1_package_from_concrete_func,
     make_torchscript_package_from_script_module,
 )
@@ -87,6 +88,38 @@ def compile_for_keras(
     with tempfile.TemporaryDirectory() as tmp_dir:
         # construct state input (a package)
         input_pkg = make_keras_package_from_module(model, Path(tmp_dir))
+
+        # run pipeline
+        device = get_device(target_device)
+
+        default_params = dict()
+        default_params.update(
+            {
+                "_compiler_target": device.target,
+                "_compiler_target_host": device.target_host,
+                "_quantizer_qtype": device.default_dtype,
+            }
+        )
+
+        outputs = run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
+
+        # TODO what should be returned by this function?
+        last_output = outputs[-1]
+        compiled_module_file = str(last_output.dir / last_output.package_file)
+        return compiled_module_file, compiled_module_file + ".relay"
+
+def compile_for_onnx_vm(
+    model, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str
+):
+    import onnx
+
+    compile_pipeline = []
+    for stage in pipeline:
+        compile_pipeline.append((get_stage(stage[0]), stage[1]))
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        # construct state input (a package)
+        input_pkg = make_onnx_package_from_module(model, Path(tmp_dir))
 
         # run pipeline
         device = get_device(target_device)
