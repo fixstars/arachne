@@ -40,6 +40,7 @@ class TVMCompiler(Stage):
         params = TVMCompiler.extract_parameters(params)
         target = params["target"]
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
         if target is None:
             return None
         if "vitis-ai" in target:
@@ -58,7 +59,7 @@ class TVMCompiler(Stage):
         if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
             return None
 
-        return TVMPackageInfo(target=target, target_host=target_host)
+        return TVMPackageInfo(target=target, target_host=target_host, target_tvmdev=target_tvmdev)
 
     @staticmethod
     def extract_parameters(params: Parameter) -> Parameter:
@@ -73,6 +74,7 @@ class TVMCompiler(Stage):
         target = params["target"]
         assert target is not None
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
 
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
         filename = "tvm_package.tar"
@@ -116,6 +118,7 @@ class TVMCompiler(Stage):
             output_info=input.output_info,
             target=target,
             target_host=target_host,
+            target_tvmdev=target_tvmdev,
             package_file=Path(filename),
         )
 
