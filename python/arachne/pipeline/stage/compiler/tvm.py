@@ -2,7 +2,9 @@ from abc import ABCMeta, abstractclassmethod, abstractmethod, abstractstaticmeth
 from pathlib import Path
 from typing import Optional, Tuple
 
+import tvm.autotvm
 import tvm.driver.tvmc as tvmc
+import tvm.driver.tvmc.common as tvmccommon
 import tvm.driver.tvmc.frontends as tvmcfrontends
 
 from arachne.pipeline.package import (
@@ -12,10 +14,10 @@ from arachne.pipeline.package import (
     ONNXPackageInfo,
     Package,
     PackageInfo,
-    Tf1Package,
-    Tf1PackageInfo,
-    TfLitePackage,
-    TfLitePackageInfo,
+    TF1Package,
+    TF1PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
     TorchScriptPackage,
     TorchScriptPackageInfo,
     TVMPackage,
@@ -48,9 +50,10 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         raise NotImplementedError()
 
     @classmethod
-    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        target = get_target_from_params(params)
-        target_host = get_target_host_from_params(params)
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:        
+        params = TVMCompilerBase.extract_parameters(params)
+        target = params["target"]
+        target_host = params["target_host"]
         if target is None:
             return None
         if "vitis-ai" in target:
@@ -58,16 +61,16 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         if not isinstance(
             input,
             (
-                TfLitePackageInfo,
+                TFLitePackageInfo,
                 TorchScriptPackageInfo,
                 DarknetPackageInfo,
-                Tf1PackageInfo,
+                TF1PackageInfo,
                 KerasPackage,
                 ONNXPackageInfo
             ),
         ):
             return None
-        if isinstance(input, TfLitePackageInfo) and input.for_edgetpu:
+        if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
             return None
         return cls._OutputPackageInfo(target=target, target_host=target_host)
 
@@ -93,14 +96,14 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         filename = "tvm_package.tar"
 
         assert isinstance(
-            input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, KerasPackage, ONNXPackage)
+            input, (TFLitePackage, TorchScriptPackage, DarknetPackage, TF1Package, KerasPackage, ONNXPackage)
         )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
-        elif isinstance(input, (TfLitePackage, TorchScriptPackage, Tf1Package, KerasPackage, ONNXPackage)):
+        elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package, KerasPackage, ONNXPackage)):
             input_filename = input.model_file
 
-        if isinstance(input, Tf1Package):
+        if isinstance(input, TF1Package):
             # When tvmc.frontends loads a tf1 model (*.pb) that outputs multiple tensors, we have to specify output tensor names
             model = tvmcfrontends.load_model(
                 str(input.dir / input_filename),
@@ -145,6 +148,10 @@ class TVMCompiler(TVMCompilerBase):
 
     @staticmethod
     def compile_model(model, target: str, target_host: str, output_dir: Path, filename: str):
+        tvm_target, _ = tvmccommon.target_from_cli(target)
+        if tvm_target.kind.name == "cuda" and "arch" in tvm_target.attrs:
+            tvm.autotvm.measure.measure_methods.set_cuda_target_arch(tvm_target.attrs["arch"])
+            
         output_path = output_dir / filename
         tvmc.compiler.compile_model(
             model,

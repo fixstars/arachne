@@ -12,10 +12,10 @@ from arachne.pipeline.package import (
     ONNXPackageInfo,
     Package,
     PackageInfo,
-    Tf1Package,
-    Tf1PackageInfo,
-    TfLitePackage,
-    TfLitePackageInfo,
+    TF1Package,
+    TF1PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
     TorchScriptPackage,
     TorchScriptPackageInfo,
     TVMPackage,
@@ -73,7 +73,7 @@ class TVMVirtualMachineCompiler(TVMCompilerBase):
                 vm_exec = relay_vm.compile(mod, target=tvm_target)
                 lib = vm_exec.mod
                 with tempfile.TemporaryDirectory() as tmpdirname:
-                    lib_name = 'lib.tar'
+                    lib_name = 'mod.tar'
                     path_lib = tmpdirname + '/' + lib_name
                     lib.export_library(path_lib)
                     with tarfile.open(package_path, "w") as tar:

@@ -6,8 +6,8 @@ from typing import Optional
 from arachne.pipeline.package import (
     Package,
     PackageInfo,
-    TfLitePackage,
-    TfLitePackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
 )
 from arachne.types import QType
 
@@ -22,14 +22,14 @@ class EdgeTpuCompiler(Stage):
 
     @staticmethod
     def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        if not isinstance(input, TfLitePackageInfo):
+        if not isinstance(input, TFLitePackageInfo):
             return None
         if input.qtype not in (QType.INT8, QType.INT8_FULL):
             return None
         if input.for_edgetpu:
             return None
 
-        return TfLitePackageInfo(qtype=input.qtype, for_edgetpu=True)
+        return TFLitePackageInfo(qtype=input.qtype, for_edgetpu=True)
 
     @staticmethod
     def extract_parameters(params: Parameter) -> Parameter:
@@ -37,14 +37,14 @@ class EdgeTpuCompiler(Stage):
 
     @staticmethod
     def process(input: Package, params: Parameter, output_dir: Path) -> Package:
-        assert isinstance(input, TfLitePackage)
+        assert isinstance(input, TFLitePackage)
         input_filename = input.model_file
         name, ext = os.path.splitext(input_filename)
         output_filename = name + "_edgetpu" + ext
         commands = ["edgetpu_compiler", "-o", str(output_dir), str(input.dir / input_filename)]
         subprocess.check_call(commands)
 
-        return TfLitePackage(
+        return TFLitePackage(
             dir=output_dir,
             input_info=input.input_info,
             output_info=input.output_info,

@@ -2,8 +2,6 @@ import importlib
 import importlib.util
 from typing import Any, Callable, List, Optional, Tuple
 
-import torch
-
 from arachne.types import ArachneDataset, IndexedOrderedDict, QType
 
 from .stage import Parameter
@@ -64,7 +62,7 @@ def get_make_dataset_from_params(
 
 def get_preprocess_from_params(
     params: Parameter,
-) -> Tuple[Optional[Callable[[torch.Tensor, IndexedOrderedDict], IndexedOrderedDict]], str]:
+) -> Tuple[Optional[Callable[[Any, IndexedOrderedDict], IndexedOrderedDict]], str]:
     original_str = ""
     preprocess = get_first_value(params, ["preprocess", "_quantizer_preprocess"])
     if isinstance(preprocess, str):

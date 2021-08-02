@@ -7,8 +7,6 @@ from typing import Optional
 
 import docker
 import numpy as np
-import torch
-import torchvision.transforms.functional
 import tvm.driver.tvmc.frontends as tvmcfrontends
 from docker.models.containers import ExecResult
 
@@ -20,10 +18,10 @@ from arachne.pipeline.package import (
     ONNXPackageInfo,
     Package,
     PackageInfo,
-    Tf1Package,
-    Tf1PackageInfo,
-    TfLitePackage,
-    TfLitePackageInfo,
+    TF1Package,
+    TF1PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
     TorchScriptPackage,
     TorchScriptPackageInfo,
     TVMPackage,
@@ -53,6 +51,9 @@ class VitisAICompiler(Stage):
 
     @staticmethod
     def _save_calib_inputs(dataset, preprocess, input_info, q_samples, output_dir):
+        import torch
+        import torchvision.transforms.functional
+
         # currently assume only one input
         data = []
         for image, _ in itertools.islice(dataset, q_samples):
@@ -130,18 +131,16 @@ class VitisAICompiler(Stage):
 
     @staticmethod
     def _copy_files_from_docker_container(client, container, output_name, output_dir):
-        tarpath_in_container = VitisAICompiler._container_work_path + "/" + output_name
-        relaypath_in_conatiner = tarpath_in_container + ".relay"
-        for filepath_in_container in [tarpath_in_container, relaypath_in_conatiner]:
-            with tempfile.TemporaryDirectory() as dname:
-                tarfilename = dname + "get.tar"
-                f = open(tarfilename, "wb")
-                bits, stat = client.api.get_archive(container.id, filepath_in_container)
-                for chunk in bits:
-                    f.write(chunk)
-                f.close()
-                with tarfile.open(tarfilename, mode="r") as tf:
-                    tf.extractall(path=output_dir)
+        with tempfile.TemporaryDirectory() as dname:
+            tarfilename = dname + "get.tar"
+            f = open(tarfilename, "wb")
+            path_in_container = VitisAICompiler._container_work_path + "/" + output_name
+            bits, stat = client.api.get_archive(container.id, path_in_container)
+            for chunk in bits:
+                f.write(chunk)
+            f.close()
+            with tarfile.open(tarfilename, mode="r") as tf:
+                tf.extractall(path=output_dir)
 
     @staticmethod
     def _get_vitis_ai_command(target, target_host, q_samples, output_name, input_info):
@@ -201,22 +200,25 @@ class VitisAICompiler(Stage):
 
     @staticmethod
     def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        target = get_target_from_params(params)
-        target_host = get_target_host_from_params(params)
+        params = VitisAICompiler.extract_parameters(params)
+        target = params["target"]
+        target_host = params["target_host"]
         if target is None:
             return None
         if "vitis-ai" not in target:
             return None
         if not isinstance(
-            input, (TfLitePackageInfo, TorchScriptPackageInfo, DarknetPackageInfo, Tf1PackageInfo)
+            input, (TFLitePackageInfo, TorchScriptPackageInfo, DarknetPackageInfo, TF1PackageInfo)
         ):
             return None
-        if isinstance(input, TfLitePackageInfo) and input.for_edgetpu:
+        if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
             return None
         if (
-            isinstance(input, (TfLitePackageInfo, TorchScriptPackageInfo))
+            isinstance(input, (TFLitePackageInfo, TorchScriptPackageInfo))
             and input.qtype != QType.FP32
         ):
+            return None
+        if params["make_dataset"] is None or params["preprocess"] is None:
             return None
 
         return TVMPackageInfo(target=target, target_host=target_host)
@@ -265,7 +267,7 @@ class VitisAICompiler(Stage):
         assert isinstance(input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, ONNXPackage))
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
-        elif isinstance(input, (TfLitePackage, TorchScriptPackage, Tf1Package)):
+        elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package)):
             input_filename = input.model_file
                      
         container = client.containers.get(vai_container_id)

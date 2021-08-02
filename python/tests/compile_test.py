@@ -1,12 +1,12 @@
 import tempfile
 
-from torchvision import models
-
 import arachne.compile
-from arachne.ishape import InputSpec
+from arachne.types.tensor_info import TensorInfo
 
 
 def test_compile_for_pytorch():
+    from torchvision import models
+
     resnet18 = models.resnet18(pretrained=True)
     input_shape = (1, 3, 224, 224)
     target_device = "host"
@@ -14,13 +14,14 @@ def test_compile_for_pytorch():
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         arachne.compile.compile_for_pytorch(
-            resnet18, [InputSpec(input_shape, "float32")], target_device, compile_pipeline, tmp_dir
+            resnet18, [TensorInfo(input_shape, "float32")], target_device, compile_pipeline, tmp_dir
         )
 
 def test_compile_for_onnx_vm():
     import onnx
     import torch
-    import tempfile
+    from torchvision import models
+
     resnet18 = models.resnet18(pretrained=True)
     with tempfile.TemporaryDirectory() as tmp_dir:
         dummy_input = torch.randn(1, 3, 224, 224)

@@ -2,12 +2,6 @@ import itertools
 from pathlib import Path
 from typing import Callable, Optional
 
-import torch
-import torch.jit
-import torch.nn
-import torch.quantization
-import torchvision.transforms.functional
-
 from arachne.pipeline.package import (
     Package,
     PackageInfo,
@@ -30,12 +24,16 @@ from ..stage import Parameter, Stage
 class PyTorchQuantizer(Stage):
     @staticmethod
     def _calibration(
-        qmodel: torch.nn.Module,
+        qmodel,
         dataset: ArachneDataset,
         preprocess: Callable,
         input_info: TensorInfoDict,
         calibrate_num: int,
     ):
+        import torch
+        import torch.nn
+        import torchvision.transforms.functional
+
         qmodel.eval()
         criterion = torch.nn.CrossEntropyLoss()
         with torch.no_grad():
@@ -54,12 +52,15 @@ class PyTorchQuantizer(Stage):
 
     @staticmethod
     def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        quantize_type = get_qtype_from_params(params)
+        params = PyTorchQuantizer.extract_parameters(params)
+        quantize_type = params["qtype"]
         if not isinstance(input, PyTorchPackageInfo):
             return None
         if quantize_type not in (QType.FP32, QType.INT8):
             return None
         if quantize_type == QType.INT8 and not input.quantizable:
+            return None
+        if params["make_dataset"] is None or params["preprocess"] is None:
             return None
 
         return TorchScriptPackageInfo(qtype=quantize_type)
@@ -92,6 +93,10 @@ class PyTorchQuantizer(Stage):
 
     @staticmethod
     def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+        import torch
+        import torch.nn
+        import torch.quantization
+
         params = PyTorchQuantizer.extract_parameters(params)
         quantize_type = params["qtype"]
         samples = params["qsample"]

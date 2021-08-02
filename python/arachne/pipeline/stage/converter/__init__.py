@@ -1,1 +1,1 @@
-from .tflite import TfLiteConverter
+from .tflite import TFLiteConverter
