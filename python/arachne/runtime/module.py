@@ -3,7 +3,6 @@ from typing import Any, Dict, Union
 
 import numpy as np
 import tvm
-from tensorflow.python.keras.backend import dtype
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.contrib.graph_executor import GraphModule
 from tvm.contrib.tflite_runtime import TFLiteModule
