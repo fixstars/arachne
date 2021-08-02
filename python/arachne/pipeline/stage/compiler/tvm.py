@@ -9,6 +9,8 @@ import tvm.driver.tvmc.frontends as tvmcfrontends
 from arachne.pipeline.package import (
     DarknetPackage,
     DarknetPackageInfo,
+    KerasPackage,
+    KerasPackageInfo,
     Package,
     PackageInfo,
     TF1Package,
@@ -20,7 +22,6 @@ from arachne.pipeline.package import (
     TVMPackage,
     TVMPackageInfo,
 )
-from arachne.pipeline.package.keras import KerasPackage
 from arachne.pipeline.stage.utils import (
     get_target_from_params,
     get_target_host_from_params,
@@ -52,7 +53,7 @@ class TVMCompiler(Stage):
                 TorchScriptPackageInfo,
                 DarknetPackageInfo,
                 TF1PackageInfo,
-                KerasPackage,
+                KerasPackageInfo,
             ),
         ):
             return None
