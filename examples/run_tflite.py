@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 
 import tensorflow as tf
@@ -18,7 +19,9 @@ from arachne.types import IndexedOrderedDict, QType, TensorInfo
 MODEL_URI = "https://ion-archives.s3.us-west-2.amazonaws.com/models/tflite/efficientdet-d0.tflite"
 
 # Model-specific input/output tensor information
-INPUT_INFO = IndexedOrderedDict([("image_arrays", TensorInfo(shape=[1, 512, 512, 3], dtype="uint8"))])
+INPUT_INFO = IndexedOrderedDict(
+    [("image_arrays", TensorInfo(shape=[1, 512, 512, 3], dtype="uint8"))]
+)
 OUTPUT_INFO = IndexedOrderedDict([("detections", TensorInfo(shape=[1, 100, 7], dtype="float32"))])
 
 # An output directory for saving execution results
@@ -27,14 +30,20 @@ OUTPUT_DIR = "./out"
 # Compile targets
 # You can find avaiable varaibles in arachne/device.py
 TARGET_DEVICE = "host"
+# TARGET_DEVICE = "jetson-nano,cpu"
+# TARGET_DEVICE = "jetson-nano,trt,cpu"
 
 # RPC server/tracker hostname
 RPC_HOST = None
+# RPC_HOST = '<hostname>:<port>'
 
 # RPC key
 RPC_KEY = None
 
 # ============================================================================================= #
+
+compile_start = time.time()
+print("Compiling... ", end="")
 
 # Create a package
 # Arachne manages the inputs/outputs of each compile/model-conversion/quantization as a package
@@ -62,19 +71,38 @@ default_params.update(
 )
 outputs = run_pipeline(compile_pipeline, pkg, default_params, OUTPUT_DIR)
 
+compile_duration = time.time() - compile_start
+print("Done! {} sec".format(compile_duration))
+
 # Export an arachne package to a specified tar file
 # outputs[-1].export('exported.tar')
 
 # Init runtime module
+init_start = time.time()
+print("Init runtime... ", end="")
+
 module = runner_init(package=outputs[-1], rpc_tracker=RPC_HOST, rpc_key=RPC_KEY, profile=False)
 
+init_duration = time.time() - init_start
+print("Done! {} sec".format(init_duration))
+
+
 # Benchmarking with dummy inputs
+benchmark_start = time.time()
+print("Benchmarking... ", end="")
 
 res = module.benchmark(10)
-# print(res)
+print(res)
+
+benchmark_duration = time.time() - benchmark_start
+print("Done! {} sec".format(benchmark_duration))
 
 
 # Run with a real input
+inference_start = time.time()
+print("Inferencing... ", end="")
+
+
 def load_image(image_path, image_size):
     input_data = tf.io.gfile.GFile(image_path, "rb").read()
     image = tf.io.decode_image(input_data, channels=3, dtype=tf.uint8)
@@ -90,3 +118,6 @@ module.run()
 prediction = module.get_outputs(OUTPUT_INFO)
 # print(prediction)
 # postprocess(...)
+
+inference_duration = time.time() - inference_start
+print("Done! {} sec".format(inference_duration))
