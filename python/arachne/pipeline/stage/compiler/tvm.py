@@ -111,7 +111,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 outputs=input.output_info.keys(),
             )
         elif isinstance(input, ONNXPackage):
-            model = tvmcfrontends.load_model(str(input.dir / input_filename), shape_dict=shape_dict, opset=11, freeze_params=True)
+            model = tvmcfrontends.load_model(str(input.dir / input_filename), shape_dict=shape_dict, freeze_params=True)
         else:
             model = tvmcfrontends.load_model(str(input.dir / input_filename), shape_dict=shape_dict)
         
