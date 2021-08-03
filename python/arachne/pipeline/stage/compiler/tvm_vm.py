@@ -11,7 +11,7 @@ from ..stage import Parameter, Stage
 from . import TVMCompilerBase
 
 
-class TVMVirtualMachineCompiler(TVMCompilerBase):
+class TVMVMCompiler(TVMCompilerBase):
     @staticmethod
     def get_name() -> str:
         return "tvm_vm_compiler"
@@ -63,6 +63,6 @@ class TVMVirtualMachineCompiler(TVMCompilerBase):
         output_path = output_dir / filename
         compile_vm(model, target, target_host, output_path)
 
-register_stage(TVMVirtualMachineCompiler)
+register_stage(TVMVMCompiler)
 
-register_stage_candidate(TVMVirtualMachineCompiler)
+register_stage_candidate(TVMVMCompiler)

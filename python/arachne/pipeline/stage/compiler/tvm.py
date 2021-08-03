@@ -39,14 +39,14 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
     def get_name() -> str:
         raise NotImplementedError()
     
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def _OutputPackage(cls, **kwargs):
+    def _OutputPackage(**kwargs):
         raise NotImplementedError()
     
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def _OutputPackageInfo(cls, **kwargs):
+    def _OutputPackageInfo(**kwargs):
         raise NotImplementedError()
 
     @classmethod
