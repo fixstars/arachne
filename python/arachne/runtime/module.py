@@ -151,8 +151,24 @@ class TVMVMRuntimeModule(RuntimeModule):
     def set_inputs(self, inputs: IndexedOrderedDict):
         self.module.set_input("main", inputs)
 
-    def get_output(self, idx: int, out=None):
-        return self.module.get_output(idx, out)
+    def _vmobj_to_list(self, output):
+        if isinstance(output, tvm.nd.NDArray):
+            return [output.asnumpy()]
+        elif isinstance(output, tvm.runtime.container.ADT) or isinstance(output, list):
+            return [self._vmobj_to_list(f) for f in output]
+        else:
+            raise RuntimeError("Unknown object type: %s" % type(output))
+
+    def get_outputs(self) -> IndexedOrderedDict:
+        outputs: IndexedOrderedDict = IndexedOrderedDict()
+        module_outputs = self._vmobj_to_list(self.module.get_outputs())
+        for i, name in enumerate(self.package.output_info.keys()):
+            outputs[name] = module_outputs[i][0]
+
+        return outputs
+
+    def get_output(self, idx: int):
+        raise NotImplementedError("cannot retrive VM output tensor by get_output. use get_outputs.")
 
     def get_num_outputs(self):
         return self.module.get_num_outputs()
