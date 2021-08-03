@@ -58,7 +58,7 @@ def test_benchmark_for_onnx_vm():
         target_device = "host"
         compile_pipeline = [("tvm_vm_compiler", {})]
 
-        compiled_packages = arachne.compile.compile_for_onnx_vm(
+        compiled_packages = arachne.compile.compile_for_onnx(
             onnx_model, target_device, compile_pipeline, tmp_dir
         )
 

@@ -30,7 +30,7 @@ def test_compile_for_onnx_vm():
         onnx_model = onnx.load_model(onnx_model_path)
         target_device = "host"
         compile_pipeline = [("tvm_vm_compiler", {})]
-        arachne.compile.compile_for_onnx_vm(onnx_model, target_device, compile_pipeline, tmp_dir)
+        arachne.compile.compile_for_onnx(onnx_model, target_device, compile_pipeline, tmp_dir)
 
 def test_compile_for_keras():
     import tensorflow as tf

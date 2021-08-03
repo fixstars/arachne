@@ -93,7 +93,7 @@ def compile_for_keras(
 
     return run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
 
-def compile_for_onnx_vm(
+def compile_for_onnx(
     model, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str
 ):
     import tempfile
