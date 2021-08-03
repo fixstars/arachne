@@ -77,7 +77,7 @@ Build and install TVM runtime.
 
 After this, set environments and start a RPC server in the device.
 ```sh
-source ./device/script/setup/setup_jetson_nano.sh
+ARACHNE_DEPLOY_RPC_TRACKER=<rpc-tracker-host>:8888 ./device/script/setup/setup_jetson_nano.sh
 ```
 
 #### Confirm regitrations RPC server into the RPC tracker

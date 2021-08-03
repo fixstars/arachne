@@ -10,6 +10,7 @@ from .package import Package, PackageInfo
 class TVMPackageInfo(PackageInfo):
     target: str
     target_host: Optional[str]
+    target_tvmdev: str
 
 
 @attr.s(auto_attribs=True, frozen=True)
