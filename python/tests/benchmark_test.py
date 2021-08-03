@@ -44,6 +44,28 @@ def test_benchmark_for_keras():
         )
         mod.benchmark(repeat=10)
 
+def test_benchmark_for_onnx_vm():
+    import onnx
+    import torch
+    from torchvision import models
+
+    resnet18 = models.resnet18(pretrained=True)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        dummy_input = torch.randn(1, 3, 224, 224)
+        onnx_model_path = tmp_dir + '/resnet18.onnx'
+        torch.onnx.export(resnet18, dummy_input, onnx_model_path)
+        onnx_model = onnx.load_model(onnx_model_path)
+        target_device = "host"
+        compile_pipeline = [("tvm_vm_compiler", {})]
+
+        compiled_packages = arachne.compile.compile_for_onnx(
+            onnx_model, target_device, compile_pipeline, tmp_dir
+        )
+
+        mod = runner_init(
+            package=compiled_packages[-1], rpc_tracker=None, rpc_key=None, profile=True
+        )
+        mod.benchmark(repeat=10)
 
 def test_benchmark_for_tf_concrete_function():
     import tensorflow as tf

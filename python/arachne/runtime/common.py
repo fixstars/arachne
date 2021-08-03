@@ -11,12 +11,13 @@ from tvm.autotvm.measure import request_remote
 from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
 from tvm.runtime.module import Module as TVMModule
-
+from tvm.runtime.vm import VirtualMachine
 from arachne.logger import Logger
 from arachne.pipeline.package import Package, TFLitePackage, TVMPackage
+from arachne.pipeline.package.tvm_vm import TVMVMPackage
 from arachne.types import IndexedOrderedDict
 
-from .module import RuntimeModule, TFLiteRuntimeModule, TVMRuntimeModule
+from .module import RuntimeModule, TFLiteRuntimeModule, TVMRuntimeModule, TVMVMRuntimeModule
 
 logger = Logger.logger()
 
@@ -59,14 +60,19 @@ def create_tvmdev(device: str, session: tvm.rpc.RPCSession) -> TVMDevice:
     return session.device(device)
 
 
-def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[str, bytearray, TVMModule]:
+def open_module_file(file: Path, session: tvm.rpc.RPCSession) -> Tuple[Optional[str], Optional[bytearray], TVMModule]:
     with tempfile.TemporaryDirectory() as tmp_dir:
         logger.debug("extracting module file %s", file)
         with tarfile.open(file) as t:
             t.extractall(tmp_dir)
-        graph = open(os.path.join(tmp_dir, "mod.json")).read()
-        params = bytearray(open(os.path.join(tmp_dir, "mod.params"), "rb").read())
-
+        graph = None
+        params = None
+        graph_path = os.path.join(tmp_dir, "mod.json")
+        if os.path.exists(graph_path):
+            graph = open(graph_path).read()
+        params_path = os.path.join(tmp_dir, "mod.params")
+        if os.path.exists(params_path):
+            params = bytearray(open(params_path, "rb").read())
         session.upload(os.path.join(tmp_dir, "mod.tar"))
         lib = session.load_module("mod.tar")
 
@@ -80,22 +86,26 @@ def create_runtime(package: Package, session: tvm.rpc.RPCSession, profile: bool)
         with open(package.dir / package.model_file, "rb") as model_fin:
             module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target)
         return TFLiteRuntimeModule(module, tvmdev, package)
-    elif isinstance(package, TVMPackage):
+    elif isinstance(package, (TVMPackage, TVMVMPackage)):
         target = package.target_tvmdev
         tvmdev = create_tvmdev(target, session)
         graph, params, lib = open_module_file(package.dir / package.package_file, session)
 
-        if profile:
-            logger.debug("creating runtime with profiling enabled")
-            # TODO(Maruoka): Set dump_root into under '.artifacts/{experiment}'
-            module = debug_executor.create(graph, lib, tvmdev, dump_root="./.prof")
-        else:
-            logger.debug("creating runtime with profiling disabled")
-            module = graph_executor.create(graph, lib, tvmdev)
+        if isinstance(package, TVMPackage):
+            if profile:
+                logger.debug("creating runtime with profiling enabled")
+                # TODO(Maruoka): Set dump_root into under '.artifacts/{experiment}'
+                module = debug_executor.create(graph, lib, tvmdev, dump_root="./.prof")
+            else:
+                logger.debug("creating runtime with profiling disabled")
+                module = graph_executor.create(graph, lib, tvmdev)
 
-        logger.debug("load params into the runtime module")
-        module.load_params(params)
-        return TVMRuntimeModule(module, tvmdev, package)
+            logger.debug("load params into the runtime module")
+            module.load_params(params)
+            return TVMRuntimeModule(module, tvmdev, package)
+        else:
+            module = VirtualMachine(lib, tvmdev)
+            return TVMVMRuntimeModule(module, tvmdev, package)
     else:
         raise RuntimeError(f"This package ({package.__class__.__name__}) cannot run.")
 

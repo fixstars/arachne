@@ -14,6 +14,8 @@ from arachne.logger import Logger
 from arachne.pipeline.package import (
     DarknetPackage,
     DarknetPackageInfo,
+    ONNXPackage,
+    ONNXPackageInfo,
     Package,
     PackageInfo,
     TF1Package,
@@ -23,7 +25,7 @@ from arachne.pipeline.package import (
     TorchScriptPackage,
     TorchScriptPackageInfo,
     TVMPackage,
-    TVMPackageInfo,
+    TVMPackageInfo
 )
 from arachne.pipeline.stage.utils import (
     get_make_dataset_from_params,
@@ -66,8 +68,19 @@ class VitisAICompiler(Stage):
         np.savez(output_dir / VitisAICompiler._calib_inputs_filename, **kwargs)
 
     @staticmethod
-    def _export_model(model_path, input_info, output_dir):
-        shape_dict = {key: tensorinfo.shape for key, tensorinfo in input_info.items()}
+    def _export_model(input, model_path, output_dir):
+        shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
+        if isinstance(input, Tf1Package):
+            # When tvmc.frontends loads a tf1 model (*.pb) that outputs multiple tensors, we have to specify output tensor names
+            tvmcmodel = tvmcfrontends.load_model(
+                str(model_path),
+                shape_dict=shape_dict,
+                outputs=input.output_info.keys(),
+            )
+        elif isinstance(input, ONNXPackage):
+            tvmcmodel = tvmcfrontends.load_model(str(model_path), shape_dict=shape_dict, freeze_params=True)
+        else:
+            tvmcmodel = tvmcfrontends.load_model(str(model_path), shape_dict=shape_dict)
         tvmcmodel = tvmcfrontends.load_model(model_path, shape_dict=shape_dict)
         tvmcmodel.save(output_dir / VitisAICompiler._export_model_filename)
 
@@ -251,12 +264,12 @@ class VitisAICompiler(Stage):
         preprocess = params["preprocess"]
         assert preprocess is not None
 
-        assert isinstance(input, (TFLitePackage, TorchScriptPackage, DarknetPackage, TF1Package))
+        assert isinstance(input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, ONNXPackage))
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
         elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package)):
             input_filename = input.model_file
-
+                     
         container = client.containers.get(vai_container_id)
         try:
             # save calibration images to .npz
@@ -264,7 +277,7 @@ class VitisAICompiler(Stage):
                 dataset, preprocess, input.input_info, samples, output_dir
             )
             # export model to IRModule/param dict
-            VitisAICompiler._export_model(input.dir / input_filename, input.input_info, output_dir)
+            VitisAICompiler._export_model(input, input.dir / input_filename, output_dir)
             # copy files to docker container
             VitisAICompiler._copy_files_to_docker_container(client, container, output_dir)
             # compile in Vitis-AI container

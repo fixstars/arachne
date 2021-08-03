@@ -7,6 +7,7 @@ from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.contrib.graph_executor import GraphModule
 from tvm.contrib.tflite_runtime import TFLiteModule
 
+from tvm.runtime.vm import VirtualMachine
 from arachne.pipeline.package.package import Package
 from arachne.pipeline.package.tflite import TFLitePackage
 from arachne.pipeline.package.tvm import TVMPackage
@@ -14,13 +15,13 @@ from arachne.types import IndexedOrderedDict
 
 
 class RuntimeModule(metaclass=ABCMeta):
-    module: Union[GraphModule, TFLiteModule]
+    module: Union[GraphModule, TFLiteModule, VirtualMachine]
     tvmdev: TVMDevice
     package: Package
 
     @abstractmethod
     def __init__(
-        self, module: Union[GraphModule, TFLiteModule], tvmdev: TVMDevice, package: Package
+        self, module: Union[GraphModule, TFLiteModule, VirtualMachine], tvmdev: TVMDevice, package: Package
     ):
         pass
 
@@ -132,3 +133,71 @@ class TFLiteRuntimeModule(RuntimeModule):
 
     def benchmark(self, repeat: int) -> Dict:
         return self._do_benchmark(repeat, "invoke")
+
+class TVMVMRuntimeModule(RuntimeModule):
+    def __init__(self, module: VirtualMachine, tvmdev: TVMDevice, package: TVMPackage):
+        assert isinstance(module, VirtualMachine)
+        self.module = module
+        self.tvmdev = tvmdev
+        self.package = package
+    
+    def set_input(self, idx: int, tensor: Any):
+        raise NotImplementedError("cannot use index to set input to the VM")
+
+    def set_inputs(self, inputs: IndexedOrderedDict):
+        self.module.set_input("main", inputs)
+
+    def _vmobj_to_list(self, output):
+        if isinstance(output, tvm.nd.NDArray):
+            return [output.asnumpy()]
+        elif isinstance(output, tvm.runtime.container.ADT) or isinstance(output, list):
+            return [self._vmobj_to_list(f) for f in output]
+        else:
+            raise RuntimeError("Unknown object type: %s" % type(output))
+
+    def get_outputs(self) -> IndexedOrderedDict:
+        outputs: IndexedOrderedDict = IndexedOrderedDict()
+        module_outputs = self._vmobj_to_list(self.module.get_outputs())
+        for i, name in enumerate(self.package.output_info.keys()):
+            outputs[name] = module_outputs[i][0]
+
+        return outputs
+
+    def get_output(self, idx: int):
+        raise NotImplementedError("cannot retrive VM output tensor by get_output. use get_outputs.")
+
+    def get_num_outputs(self):
+        return self.module.get_num_outputs()
+
+    def run(self):
+        self.module.invoke_stateful("main")
+
+    def benchmark(self, repeat: int) -> Dict:
+        return self._do_benchmark(repeat)
+    
+    def _do_benchmark(self, repeat: int) -> Dict:
+        import time
+
+        input_tensors = [
+            np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype)
+            for ispec in self.package.input_info.values()
+        ]
+
+        self.set_inputs(input_tensors)
+        
+        elapsed = []
+        for _ in range(repeat):
+            t1 = time.perf_counter()
+            self.run()
+            t2 = time.perf_counter()
+            elapsed.append(t2 - t1)
+        elapsed = np.array(elapsed)
+
+        first_ts = elapsed[0] * 1000
+        # because first execution is slow, calculate average time from the second execution
+        mean_ts = np.mean(elapsed[1:]) * 1000
+        std_ts = np.std(elapsed[1:]) * 1000
+        max_ts = np.max(elapsed[1:]) * 1000
+        min_ts = np.min(elapsed[1:]) * 1000
+
+        return {"first": first_ts, "mean_rest": mean_ts, "std_rest": std_ts, "max_rest": max_ts, "min_rest": min_ts}
