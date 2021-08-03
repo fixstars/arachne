@@ -166,7 +166,6 @@ def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     input_info = TensorInfoDict()
     sess =  onnxruntime.InferenceSession(str(onnx_path))
 
-    inputs = sess.get_inputs()
     for inp in sess.get_inputs():
         input_info[inp.name] = TensorInfo([1] + inp.shape[1:])
 
