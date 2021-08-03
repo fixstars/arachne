@@ -3,13 +3,11 @@ from typing import Any, Dict, Union
 
 import numpy as np
 import tvm
-from tensorflow.python.keras.backend import dtype
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.contrib.graph_executor import GraphModule
 from tvm.contrib.tflite_runtime import TFLiteModule
-from tvm.driver import tvmc
-from tvm.runtime.vm import VirtualMachine
 
+from tvm.runtime.vm import VirtualMachine
 from arachne.pipeline.package.package import Package
 from arachne.pipeline.package.tflite import TFLitePackage
 from arachne.pipeline.package.tvm import TVMPackage
@@ -57,12 +55,10 @@ class RuntimeModule(metaclass=ABCMeta):
         prof_result = timer()
         times = prof_result.results
 
-        result = tvmc.TVMCResult(None, times)
-
-        mean_ts = np.mean(result.times) * 1000
-        std_ts = np.std(result.times) * 1000
-        max_ts = np.max(result.times) * 1000
-        min_ts = np.min(result.times) * 1000
+        mean_ts = np.mean(times) * 1000
+        std_ts = np.std(times) * 1000
+        max_ts = np.max(times) * 1000
+        min_ts = np.min(times) * 1000
 
         return {"mean": mean_ts, "std": std_ts, "max": max_ts, "min": min_ts}
 

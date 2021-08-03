@@ -3,14 +3,13 @@ import tarfile
 import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
+from urllib.parse import urlparse
 
-import tvm.driver.tvmc.common as tvmccommon
 import tvm.rpc
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.autotvm.measure import request_remote
 from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
-from tvm.driver.tvmc.common import parse_target
 from tvm.runtime.module import Module as TVMModule
 from tvm.runtime.vm import VirtualMachine
 from arachne.logger import Logger
@@ -23,8 +22,21 @@ from .module import RuntimeModule, TFLiteRuntimeModule, TVMRuntimeModule, TVMVMR
 logger = Logger.logger()
 
 
+def parse_rpc_tracker_url(rpc_tracker_str):
+    rpc_hostname = rpc_port = None
+
+    if rpc_tracker_str:
+        parsed_url = urlparse("//%s" % rpc_tracker_str)
+        rpc_hostname = parsed_url.hostname
+        rpc_port = parsed_url.port or 9090
+        logger.info("RPC tracker hostname: %s", rpc_hostname)
+        logger.info("RPC tracker port: %s", rpc_port)
+
+    return rpc_hostname, rpc_port
+
+
 def create_session(rpc_tracker: Optional[str], rpc_key: Optional[str]) -> tvm.rpc.RPCSession:
-    hostname, port = tvmccommon.tracker_host_port_from_cli(rpc_tracker)
+    hostname, port = parse_rpc_tracker_url(rpc_tracker)
 
     if hostname:
         # Remote RPC
@@ -75,8 +87,7 @@ def create_runtime(package: Package, session: tvm.rpc.RPCSession, profile: bool)
             module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target)
         return TFLiteRuntimeModule(module, tvmdev, package)
     elif isinstance(package, (TVMPackage, TVMVMPackage)):
-        targets = parse_target(package.target)
-        target = targets[-1]["raw"]
+        target = package.target_tvmdev
         tvmdev = create_tvmdev(target, session)
         graph, params, lib = open_module_file(package.dir / package.package_file, session)
 

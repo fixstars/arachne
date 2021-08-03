@@ -12,6 +12,8 @@ from arachne.pipeline.package import (
     DarknetPackageInfo,
     ONNXPackage,
     ONNXPackageInfo,
+    KerasPackage,
+    KerasPackageInfo,
     Package,
     PackageInfo,
     TF1Package,
@@ -23,7 +25,6 @@ from arachne.pipeline.package import (
     TVMPackage,
     TVMPackageInfo,
 )
-from arachne.pipeline.package.keras import KerasPackage
 from arachne.pipeline.stage.utils import (
     get_target_from_params,
     get_target_host_from_params,
@@ -54,6 +55,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         params = TVMCompilerBase.extract_parameters(params)
         target = params["target"]
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
         if target is None:
             return None
         if "vitis-ai" in target:
@@ -65,14 +67,14 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 TorchScriptPackageInfo,
                 DarknetPackageInfo,
                 TF1PackageInfo,
-                KerasPackage,
-                ONNXPackageInfo
+                ONNXPackageInfo,
+                KerasPackageInfo,
             ),
         ):
             return None
         if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
             return None
-        return cls._OutputPackageInfo(target=target, target_host=target_host)
+        return cls._OutputPackageInfo(target=target, target_host=target_host, target_tvmdev=target_tvmdev)
 
     @staticmethod
     def extract_parameters(params: Parameter) -> Parameter:
@@ -91,6 +93,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         target = params["target"]
         assert target is not None
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
 
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
         filename = "tvm_package.tar"
@@ -129,6 +132,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             output_info=input.output_info,
             target=target,
             target_host=target_host,
+            target_tvmdev=target_tvmdev,
             package_file=Path(filename),
         )
         
@@ -162,7 +166,6 @@ class TVMCompiler(TVMCompilerBase):
             target_host=target_host,
             desired_layout=None,
         )
-        
 
 register_stage(TVMCompiler)
 
