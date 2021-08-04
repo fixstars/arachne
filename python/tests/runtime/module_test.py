@@ -7,6 +7,12 @@ from arachne.pipeline.package.frontend import make_tf1_package_from_concrete_fun
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import runner_init
+from arachne.runtime.module import (
+    TFLiteRuntimeModule,
+    TVMRuntimeModule,
+    TVMVMRuntimeModule,
+)
+from arachne.types.indexed_ordered_dict import IndexedOrderedDict
 from arachne.types.qtype import QType
 
 
@@ -41,7 +47,7 @@ def test_tvm_runtime_module():
 
         pkg = run_pipeline(pipeline, pkg, default_params, tmp_dir)[-1]
 
-        mod = runner_init(pkg)
+        mod: TVMRuntimeModule = runner_init(pkg)
 
         # Check primitive methods work correctly
         assert mod.get_num_inputs() == 2
@@ -104,7 +110,7 @@ def test_tflite_runtime_module():
         # Otherwise, tvm will cause a SEGV at set_input
         input_data = np.array(1.0, dtype=np.float32)
 
-        mod = runner_init(pkg)
+        mod: TFLiteRuntimeModule = runner_init(pkg)
 
         mod.set_input(0, input_data)
         mod.set_input(1, input_data)
@@ -117,3 +123,67 @@ def test_tflite_runtime_module():
         mod.benchmark(10)
 
         del t
+
+
+def test_tvmvm_runtime_module():
+    import tensorflow as tf
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+
+        @tf.function(
+            input_signature=[
+                tf.TensorSpec(shape=[], dtype=tf.float32),
+                tf.TensorSpec(shape=[], dtype=tf.float32),
+            ]
+        )
+        def add(x, y):
+            return x + y
+
+        concrete_func = add.get_concrete_function()
+
+        pkg = make_tf1_package_from_concrete_func(concrete_func, tmp_dir)
+        pipeline = [(get_stage("tvm_vm_compiler"), {})]
+
+        target = get_target("host")
+        default_params = dict()
+        default_params.update(
+            {
+                "_compiler_target": target.target,
+                "_compiler_target_host": target.target_host,
+                "_quantizer_qtype": target.default_qtype,
+            }
+        )
+
+        pkg = run_pipeline(pipeline, pkg, default_params, tmp_dir)[-1]
+
+        mod: TVMVMRuntimeModule = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
+
+        # NOTE: dtype is required.
+        # Otherwise, tvm will cause a SEGV at set_input
+        input_data = np.array(1.0, dtype=np.float32)
+        inputs = [input_data, input_data]
+
+        mod.set_inputs(inputs)
+
+        mod.run()
+
+        outputs = mod.get_output_details()
+        t = mod.get_outputs(outputs)
+        assert t["Identity"] == 2.0
+        del t
+
+        input_data = np.array(2.0, dtype=np.float32)
+        inputs2 = mod.get_input_details()
+        inputs2['x'] = input_data
+        inputs2['y'] = input_data
+
+        mod.set_inputs(inputs2)
+
+        mod.run()
+
+        outputs = mod.get_output_details()
+        t = mod.get_outputs(outputs)
+        assert t["Identity"] == 4.0
+        del t
+
+        mod.benchmark(10)
