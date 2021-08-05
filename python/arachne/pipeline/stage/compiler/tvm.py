@@ -8,6 +8,8 @@ import tvm.driver.tvmc.common as tvmccommon
 import tvm.driver.tvmc.frontends as tvmcfrontends
 
 from arachne.pipeline.package import (
+    CaffePackage,
+    CaffePackageInfo,
     DarknetPackage,
     DarknetPackageInfo,
     ONNXPackage,
@@ -69,6 +71,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 TF1PackageInfo,
                 ONNXPackageInfo,
                 KerasPackageInfo,
+                CaffePackageInfo
             ),
         ):
             return None
@@ -99,10 +102,12 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         filename = "tvm_package.tar"
 
         assert isinstance(
-            input, (TFLitePackage, TorchScriptPackage, DarknetPackage, TF1Package, KerasPackage, ONNXPackage)
+            input, (TFLitePackage, TorchScriptPackage, DarknetPackage, TF1Package, KerasPackage, ONNXPackage, CaffePackage)
         )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
+        elif isinstance(input, CaffePackage):
+            input_filename = input.caffemodel_file
         elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package, KerasPackage, ONNXPackage)):
             input_filename = input.model_file
 

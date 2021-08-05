@@ -56,6 +56,9 @@ RUN bash /install/install_opencv.sh
 COPY install/install_darknet.sh /install/install_darknet.sh
 RUN bash /install/install_darknet.sh
 
+COPY install/install_caffe.sh /install/install_caffe.sh
+RUN bash /install/install_caffe.sh
+
 COPY install/install_docker.sh /install/install_docker.sh
 RUN bash /install/install_docker.sh
 
