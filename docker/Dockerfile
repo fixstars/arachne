@@ -2,8 +2,6 @@ FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update --fix-missing
-
 COPY install/install_core.sh /install/install_core.sh
 RUN bash /install/install_core.sh
 

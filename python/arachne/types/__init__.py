@@ -1,4 +1,3 @@
-from .arachne_dataset import ArachneDataset, ArachneDatasetFromSequence
 from .indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from .qtype import QType
 from .registry import Registry

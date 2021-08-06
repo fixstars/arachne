@@ -3,6 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+from arachne.dataset import Dataset
 from arachne.pipeline.package import (
     KerasPackage,
     KerasPackageInfo,
@@ -21,7 +22,7 @@ from arachne.pipeline.stage.utils import (
     get_qtype_from_params,
     parse_bool,
 )
-from arachne.types import ArachneDataset, IndexedOrderedDict, QType
+from arachne.types import IndexedOrderedDict, QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
@@ -130,7 +131,8 @@ class TFLiteConverter(Stage):
                 converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_path)
         else:
             raise RuntimeError(
-                f"The type of input package must be TF1Package or TF2Package, but it is {input.__class__.__name__}"
+                "The type of input package must be TF1Package or TF2Package, "
+                f"but it is {input.__class__.__name__}"
             )
 
         converter.allow_custom_ops = True
@@ -144,7 +146,7 @@ class TFLiteConverter(Stage):
             make_dataset = params["make_dataset"]
             assert make_dataset is not None
             dataset = make_dataset()
-            assert isinstance(dataset, ArachneDataset)
+            assert isinstance(dataset, Dataset)
             preprocess = params["preprocess"]
             assert preprocess is not None
 
