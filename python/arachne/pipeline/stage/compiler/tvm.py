@@ -49,9 +49,9 @@ logger = Logger.logger()
 class TVMCompilerBase(Stage, metaclass=ABCMeta):
     """A base class for TVMCompiler & TVMVMCompiler"""
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def get_name() -> str:
+    def get_name(cls) -> str:
         raise NotImplementedError()
 
     @staticmethod
@@ -92,8 +92,8 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             target=target, target_host=target_host, target_tvmdev=target_tvmdev
         )
 
-    @staticmethod
-    def extract_parameters(params: Parameter) -> Parameter:
+    @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
         target = get_target_from_params(params)
         target_host = get_target_host_from_params(params)
 
@@ -221,8 +221,8 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 class TVMCompiler(TVMCompilerBase):
     """A stage for compiling a dnn model via tvm.relay.build()"""
 
-    @staticmethod
-    def get_name() -> str:
+    @classmethod
+    def get_name(cls) -> str:
         return "tvm_compiler"
 
     @staticmethod
@@ -354,8 +354,8 @@ register_stage_candidate(TVMCompiler)
 class TVMVMCompiler(TVMCompilerBase):
     """A stage for compiling a dnn model via tvm.relay.vm.build()"""
 
-    @staticmethod
-    def get_name() -> str:
+    @classmethod
+    def get_name(cls) -> str:
         return "tvm_vm_compiler"
 
     @staticmethod

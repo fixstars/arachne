@@ -8,22 +8,22 @@ Parameter = Dict[str, Any]
 
 
 class Stage(metaclass=ABCMeta):
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def get_name() -> str:
+    def get_name(cls) -> str:
         pass
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         pass
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def extract_parameters(params: Parameter) -> Parameter:
+    def extract_parameters(cls, params: Parameter) -> Parameter:
         pass
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+    def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         pass

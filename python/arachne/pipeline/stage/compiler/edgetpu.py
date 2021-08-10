@@ -16,12 +16,12 @@ from ..stage import Parameter, Stage
 
 
 class EdgeTpuCompiler(Stage):
-    @staticmethod
-    def get_name() -> str:
+    @classmethod
+    def get_name(cls) -> str:
         return "edgetpu_compiler"
 
-    @staticmethod
-    def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
+    @classmethod
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         if not isinstance(input, TFLitePackageInfo):
             return None
         if input.qtype not in (QType.INT8, QType.INT8_FULL):
@@ -31,12 +31,12 @@ class EdgeTpuCompiler(Stage):
 
         return TFLitePackageInfo(qtype=input.qtype, for_edgetpu=True)
 
-    @staticmethod
-    def extract_parameters(params: Parameter) -> Parameter:
+    @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
         return {}
 
-    @staticmethod
-    def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+    @classmethod
+    def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         assert isinstance(input, TFLitePackage)
         input_filename = input.model_file
         name, ext = os.path.splitext(input_filename)
