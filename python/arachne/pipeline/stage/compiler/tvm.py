@@ -66,7 +66,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 
     @classmethod
     def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
-        params = TVMCompilerBase.extract_parameters(params)
+        params = cls.extract_parameters(params)
         target = params["target"]
         target_host = params["target_host"]
         target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
@@ -94,13 +94,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 
     @classmethod
     def extract_parameters(cls, params: Parameter) -> Parameter:
-        target = get_target_from_params(params)
-        target_host = get_target_host_from_params(params)
-
-        new_params = {"target": target, "target_host": target_host}
-        new_params.update(params)
-
-        return new_params
+        raise NotImplementedError()
 
     @staticmethod
     def __load_tvmc_model(input: Package) -> TVMCModel:
@@ -234,6 +228,22 @@ class TVMCompiler(TVMCompilerBase):
         return TVMPackageInfo(**kwargs)
 
     @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
+        target = get_target_from_params(params)
+        target_host = get_target_host_from_params(params)
+
+        new_params = {}
+        new_params["target"] = target
+        new_params["target_host"] = target_host
+        new_params["tuning_records"] = params.get("tuning_records")
+        new_params["disabled_pass"] = params.get("disabled_pass")
+        new_params["opt_level"] = params.get("opt_level", 3)
+        new_params["cross"] = params.get("cross")
+        new_params["cross_options"] = params.get("cross_options")
+
+        return new_params
+
+    @classmethod
     def compile_model(
         cls,
         model: TVMCModel,
@@ -365,6 +375,19 @@ class TVMVMCompiler(TVMCompilerBase):
     @staticmethod
     def _OutputPackageInfo(**kwargs) -> TVMVMPackageInfo:
         return TVMVMPackageInfo(**kwargs)
+
+    @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
+        target = get_target_from_params(params)
+        target_host = get_target_host_from_params(params)
+
+        new_params = {}
+        new_params["target"] = target
+        new_params["target_host"] = target_host
+        new_params["disabled_pass"] = params.get("disabled_pass")
+        new_params["opt_level"] = params.get("opt_level", 3)
+
+        return new_params
 
     @classmethod
     def compile_model(
