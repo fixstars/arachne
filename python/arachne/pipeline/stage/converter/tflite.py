@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from arachne.dataset import Dataset
+from arachne.logger import Logger
 from arachne.pipeline.package import (
     KerasPackage,
     KerasPackageInfo,
@@ -26,6 +27,8 @@ from arachne.types import IndexedOrderedDict, QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
+
+logger = Logger.logger()
 
 
 class SetShapeMode(Enum):
@@ -122,6 +125,7 @@ class TFLiteConverter(Stage):
                 ):
                     new_names.clear()
                     for tensor, info in zip(input_tensors, input.input_info.values()):
+                        logger.info(f"Set input shape: {tensor.name} <= {info.shape}")
                         new_names.append(tensor.name.split(":")[0])
                         tensor.set_shape(info.shape)
 
@@ -136,6 +140,7 @@ class TFLiteConverter(Stage):
             )
 
         converter.allow_custom_ops = True
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
 
         if quantize_type is QType.FP32:
             pass
