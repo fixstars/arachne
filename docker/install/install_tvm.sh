@@ -5,7 +5,7 @@ set -euo pipefail
 current_dir=$(cd $(dirname $0); pwd)
 script_dir=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)
 
-if [ -z ${TVM_DIR+x} ]; 
+if [ -z ${TVM_DIR+x} ];
 then
     tvm_dir=${script_dir}/../../3rdparty/tvm
 else
@@ -28,6 +28,7 @@ echo set\(USE_CUDNN ON\) >> config.cmake
 echo set\(USE_CUBLAS ON\) >> config.cmake
 echo set\(USE_TENSORRT_CODEGEN ON\) >> config.cmake
 echo set\(USE_TENSORRT_RUNTIME ON\) >> config.cmake
+echo set\(USE_ONNX_RUNTIME /usr/local/onnxruntime\) >> config.cmake
 
 # Build
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ${tvm_dir}
