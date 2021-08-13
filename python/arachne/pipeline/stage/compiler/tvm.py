@@ -238,8 +238,6 @@ class TVMCompiler(TVMCompilerBase):
         new_params["tuning_records"] = params.get("tuning_records")
         new_params["disabled_pass"] = params.get("disabled_pass")
         new_params["opt_level"] = params.get("opt_level", 3)
-        new_params["cross"] = params.get("cross")
-        new_params["cross_options"] = params.get("cross_options")
 
         return new_params
 
@@ -318,10 +316,8 @@ class TVMCompiler(TVMCompilerBase):
         ### Export a package ###
         # Create a new tvmc model package object from the graph definition.
 
-        cross = compile_params.get("cross")
-        cross_options = compile_params.get("cross_options")
         package_path = model.export_package(
-            graph_module, str(output_path), cross, cross_options, "tar"
+            graph_module, str(output_path), lib_format="tar"
         )
 
         # Write dumps to file.
