@@ -7,6 +7,7 @@ from typing import Optional
 
 import docker
 import numpy as np
+import tvm.driver.tvmc.common as tvmccommon
 import tvm.driver.tvmc.frontends as tvmcfrontends
 from docker.models.containers import ExecResult
 
@@ -71,7 +72,7 @@ class VitisAICompiler(Stage):
     @staticmethod
     def _export_model(input, model_path, output_dir):
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
-        if isinstance(input, Tf1Package):
+        if isinstance(input, TF1Package):
             # When tvmc.frontends loads a tf1 model (*.pb) that outputs multiple tensors, we have to specify output tensor names
             tvmcmodel = tvmcfrontends.load_model(
                 str(model_path),
@@ -206,6 +207,7 @@ class VitisAICompiler(Stage):
         params = VitisAICompiler.extract_parameters(params)
         target = params["target"]
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
         if target is None:
             return None
         if "vitis-ai" not in target:
@@ -213,10 +215,10 @@ class VitisAICompiler(Stage):
         if not isinstance(
             input,
             (
-                TfLitePackageInfo,
+                TFLitePackageInfo,
                 TorchScriptPackageInfo,
                 DarknetPackageInfo,
-                Tf1PackageInfo,
+                TF1PackageInfo,
                 ONNXPackageInfo,
             ),
         ):
@@ -231,7 +233,7 @@ class VitisAICompiler(Stage):
         if params["make_dataset"] is None or params["preprocess"] is None:
             return None
 
-        return TVMPackageInfo(target=target, target_host=target_host)
+        return TVMPackageInfo(target=target, target_host=target_host, target_tvmdev=target_tvmdev)
 
     @classmethod
     def extract_parameters(cls, params: Parameter) -> Parameter:
@@ -257,6 +259,7 @@ class VitisAICompiler(Stage):
         samples = params["qsample"]
         target = params["target"]
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
         assert target is not None
         output_name = "tvm_package.tar"
         client = docker.from_env()
@@ -275,7 +278,7 @@ class VitisAICompiler(Stage):
         assert preprocess is not None
 
         assert isinstance(
-            input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, ONNXPackage)
+            input, (TFLitePackage, TorchScriptPackage, DarknetPackage, TF1Package, ONNXPackage)
         )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
@@ -312,6 +315,7 @@ class VitisAICompiler(Stage):
             output_info=input.output_info,
             target=target,
             target_host=target_host,
+            target_tvmdev=target_tvmdev,
             package_file=Path(output_name),
         )
 
