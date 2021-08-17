@@ -38,12 +38,12 @@ class SetShapeMode(Enum):
 
 
 class TFLiteConverter(Stage):
-    @staticmethod
-    def get_name() -> str:
+    @classmethod
+    def get_name(cls) -> str:
         return "tflite_converter"
 
-    @staticmethod
-    def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
+    @classmethod
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         params = TFLiteConverter.extract_parameters(params)
         quantize_type = params["qtype"]
         if not isinstance(input, (KerasPackageInfo, TF1PackageInfo, TF2PackageInfo)):
@@ -56,8 +56,8 @@ class TFLiteConverter(Stage):
 
         return TFLitePackageInfo(qtype=quantize_type, for_edgetpu=False)
 
-    @staticmethod
-    def extract_parameters(params: Parameter) -> Parameter:
+    @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
         quantize_type = get_qtype_from_params(params)
         samples = int(params.get("qsample", "256"))
         make_dataset, make_dataset_str = get_make_dataset_from_params(params)
@@ -80,8 +80,8 @@ class TFLiteConverter(Stage):
             "set_shape": set_shape,
         }
 
-    @staticmethod
-    def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+    @classmethod
+    def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         params = TFLiteConverter.extract_parameters(params)
         quantize_type = params["qtype"]
         samples = params["qsample"]

@@ -12,6 +12,7 @@ class TVMVMPackageInfo(PackageInfo):
     target_host: Optional[str]
     target_tvmdev: str
 
+
 @attr.s(auto_attribs=True, frozen=True)
 class TVMVMPackage(TVMVMPackageInfo, Package):
     package_file: Path

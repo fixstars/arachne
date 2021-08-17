@@ -47,12 +47,12 @@ class PyTorchQuantizer(Stage):
                 output = qmodel(preprocessed)
                 loss = criterion(output, target)
 
-    @staticmethod
-    def get_name() -> str:
+    @classmethod
+    def get_name(cls) -> str:
         return "pytorch_quantizer"
 
-    @staticmethod
-    def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
+    @classmethod
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         params = PyTorchQuantizer.extract_parameters(params)
         quantize_type = params["qtype"]
         if not isinstance(input, PyTorchPackageInfo):
@@ -66,8 +66,8 @@ class PyTorchQuantizer(Stage):
 
         return TorchScriptPackageInfo(qtype=quantize_type)
 
-    @staticmethod
-    def extract_parameters(params: Parameter) -> Parameter:
+    @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
         quantize_type = get_qtype_from_params(params)
         samples = int(params.get("qsample", "256"))
         qbackend = params.get("qbackend")
@@ -92,8 +92,8 @@ class PyTorchQuantizer(Stage):
             "preprocess_str": preprocess_str,
         }
 
-    @staticmethod
-    def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+    @classmethod
+    def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         import torch
         import torch.nn
         import torch.quantization

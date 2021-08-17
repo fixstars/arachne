@@ -26,7 +26,7 @@ from arachne.pipeline.package import (
     TorchScriptPackage,
     TorchScriptPackageInfo,
     TVMPackage,
-    TVMPackageInfo
+    TVMPackageInfo,
 )
 from arachne.pipeline.stage.utils import (
     get_make_dataset_from_params,
@@ -197,12 +197,12 @@ class VitisAICompiler(Stage):
         if exitcode != 0:
             raise Exception("Compile in Vitis-AI container failed.")
 
-    @staticmethod
-    def get_name() -> str:
+    @classmethod
+    def get_name(cls) -> str:
         return "vitis_ai_compiler"
 
-    @staticmethod
-    def get_output_info(input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
+    @classmethod
+    def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         params = VitisAICompiler.extract_parameters(params)
         target = params["target"]
         target_host = params["target_host"]
@@ -233,8 +233,8 @@ class VitisAICompiler(Stage):
 
         return TVMPackageInfo(target=target, target_host=target_host)
 
-    @staticmethod
-    def extract_parameters(params: Parameter) -> Parameter:
+    @classmethod
+    def extract_parameters(cls, params: Parameter) -> Parameter:
         target = get_target_from_params(params)
         target_host = get_target_host_from_params(params)
         samples = int(params.get("qsample", "256"))
@@ -251,8 +251,8 @@ class VitisAICompiler(Stage):
             "preprocess_str": preprocess_str,
         }
 
-    @staticmethod
-    def process(input: Package, params: Parameter, output_dir: Path) -> Package:
+    @classmethod
+    def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         params = VitisAICompiler.extract_parameters(params)
         samples = params["qsample"]
         target = params["target"]
@@ -281,7 +281,7 @@ class VitisAICompiler(Stage):
             input_filename = input.weight_file
         elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package, ONNXPackage)):
             input_filename = input.model_file
-                     
+
         container = client.containers.get(vai_container_id)
         try:
             # save calibration images to .npz

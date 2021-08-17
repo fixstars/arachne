@@ -13,7 +13,7 @@ examples/out
 .bash_history
 .python_history
 
-prof/
+.prof/
 
 # Python
 arachne-*-py*.whl
