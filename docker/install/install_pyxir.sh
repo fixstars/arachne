@@ -5,6 +5,10 @@ set -euo pipefail
 current_dir=$(cd $(dirname $0); pwd)
 script_dir=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)
 git clone --recursive https://github.com/Xilinx/pyxir
+cd pyxir
+git checkout refs/tags/v0.2.1
+git submodule update --recursive
+cd ..
 
 #modify ultra96 hardware file for DPU-PYNQ v2.6
 wget https://www.xilinx.com/bin/public/openDownload?filename=pynqdpu.dpu.ultra96.hwh -O ultra96.hwh

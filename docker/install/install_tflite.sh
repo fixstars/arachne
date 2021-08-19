@@ -13,7 +13,7 @@ cd ..
 python3 -m pip install flatbuffers
 
 # Build tensorflow-lite
-apt-get install -y swig libjpeg-dev zlib1g-dev python3-dev python3-numpy
+apt-get update && apt-get install -y swig libjpeg-dev zlib1g-dev python3-dev python3-numpy
 python3 -m pip install numpy pybind11
 
 /tensorflow/tensorflow/lite/tools/make/download_dependencies.sh

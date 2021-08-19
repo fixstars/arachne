@@ -16,6 +16,8 @@ from tvm.target import Target
 
 from arachne.logger import Logger
 from arachne.pipeline.package import (
+    CaffePackage,
+    CaffePackageInfo,
     DarknetPackage,
     DarknetPackageInfo,
     KerasPackage,
@@ -83,6 +85,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 TF1PackageInfo,
                 ONNXPackageInfo,
                 KerasPackageInfo,
+                CaffePackageInfo
             ),
         ):
             return None
@@ -121,10 +124,13 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 TF1Package,
                 KerasPackage,
                 ONNXPackage,
+                CaffePackage
             ),
         )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
+        elif isinstance(input, CaffePackage):
+            input_filename = input.caffemodel_file
         elif isinstance(
             input, (TFLitePackage, TorchScriptPackage, TF1Package, KerasPackage, ONNXPackage)
         ):

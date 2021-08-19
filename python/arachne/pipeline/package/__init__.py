@@ -1,3 +1,4 @@
+from .caffe import CaffePackage, CaffePackageInfo
 from .darknet import DarknetPackage, DarknetPackageInfo
 from .keras import KerasPackage, KerasPackageInfo
 from .onnx import ONNXPackage, ONNXPackageInfo

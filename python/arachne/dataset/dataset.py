@@ -4,7 +4,7 @@ from typing_extensions import Protocol, runtime_checkable
 
 
 @runtime_checkable
-class ArachneDataset(Protocol):
+class Dataset(Protocol):
     def __len__(self) -> int:
         ...
 
@@ -12,7 +12,7 @@ class ArachneDataset(Protocol):
         ...
 
 
-class ArachneDatasetFromSequence:
+class DatasetFromSequence:
     def __init__(self, seq):
         self._seq = seq
 
