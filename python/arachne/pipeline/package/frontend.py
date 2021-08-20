@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from tvm.contrib.download import download as tvm_download
 
 from arachne.pipeline.package import (
+    CaffePackage,
     DarknetPackage,
     KerasPackage,
     ONNXPackage,
@@ -157,6 +158,23 @@ def make_keras_package_from_module(model, output_dir: Path) -> KerasPackage:
         model_file=Path(h5_path),
     )
 
+
+def make_onnx_package(
+    model_url: str,
+    input_info: TensorInfoDict,
+    output_info: TensorInfoDict,
+    output_dir: Path,
+) -> ONNXPackage:
+    outputs = download(model_url, output_dir)
+
+    return ONNXPackage(
+        dir=output_dir,
+        input_info=input_info,
+        output_info=output_info,
+        model_file=Path(outputs[0].name),
+    )
+
+
 def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     import onnx
     import onnxruntime
@@ -164,7 +182,7 @@ def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     onnx.save_model(model, onnx_path)
     
     input_info = TensorInfoDict()
-    sess =  onnxruntime.InferenceSession(str(onnx_path))
+    sess = onnxruntime.InferenceSession(str(onnx_path))
 
     for inp in sess.get_inputs():
         input_info[inp.name] = TensorInfo([1] + inp.shape[1:])
@@ -265,4 +283,22 @@ def make_darknet_package(
         output_info=output_info,
         cfg_file=Path(outputs[0].name),
         weight_file=Path(outputs[1].name),
+    )
+
+
+def make_caffe_package(
+    prototxt_url: str,
+    caffemodel_url: str,
+    input_info: TensorInfoDict,
+    output_info: TensorInfoDict,
+    output_dir: Path,
+) -> CaffePackage:
+    outputs = download([prototxt_url, caffemodel_url], output_dir)
+
+    return CaffePackage(
+        dir=output_dir,
+        input_info=input_info,
+        output_info=output_info,
+        prototxt_file=Path(outputs[0].name),
+        caffemodel_file=Path(outputs[1].name),
     )
