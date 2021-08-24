@@ -6,6 +6,7 @@ import tvm
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 from tvm.contrib.graph_executor import GraphModule
 from tvm.contrib.tflite_runtime import TFLiteModule
+from tvm.runtime.profiler_vm import VirtualMachineProfiler
 from tvm.runtime.vm import VirtualMachine
 
 from arachne.pipeline.package.package import Package
@@ -297,13 +298,19 @@ class TVMVMRuntimeModule(RuntimeModule):
             raise RuntimeError("unreachable")
 
     def run(self):
-        self.module.invoke_stateful("main")
+        if isinstance(self.module, VirtualMachineProfiler):
+            vmprofile_res = self.module.profile(func_name="main")
+            print(vmprofile_res)
+        elif isinstance(self.module, VirtualMachine):
+            self.module.invoke_stateful("main")
+        else:
+            raise Exception("unreachable")
 
     def benchmark(self, repeat: int) -> Dict:
         import time
 
         input_tensors = [
-            np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype)
+            np.random.uniform(0, 255, size=ispec.shape).astype(ispec.dtype)
             for ispec in self.package.input_info.values()
         ]
 
