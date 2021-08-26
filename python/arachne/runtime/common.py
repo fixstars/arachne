@@ -12,6 +12,7 @@ from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
 from tvm.runtime.module import Module as TVMModule
 from tvm.runtime.vm import VirtualMachine
+from tvm.runtime.profiler_vm import VirtualMachineProfiler
 from arachne.logger import Logger
 from arachne.pipeline.package import Package, TFLitePackage, TVMPackage
 from arachne.pipeline.package.tvm_vm import TVMVMPackage
@@ -103,8 +104,11 @@ def create_runtime(package: Package, session: tvm.rpc.RPCSession, profile: bool)
             logger.debug("load params into the runtime module")
             module.load_params(params)
             return TVMRuntimeModule(module, tvmdev, package)
-        else:
-            module = VirtualMachine(lib, tvmdev)
+        elif isinstance(package, TVMVMPackage):
+            if profile:
+                module = VirtualMachineProfiler(lib, tvmdev)
+            else:
+                module = VirtualMachine(lib, tvmdev)
             return TVMVMRuntimeModule(module, tvmdev, package)
     else:
         raise RuntimeError(f"This package ({package.__class__.__name__}) cannot run.")
