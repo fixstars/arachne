@@ -11,7 +11,7 @@ from tvm.autotvm.measure import request_remote
 from tvm.contrib import graph_executor, tflite_runtime
 from tvm.contrib.debugger import debug_executor
 from tvm.runtime.module import Module as TVMModule
-from tvm.runtime.vm import VirtualMachine, Executable
+from tvm.runtime.vm import VirtualMachine
 from tvm.runtime.profiler_vm import VirtualMachineProfiler
 from arachne.logger import Logger
 from arachne.pipeline.package import Package, TFLitePackage, TVMPackage
@@ -106,8 +106,6 @@ def create_runtime(package: Package, session: tvm.rpc.RPCSession, profile: bool)
             return TVMRuntimeModule(module, tvmdev, package)
         elif isinstance(package, TVMVMPackage):
             if profile:
-                if not isinstance(lib, Executable):
-                    lib = Executable(lib)
                 module = VirtualMachineProfiler(lib, tvmdev)
             else:
                 module = VirtualMachine(lib, tvmdev)
