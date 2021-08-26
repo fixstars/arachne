@@ -2,8 +2,6 @@ FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update --fix-missing
-
 COPY install/install_core.sh /install/install_core.sh
 RUN bash /install/install_core.sh
 
@@ -55,6 +53,9 @@ RUN bash /install/install_opencv.sh
 
 COPY install/install_darknet.sh /install/install_darknet.sh
 RUN bash /install/install_darknet.sh
+
+COPY install/install_caffe.sh /install/install_caffe.sh
+RUN bash /install/install_caffe.sh
 
 COPY install/install_docker.sh /install/install_docker.sh
 RUN bash /install/install_docker.sh

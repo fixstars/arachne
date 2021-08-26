@@ -2,6 +2,7 @@ import itertools
 from pathlib import Path
 from typing import Callable, Optional
 
+from arachne.dataset import Dataset
 from arachne.pipeline.package import (
     Package,
     PackageInfo,
@@ -15,7 +16,7 @@ from arachne.pipeline.stage.utils import (
     get_preprocess_from_params,
     get_qtype_from_params,
 )
-from arachne.types import ArachneDataset, QType, TensorInfoDict
+from arachne.types import QType, TensorInfoDict
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
@@ -25,7 +26,7 @@ class PyTorchQuantizer(Stage):
     @staticmethod
     def _calibration(
         qmodel,
-        dataset: ArachneDataset,
+        dataset: Dataset,
         preprocess: Callable,
         input_info: TensorInfoDict,
         calibrate_num: int,
@@ -112,7 +113,7 @@ class PyTorchQuantizer(Stage):
             make_dataset = params["make_dataset"]
             assert make_dataset is not None
             dataset = make_dataset()
-            assert isinstance(dataset, ArachneDataset)
+            assert isinstance(dataset, Dataset)
             preprocess = params["preprocess"]
             assert preprocess is not None
 

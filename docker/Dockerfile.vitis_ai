@@ -16,7 +16,7 @@
 # under the License.
 
 # use Vitis AI
-FROM xilinx/vitis-ai:latest
+FROM xilinx/vitis-ai:1.3.411
 
 RUN apt-get update --fix-missing
 

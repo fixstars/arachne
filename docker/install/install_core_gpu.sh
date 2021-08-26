@@ -2,5 +2,4 @@
 
 set -euo pipefail
 
-apt install -y libcublas-dev
-
+apt-get update && apt-get install -y libcublas-dev

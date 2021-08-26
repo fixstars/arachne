@@ -2,5 +2,5 @@
 
 set -euo pipefail
 
-apt-get install -y --no-install-recommends \
+apt-get update && apt-get install -y --no-install-recommends \
   vim neovim emacs tmux zsh

@@ -307,8 +307,6 @@ class TVMVMRuntimeModule(RuntimeModule):
             raise Exception("unreachable")
 
     def benchmark(self, repeat: int) -> Dict:
-        import time
-
         input_tensors = [
             np.random.uniform(0, 255, size=ispec.shape).astype(ispec.dtype)
             for ispec in self.package.input_info.values()
@@ -316,20 +314,18 @@ class TVMVMRuntimeModule(RuntimeModule):
 
         self.set_inputs(input_tensors)
 
-        elapsed = []
-        for _ in range(repeat):
-            t1 = time.perf_counter()
-            self.run()
-            t2 = time.perf_counter()
-            elapsed.append(t2 - t1)
-        elapsed = np.array(elapsed)
+        timer = self.module.module.time_evaluator("invoke_stateful", self.tvmdev, 1, repeat=repeat)
+        self.run()
 
-        first_ts = elapsed[0] * 1000
+        prof_result = timer("main")
+        times = prof_result.results
+
         # because first execution is slow, calculate average time from the second execution
-        mean_ts = np.mean(elapsed[1:]) * 1000
-        std_ts = np.std(elapsed[1:]) * 1000
-        max_ts = np.max(elapsed[1:]) * 1000
-        min_ts = np.min(elapsed[1:]) * 1000
+        first_ts = times[0] * 1000
+        mean_ts = np.mean(times[1:]) * 1000
+        std_ts = np.std(times[1:]) * 1000
+        max_ts = np.max(times[1:]) * 1000
+        min_ts = np.min(times[1:]) * 1000
 
         return {
             "first": first_ts,

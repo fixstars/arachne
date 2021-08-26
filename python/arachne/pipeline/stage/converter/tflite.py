@@ -3,6 +3,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+from arachne.dataset import Dataset
+from arachne.logger import Logger
 from arachne.pipeline.package import (
     KerasPackage,
     KerasPackageInfo,
@@ -21,10 +23,12 @@ from arachne.pipeline.stage.utils import (
     get_qtype_from_params,
     parse_bool,
 )
-from arachne.types import ArachneDataset, IndexedOrderedDict, QType
+from arachne.types import IndexedOrderedDict, QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
+
+logger = Logger.logger()
 
 
 class SetShapeMode(Enum):
@@ -121,6 +125,7 @@ class TFLiteConverter(Stage):
                 ):
                     new_names.clear()
                     for tensor, info in zip(input_tensors, input.input_info.values()):
+                        logger.info(f"Set input shape: {tensor.name} <= {info.shape}")
                         new_names.append(tensor.name.split(":")[0])
                         tensor.set_shape(info.shape)
 
@@ -130,10 +135,12 @@ class TFLiteConverter(Stage):
                 converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_path)
         else:
             raise RuntimeError(
-                f"The type of input package must be TF1Package or TF2Package, but it is {input.__class__.__name__}"
+                "The type of input package must be TF1Package or TF2Package, "
+                f"but it is {input.__class__.__name__}"
             )
 
         converter.allow_custom_ops = True
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
 
         if quantize_type is QType.FP32:
             pass
@@ -144,7 +151,7 @@ class TFLiteConverter(Stage):
             make_dataset = params["make_dataset"]
             assert make_dataset is not None
             dataset = make_dataset()
-            assert isinstance(dataset, ArachneDataset)
+            assert isinstance(dataset, Dataset)
             preprocess = params["preprocess"]
             assert preprocess is not None
 

@@ -1,7 +1,9 @@
-from typing import Iterable, List, Set, Type
+from typing import Any, Callable, Iterable, List, Set, Type
 
+from arachne.dataset import Dataset
 from arachne.device import Target, TVMCTarget
 from arachne.logger import Logger
+from arachne.types.indexed_ordered_dict import IndexedOrderedDict
 from arachne.utils import make_artifact_dir
 
 from . import Pipeline
@@ -86,11 +88,11 @@ def make_params_for_target(target: Target) -> Parameter:
     return params
 
 
-# def make_base_params(
-#     preprocess: Callable[[torch.Tensor, IndexedOrderedDict], IndexedOrderedDict],
-#     make_dataset: Callable[[], ArachneDataset],
-# ) -> Parameter:
-#     return {"_quantizer_preprocess": preprocess, "_quantizer_make_dataset": make_dataset}
+def make_base_params(
+    preprocess: Callable[[Any, IndexedOrderedDict], IndexedOrderedDict],
+    make_dataset: Callable[[], Dataset]
+) -> Parameter:
+    return {"_quantizer_preprocess": preprocess, "_quantizer_make_dataset": make_dataset}
 
 
 def make_pipeline_candidate(

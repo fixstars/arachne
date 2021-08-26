@@ -2,7 +2,8 @@ import importlib
 import importlib.util
 from typing import Any, Callable, List, Optional, Tuple
 
-from arachne.types import ArachneDataset, IndexedOrderedDict, QType
+from arachne.dataset import Dataset
+from arachne.types import IndexedOrderedDict, QType
 
 from .stage import Parameter
 
@@ -48,7 +49,7 @@ def get_qtype_from_params(params: Parameter, default: QType = QType.INT8) -> QTy
 
 def get_make_dataset_from_params(
     params: Parameter,
-) -> Tuple[Optional[Callable[[], ArachneDataset]], str]:
+) -> Tuple[Optional[Callable[[], Dataset]], str]:
     original_str = ""
     make_dataset = get_first_value(params, ["make_dataset", "_quantizer_make_dataset"])
     if isinstance(make_dataset, str):

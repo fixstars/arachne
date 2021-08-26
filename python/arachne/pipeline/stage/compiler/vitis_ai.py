@@ -7,9 +7,11 @@ from typing import Optional
 
 import docker
 import numpy as np
+import tvm.driver.tvmc.common as tvmccommon
 import tvm.driver.tvmc.frontends as tvmcfrontends
 from docker.models.containers import ExecResult
 
+from arachne.dataset import Dataset
 from arachne.logger import Logger
 from arachne.pipeline.package import (
     DarknetPackage,
@@ -33,7 +35,7 @@ from arachne.pipeline.stage.utils import (
     get_target_from_params,
     get_target_host_from_params,
 )
-from arachne.types import ArachneDataset, QType
+from arachne.types import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage
@@ -70,7 +72,7 @@ class VitisAICompiler(Stage):
     @staticmethod
     def _export_model(input, model_path, output_dir):
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
-        if isinstance(input, Tf1Package):
+        if isinstance(input, TF1Package):
             # When tvmc.frontends loads a tf1 model (*.pb) that outputs multiple tensors, we have to specify output tensor names
             tvmcmodel = tvmcfrontends.load_model(
                 str(model_path),
@@ -131,16 +133,18 @@ class VitisAICompiler(Stage):
 
     @staticmethod
     def _copy_files_from_docker_container(client, container, output_name, output_dir):
-        with tempfile.TemporaryDirectory() as dname:
-            tarfilename = dname + "get.tar"
-            f = open(tarfilename, "wb")
-            path_in_container = VitisAICompiler._container_work_path + "/" + output_name
-            bits, stat = client.api.get_archive(container.id, path_in_container)
-            for chunk in bits:
-                f.write(chunk)
-            f.close()
-            with tarfile.open(tarfilename, mode="r") as tf:
-                tf.extractall(path=output_dir)
+        tarpath_in_container = VitisAICompiler._container_work_path + "/" + output_name
+        relaypath_in_conatiner = tarpath_in_container + ".relay"
+        for filepath_in_container in [tarpath_in_container, relaypath_in_conatiner]:
+            with tempfile.TemporaryDirectory() as dname:
+                tarfilename = dname + "get.tar"
+                f = open(tarfilename, "wb")
+                bits, stat = client.api.get_archive(container.id, filepath_in_container)
+                for chunk in bits:
+                    f.write(chunk)
+                f.close()
+                with tarfile.open(tarfilename, mode="r") as tf:
+                    tf.extractall(path=output_dir)
 
     @staticmethod
     def _get_vitis_ai_command(target, target_host, q_samples, output_name, input_info):
@@ -203,12 +207,20 @@ class VitisAICompiler(Stage):
         params = VitisAICompiler.extract_parameters(params)
         target = params["target"]
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
         if target is None:
             return None
         if "vitis-ai" not in target:
             return None
         if not isinstance(
-            input, (TFLitePackageInfo, TorchScriptPackageInfo, DarknetPackageInfo, TF1PackageInfo)
+            input,
+            (
+                TFLitePackageInfo,
+                TorchScriptPackageInfo,
+                DarknetPackageInfo,
+                TF1PackageInfo,
+                ONNXPackageInfo,
+            ),
         ):
             return None
         if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
@@ -221,7 +233,7 @@ class VitisAICompiler(Stage):
         if params["make_dataset"] is None or params["preprocess"] is None:
             return None
 
-        return TVMPackageInfo(target=target, target_host=target_host)
+        return TVMPackageInfo(target=target, target_host=target_host, target_tvmdev=target_tvmdev)
 
     @classmethod
     def extract_parameters(cls, params: Parameter) -> Parameter:
@@ -247,6 +259,7 @@ class VitisAICompiler(Stage):
         samples = params["qsample"]
         target = params["target"]
         target_host = params["target_host"]
+        target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
         assert target is not None
         output_name = "tvm_package.tar"
         client = docker.from_env()
@@ -260,14 +273,16 @@ class VitisAICompiler(Stage):
         make_dataset = params["make_dataset"]
         assert make_dataset is not None
         dataset = make_dataset()
-        assert isinstance(dataset, ArachneDataset)
+        assert isinstance(dataset, Dataset)
         preprocess = params["preprocess"]
         assert preprocess is not None
 
-        assert isinstance(input, (TfLitePackage, TorchScriptPackage, DarknetPackage, Tf1Package, ONNXPackage))
+        assert isinstance(
+            input, (TFLitePackage, TorchScriptPackage, DarknetPackage, TF1Package, ONNXPackage)
+        )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
-        elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package)):
+        elif isinstance(input, (TFLitePackage, TorchScriptPackage, TF1Package, ONNXPackage)):
             input_filename = input.model_file
 
         container = client.containers.get(vai_container_id)
@@ -300,6 +315,7 @@ class VitisAICompiler(Stage):
             output_info=input.output_info,
             target=target,
             target_host=target_host,
+            target_tvmdev=target_tvmdev,
             package_file=Path(output_name),
         )
 
