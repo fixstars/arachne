@@ -9,6 +9,8 @@ python3 -m pip install \
     orderedset attrs requests Pillow packaging cloudpickle synr \
     mypy isort black flake8 ffi-navigator
 
+python3 -m pip install "cmake>=3.13"
+
 python3 -m pip install pycocotools
 
-python3 -m pip install --upgrade keyrings.alt 
+python3 -m pip install --upgrade keyrings.alt
