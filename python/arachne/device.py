@@ -114,6 +114,7 @@ def f(*args: T) -> FrozenSet[T]:
 
 
 target_x86 = "llvm -mtriple=x86_64-linux-gnu -mattr=+fma,+avx2"
+target_upcore_plus = "llvm -mtriple=x86_64-linux-gnu"
 target_arm = "llvm -keys=arm_cpu -mtriple=aarch64-linux-gnu -mattr=+neon"
 target_raspi4 = f"{target_arm} -model=bcm2711 -mcpu=cortex-a72"
 target_trt = "tensorrt --remove_no_mac_subgraphs"
@@ -130,6 +131,17 @@ DeviceRegistry.register(
             f("trt", "cpu"): TVMCTarget("fp32", f"{target_trt}, {target_x86}"),
             f("cuda"): TVMCTarget("fp32", "cuda", target_x86),
             f("cpu"): TVMCTarget("int8", target_x86),
+            f("tflite"): TFLiteTarget("int8"),
+        },
+    )
+)
+
+DeviceRegistry.register(
+    Device(
+        "upcore-plus",
+        {"cpu"},
+        {
+            f("cpu"): TVMCTarget("int8", target_upcore_plus),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
