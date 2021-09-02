@@ -3,9 +3,10 @@ from pathlib import Path
 
 import tensorflow as tf
 
-from arachne.device import get_target
+from arachne.device import TVMCTarget, get_target
 from arachne.pipeline.package.frontend import make_tflite_package
-from arachne.pipeline.runner import run_pipeline
+from arachne.pipeline.pipeline import Pipeline
+from arachne.pipeline.runner import make_params_for_target, run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import runner_init
 from arachne.types import IndexedOrderedDict, QType, TensorInfo
@@ -57,18 +58,11 @@ pkg = make_tflite_package(
 )
 
 # Run a compile pipeline
-compile_pipeline = [(get_stage("tvm_compiler"), {})]
+target: TVMCTarget = get_target(TARGET_DEVICE)
 
-target = get_target(TARGET_DEVICE)
+compile_pipeline: Pipeline = [(get_stage("tvm_compiler"), {})]
 
-default_params = dict()
-default_params.update(
-    {
-        "_compiler_target": target.target,
-        "_compiler_target_host": target.target_host,
-        "_quantizer_qtype": target.default_qtype,
-    }
-)
+default_params = make_params_for_target(target)
 outputs = run_pipeline(compile_pipeline, pkg, default_params, OUTPUT_DIR)
 
 compile_duration = time.time() - compile_start

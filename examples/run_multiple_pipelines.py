@@ -3,14 +3,10 @@ from pathlib import Path
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
-from arachne.benchmark import benchmark_tvm_model
-from arachne.common import run_module, runner_init
-from arachne.device import get_device, get_target, parse_device_name
-from arachne.ishape import InputSpec
+from arachne.device import get_target
 from arachne.pipeline.package.frontend import make_tf1_package
-from arachne.pipeline.runner import make_pipeline_candidate, run_pipeline
-from arachne.pipeline.stage.registry import get_stage
-from arachne.types import QType, TensorInfo, TensorInfoDict
+from arachne.pipeline.runner import make_pipeline_candidate
+from arachne.types import TensorInfo, TensorInfoDict
 
 # ============================================================================================= #
 
@@ -45,7 +41,8 @@ OUTPUT_DIR = "./out"
 
 # Compile targets
 # You can find avaiable varaibles in arachne/device.py
-TARGET_DEVICE = "host"
+# TARGET_DEVICE = "host"
+TARGET_DEVICE = "jetson-nano,cpu"
 
 # RPC server/tracker hostname
 RPC_HOST = None

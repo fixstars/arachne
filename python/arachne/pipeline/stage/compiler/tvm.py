@@ -3,7 +3,7 @@ import tarfile
 import tempfile
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import tvm.autotvm
 import tvm.driver.tvmc.common as tvmccommon
@@ -66,36 +66,64 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
     def _OutputPackageInfo(**kwargs):
         raise NotImplementedError()
 
+    @staticmethod
+    def _validate_target(target: str) -> bool:
+        if target is None:
+            return False
+        if "vitis-ai" in target:
+            return False
+        return True
+
+    @staticmethod
+    def _validate_input(input: Union[Package, PackageInfo]) -> bool:
+        if not isinstance(
+            input,
+            (
+                TFLitePackage,
+                TFLitePackageInfo,
+                TorchScriptPackage,
+                TorchScriptPackageInfo,
+                DarknetPackage,
+                DarknetPackageInfo,
+                TF1Package,
+                TF1PackageInfo,
+                ONNXPackage,
+                ONNXPackageInfo,
+                KerasPackage,
+                KerasPackageInfo,
+                CaffePackage,
+                CaffePackageInfo,
+            ),
+        ):
+            return False
+
+        if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
+            return False
+
+        return True
+
     @classmethod
     def get_output_info(cls, input: PackageInfo, params: Parameter) -> Optional[PackageInfo]:
         params = cls.extract_parameters(params)
         target = params["target"]
+
+        if not cls._validate_target(target):
+            return None
+
         target_host = params["target_host"]
         target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
-        if target is None:
+
+        if not cls._validate_input(input):
             return None
-        if "vitis-ai" in target:
-            return None
-        if not isinstance(
-            input,
-            (
-                TFLitePackageInfo,
-                TorchScriptPackageInfo,
-                DarknetPackageInfo,
-                TF1PackageInfo,
-                ONNXPackageInfo,
-                KerasPackageInfo,
-                CaffePackageInfo
-            ),
-        ):
-            return None
-        if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
-            return None
+
         return cls._OutputPackageInfo(
-            target=target, target_host=target_host, target_tvmdev=target_tvmdev
+            target=target,
+            target_host=target_host,
+            target_tvmdev=target_tvmdev,
         )
 
     @classmethod
+    @abstractmethod
     def extract_parameters(cls, params: Parameter) -> Parameter:
         raise NotImplementedError()
 
@@ -115,18 +143,6 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
 
-        assert isinstance(
-            input,
-            (
-                TFLitePackage,
-                TorchScriptPackage,
-                DarknetPackage,
-                TF1Package,
-                KerasPackage,
-                ONNXPackage,
-                CaffePackage
-            ),
-        )
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
         elif isinstance(input, CaffePackage):
@@ -168,9 +184,15 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
     def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         params = cls.extract_parameters(params)
         target = params["target"]
-        assert target is not None
+
+        if not cls._validate_target(target):
+            assert False, ("target must not be {}".format(target))
+
         target_host = params["target_host"]
         target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
+
+        if not cls._validate_input(input):
+            assert False, ("input must not be {}".format(type(input)))
 
         tvmc_model: TVMCModel = cls.__load_tvmc_model(input)
 
@@ -244,6 +266,17 @@ class TVMCompiler(TVMCompilerBase):
         new_params["tuning_records"] = params.get("tuning_records")
         new_params["disabled_pass"] = params.get("disabled_pass")
         new_params["opt_level"] = params.get("opt_level", 3)
+        new_params["lib_format"] = params.get("lib_format", "tar")
+        if new_params["lib_format"] == "tar":
+            # NOTE: we should ignore cross and cross_options because export_package will output a *.so with a *.tar name
+            new_params["cross"] = None
+            new_params["cross_options"] = None
+        else:
+            new_params["cross"] = params.get("cross", None)
+            if not new_params["cross"]:
+                # if the cross parameter is not set, check the default parameter
+                new_params["cross"] = params.get("_compiler_cross", None)
+            new_params["cross_options"] = params.get("cross_options", None)
 
         return new_params
 
@@ -323,7 +356,11 @@ class TVMCompiler(TVMCompilerBase):
         # Create a new tvmc model package object from the graph definition.
 
         package_path = model.export_package(
-            graph_module, str(output_path), lib_format="tar"
+            graph_module,
+            str(output_path),
+            cross=compile_params["cross"],
+            cross_options=compile_params["cross_options"],
+            lib_format=compile_params["lib_format"],
         )
 
         # Write dumps to file.

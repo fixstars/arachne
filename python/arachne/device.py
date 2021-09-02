@@ -21,11 +21,14 @@ class Target(metaclass=ABCMeta):
 class TVMCTarget(Target):
     target: str
     target_host: Optional[str] = None
+    cross_compiler: Optional[str] = None
 
     def validate_package(self, package: PackageInfo) -> bool:
         if not isinstance(package, TVMPackageInfo):
             return False
 
+        # NOTE: cross_compiler does not exist in package
+        # So, we exclude the parameter from validation
         return package.target == self.target and package.target_host == self.target_host
 
 
@@ -122,6 +125,8 @@ target_jetson_nano = str(TVMTarget("nvidia/jetson-nano"))
 target_jetson_tx2 = str(TVMTarget("nvidia/jetson-tx2"))
 target_jetson_xavier_nx = "cuda -keys=cuda,gpu -arch=sm_72 -max_num_threads=1024 -max_threads_per_block=1024 -registers_per_block=65536 -shared_memory_per_block=49152 -thread_warp_size=32"
 
+cc_arm = "aarch64-linux-gnu-gcc"
+
 DeviceRegistry.register(
     Device(
         "host",
@@ -152,7 +157,7 @@ DeviceRegistry.register(
         "raspi4",
         {"cpu"},
         {
-            f("cpu"): TVMCTarget("int8", target_raspi4),
+            f("cpu"): TVMCTarget("int8", target_raspi4, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
@@ -163,10 +168,14 @@ DeviceRegistry.register(
         "jetson-nano",
         {"trt", "cuda"},
         {
-            f("trt", "cuda"): TVMCTarget("fp32", f"{target_trt}, {target_jetson_nano}", target_arm),
-            f("trt", "cpu"): TVMCTarget("fp32", f"{target_trt}, {target_arm}"),
-            f("cuda"): TVMCTarget("fp32", target_jetson_nano, target_arm),
-            f("cpu"): TVMCTarget("int8", target_arm),
+            f("trt", "cuda"): TVMCTarget(
+                "fp32", f"{target_trt}, {target_jetson_nano}", target_arm, cross_compiler=cc_arm
+            ),
+            f("trt", "cpu"): TVMCTarget(
+                "fp32", f"{target_trt}, {target_arm}", cross_compiler=cc_arm
+            ),
+            f("cuda"): TVMCTarget("fp32", target_jetson_nano, target_arm, cross_compiler=cc_arm),
+            f("cpu"): TVMCTarget("int8", target_arm, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
@@ -177,10 +186,14 @@ DeviceRegistry.register(
         "jetson-tx2",
         {"trt", "cuda"},
         {
-            f("trt", "cuda"): TVMCTarget("fp32", f"{target_trt}, {target_jetson_tx2}", target_arm),
-            f("trt", "cpu"): TVMCTarget("fp32", f"{target_trt}, {target_arm}"),
-            f("cuda"): TVMCTarget("fp32", target_jetson_tx2, target_arm),
-            f("cpu"): TVMCTarget("int8", target_arm),
+            f("trt", "cuda"): TVMCTarget(
+                "fp32", f"{target_trt}, {target_jetson_tx2}", target_arm, cross_compiler=cc_arm
+            ),
+            f("trt", "cpu"): TVMCTarget(
+                "fp32", f"{target_trt}, {target_arm}", cross_compiler=cc_arm
+            ),
+            f("cuda"): TVMCTarget("fp32", target_jetson_tx2, target_arm, cross_compiler=cc_arm),
+            f("cpu"): TVMCTarget("int8", target_arm, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
@@ -192,11 +205,18 @@ DeviceRegistry.register(
         {"trt", "cuda"},
         {
             f("trt", "cuda"): TVMCTarget(
-                "fp32", f"{target_trt}, {target_jetson_xavier_nx}", target_arm
+                "fp32",
+                f"{target_trt}, {target_jetson_xavier_nx}",
+                target_arm,
+                cross_compiler=cc_arm,
             ),
-            f("trt", "cpu"): TVMCTarget("fp32", f"{target_trt}, {target_arm}"),
-            f("cuda"): TVMCTarget("fp32", target_jetson_xavier_nx, target_arm),
-            f("cpu"): TVMCTarget("int8", target_arm),
+            f("trt", "cpu"): TVMCTarget(
+                "fp32", f"{target_trt}, {target_arm}", cross_compiler=cc_arm
+            ),
+            f("cuda"): TVMCTarget(
+                "fp32", target_jetson_xavier_nx, target_arm, cross_compiler=cc_arm
+            ),
+            f("cpu"): TVMCTarget("int8", target_arm, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
@@ -208,7 +228,7 @@ DeviceRegistry.register(
         {"edgetpu"},
         {
             f("edgetpu"): EdgeTpuTarget("int8"),
-            f("cpu"): TVMCTarget("int8", target_arm),
+            f("cpu"): TVMCTarget("int8", target_arm, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
@@ -220,7 +240,7 @@ DeviceRegistry.register(
         {"dpu"},
         {
             f("dpu"): DPUTarget(f"vitis-ai -dpu=DPUCZDX8G-ultra96, {target_arm}"),
-            f("cpu"): TVMCTarget("int8", target_arm),
+            f("cpu"): TVMCTarget("int8", target_arm, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
@@ -232,7 +252,7 @@ DeviceRegistry.register(
         {"dpu"},
         {
             f("dpu"): DPUTarget(f"vitis-ai -dpu=DPUCZDX8G-som, {target_arm}"),
-            f("cpu"): TVMCTarget("int8", target_arm),
+            f("cpu"): TVMCTarget("int8", target_arm, cross_compiler=cc_arm),
             f("tflite"): TFLiteTarget("int8"),
         },
     )
