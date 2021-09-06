@@ -84,6 +84,7 @@ def make_params_for_target(target: Target) -> Parameter:
     if isinstance(target, TVMCTarget):
         params["_compiler_target"] = target.target
         params["_compiler_target_host"] = target.target_host
+        params["_compiler_cross"] = target.cross_compiler
 
     return params
 

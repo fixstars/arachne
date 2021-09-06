@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import List, Tuple
 
-from arachne.device import get_target
+from arachne.device import Device, get_device, get_target, parse_device_name
 from arachne.pipeline.package.frontend import (
     make_keras_package_from_module,
     make_onnx_package_from_module,
     make_tf1_package_from_concrete_func,
     make_torchscript_package_from_script_module,
 )
-from arachne.pipeline.runner import run_pipeline
+from arachne.pipeline.runner import make_params_for_target, run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.pipeline.stage.stage import Parameter
 from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
@@ -53,14 +53,7 @@ def compile_for_pytorch(
     # Run compile pipeline
     target = get_target(target_device)
 
-    default_params = dict()
-    default_params.update(
-        {
-            "_compiler_target": target.target,
-            "_compiler_target_host": target.target_host,
-            "_quantizer_qtype": target.default_qtype,
-        }
-    )
+    default_params = make_params_for_target(target)
 
     return run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
 
@@ -82,16 +75,10 @@ def compile_for_keras(
     # Run pipeline
     target = get_target(target_device)
 
-    default_params = dict()
-    default_params.update(
-        {
-            "_compiler_target": target.target,
-            "_compiler_target_host": target.target_host,
-            "_quantizer_qtype": target.default_qtype,
-        }
-    )
+    default_params = make_params_for_target(target)
 
     return run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
+
 
 def compile_for_onnx(
     model, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str
@@ -109,16 +96,10 @@ def compile_for_onnx(
         # run pipeline
         target = get_target(target_device)
 
-        default_params = dict()
-        default_params.update(
-            {
-                "_compiler_target": target.target,
-                "_compiler_target_host": target.target_host,
-                "_quantizer_qtype": target.default_qtype,
-            }
-        )
+        default_params = make_params_for_target(target)
 
         return run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
+
 
 def compile_for_tf_concrete_function(
     concrete_func, target_device: str, pipeline: List[Tuple[str, Parameter]], output_dir: str
@@ -138,13 +119,6 @@ def compile_for_tf_concrete_function(
     # Run pipeline
     target = get_target(target_device)
 
-    default_params = dict()
-    default_params.update(
-        {
-            "_compiler_target": target.target,
-            "_compiler_target_host": target.target_host,
-            "_quantizer_qtype": target.default_qtype,
-        }
-    )
+    default_params = make_params_for_target(target)
 
     return run_pipeline(compile_pipeline, input_pkg, default_params, output_dir)
