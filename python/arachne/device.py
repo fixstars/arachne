@@ -83,7 +83,7 @@ class Device:
         return list(self._target_list.values())
 
 
-DeviceRegistry = Registry[Device]
+DeviceRegistry = Registry[str, Device]
 
 
 def parse_device_name(device_name: str) -> Tuple[str, Set[str]]:
@@ -93,6 +93,10 @@ def parse_device_name(device_name: str) -> Tuple[str, Set[str]]:
 
 def get_device(key: str) -> Optional[Device]:
     return DeviceRegistry.get(key)
+
+
+def register_device(device: Device):
+    DeviceRegistry.register(device.get_name(), device)
 
 
 def get_target(device_name: str) -> Optional[Target]:
@@ -127,7 +131,7 @@ target_jetson_xavier_nx = "cuda -keys=cuda,gpu -arch=sm_72 -max_num_threads=1024
 
 cc_arm = "aarch64-linux-gnu-gcc"
 
-DeviceRegistry.register(
+register_device(
     Device(
         "host",
         {"cpu"},
@@ -141,7 +145,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "upcore-plus",
         {"cpu"},
@@ -152,7 +156,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "raspi4",
         {"cpu"},
@@ -163,7 +167,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "jetson-nano",
         {"trt", "cuda"},
@@ -181,7 +185,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "jetson-tx2",
         {"trt", "cuda"},
@@ -199,7 +203,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "jetson-xavier-nx",
         {"trt", "cuda"},
@@ -222,7 +226,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "coral",
         {"edgetpu"},
@@ -234,7 +238,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "ultra96",
         {"dpu"},
@@ -246,7 +250,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "kv260",
         {"dpu"},

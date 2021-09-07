@@ -3,27 +3,22 @@ from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 from typing_extensions import Protocol
 
-
-class HasName(Protocol):
-    get_name: Callable[[], str]
-
-
-T = TypeVar("T", bound=HasName)
+K = TypeVar("K")
+V = TypeVar("V")
 
 
-class Registry(Generic[T]):
-    __registries: Dict[Type, Dict[str, T]] = defaultdict(OrderedDict)
+class Registry(Generic[K, V]):
+    __registries: Dict[Type, Dict[K, V]] = defaultdict(OrderedDict)
 
     @classmethod
-    def register(cls, value: T):
-        key = value.get_name()
+    def register(cls, key: K, value: V):
         assert key not in cls.__registries.keys()
         cls.__registries[cls][key] = value
 
     @classmethod
-    def get(cls, key: str) -> Optional[T]:
+    def get(cls, key: str) -> Optional[V]:
         return cls.__registries[cls].get(key)
 
     @classmethod
-    def list(cls) -> List[str]:
+    def list(cls) -> List[K]:
         return list(cls.__registries[cls].keys())

@@ -3,7 +3,7 @@ from typing import Iterable, List, Optional, Tuple, Type
 from arachne.pipeline.stage import Parameter, Stage
 from arachne.types import Registry
 
-StageRegistry = Registry[Type[Stage]]
+StageRegistry = Registry[str, Type[Stage]]
 
 stage_candidates: List[Tuple[Type[Stage], Parameter]] = []
 
@@ -13,7 +13,7 @@ def get_stage(key: str) -> Optional[Type[Stage]]:
 
 
 def register_stage(stage: Type[Stage]):
-    StageRegistry.register(stage)
+    StageRegistry.register(stage.get_name(), stage)
 
 
 def stage_list() -> List[str]:

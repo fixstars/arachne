@@ -19,6 +19,7 @@ from arachne.pipeline.package import TVMPackage, TVMVMPackage
 from arachne.runtime.session import create_tvmdev
 from arachne.types import IndexedOrderedDict
 
+from ._registry import register_module_class
 from .module import RuntimeModule
 
 logger = Logger.logger()
@@ -173,6 +174,9 @@ class TVMRuntimeModule(RuntimeModule):
         return self.module.get_num_outputs()
 
 
+register_module_class(TVMPackage, TVMRuntimeModule)
+
+
 class TVMVMRuntimeModule(RuntimeModule):
     def __init__(self, package: TVMVMPackage, session: tvm.rpc.RPCSession, profile: bool):
         assert isinstance(package, TVMVMPackage)
@@ -264,3 +268,6 @@ class TVMVMRuntimeModule(RuntimeModule):
             return [self.__vmobj_to_list(f) for f in output]
         else:
             raise RuntimeError("Unknown object type: %s" % type(output))
+
+
+register_module_class(TVMVMPackage, TVMVMRuntimeModule)

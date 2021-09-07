@@ -9,6 +9,7 @@ from arachne.pipeline.package.tflite import TFLitePackage
 from arachne.runtime.session import create_tvmdev
 from arachne.types import IndexedOrderedDict
 
+from ._registry import register_module_class
 from .module import RuntimeModule
 
 
@@ -86,3 +87,6 @@ class TFLiteRuntimeModule(RuntimeModule):
     def set_num_threads(self, num_threads):
         """A wrapper for TFLiteModule.set_num_threads()"""
         self.module.set_num_threads(num_threads)
+
+
+register_module_class(TFLitePackage, TFLiteRuntimeModule)
