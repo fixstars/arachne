@@ -1,58 +1,15 @@
-from abc import ABCMeta, abstractmethod
 from typing import AbstractSet, Dict, FrozenSet, List, Optional, Set, Tuple, TypeVar
 
-import attr
 from tvm.target import Target as TVMTarget
 
-from arachne.pipeline.package import PackageInfo, TFLitePackageInfo, TVMPackageInfo
+from arachne.runtime.target import (
+    DPUTarget,
+    EdgeTpuTarget,
+    Target,
+    TFLiteTarget,
+    TVMCTarget,
+)
 from arachne.types import Registry
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class Target(metaclass=ABCMeta):
-    default_qtype: str
-
-    @abstractmethod
-    def validate_package(self, package: PackageInfo) -> bool:
-        pass
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class TVMCTarget(Target):
-    target: str
-    target_host: Optional[str] = None
-    cross_compiler: Optional[str] = None
-
-    def validate_package(self, package: PackageInfo) -> bool:
-        if not isinstance(package, TVMPackageInfo):
-            return False
-
-        # NOTE: cross_compiler does not exist in package
-        # So, we exclude the parameter from validation
-        return package.target == self.target and package.target_host == self.target_host
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class DPUTarget(TVMCTarget):
-    default_qtype: str = attr.ib(default="fp32", init=False)
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class TFLiteTarget(Target):
-    def validate_package(self, package: PackageInfo) -> bool:
-        if not isinstance(package, TFLitePackageInfo):
-            return False
-
-        return not package.for_edgetpu
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class EdgeTpuTarget(Target):
-    def validate_package(self, package: PackageInfo) -> bool:
-        if not isinstance(package, TFLitePackageInfo):
-            return False
-
-        return package.for_edgetpu
 
 
 class Device:
