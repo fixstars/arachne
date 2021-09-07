@@ -18,12 +18,12 @@ class Registry(Generic[T]):
     def register(cls, value: T):
         key = value.get_name()
         assert key not in cls.__registries.keys()
-        Registry.__registries[cls][key] = value
+        cls.__registries[cls][key] = value
 
     @classmethod
     def get(cls, key: str) -> Optional[T]:
-        return Registry.__registries[cls].get(key)
+        return cls.__registries[cls].get(key)
 
     @classmethod
     def list(cls) -> List[str]:
-        return list(Registry.__registries[cls].keys())
+        return list(cls.__registries[cls].keys())
