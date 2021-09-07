@@ -24,6 +24,12 @@ class RuntimeModule(metaclass=ABCMeta):
 
     @abstractmethod
     def get_name(self) -> str:
+        """Get the RuntimeModule name
+
+        Returns
+        ----------
+        str : The RuntimeModule name
+        """
         pass
 
     @abstractmethod
