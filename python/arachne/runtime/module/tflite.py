@@ -24,6 +24,9 @@ class TFLiteRuntimeModule(RuntimeModule):
         self.tvmdev = tvmdev
         self.package = package
 
+    def get_name(self) -> str:
+        return "tflite_runtime_module"
+
     def set_inputs(self, inputs: Union[IndexedOrderedDict, List]):
         if isinstance(inputs, IndexedOrderedDict):
             for i, k in enumerate(self.package.input_info.keys()):
