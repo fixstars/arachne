@@ -24,22 +24,24 @@ from arachne.pipeline.package import (
     KerasPackageInfo,
     ONNXPackage,
     ONNXPackageInfo,
-    Package,
-    PackageInfo,
     TF1Package,
     TF1PackageInfo,
-    TFLitePackage,
-    TFLitePackageInfo,
     TorchScriptPackage,
     TorchScriptPackageInfo,
-    TVMPackage,
-    TVMPackageInfo,
-    TVMVMPackage,
-    TVMVMPackageInfo,
 )
 from arachne.pipeline.stage.utils import (
     get_target_from_params,
     get_target_host_from_params,
+)
+from arachne.runtime.package import (
+    Package,
+    PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
+    TVMPackage,
+    TVMPackageInfo,
+    TVMVMPackage,
+    TVMVMPackageInfo,
 )
 
 from .._registry import register_stage, register_stage_candidate

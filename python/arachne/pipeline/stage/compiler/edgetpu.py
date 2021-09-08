@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
-from arachne.pipeline.package import (
+from arachne.runtime.package import (
     Package,
     PackageInfo,
     TFLitePackage,

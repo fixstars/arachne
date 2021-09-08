@@ -15,7 +15,7 @@ from tvm.runtime.profiler_vm import VirtualMachineProfiler
 from tvm.runtime.vm import VirtualMachine
 
 from arachne.logger import Logger
-from arachne.pipeline.package import TVMPackage, TVMVMPackage
+from arachne.runtime.package import TVMPackage, TVMVMPackage
 from arachne.runtime.session import create_tvmdev
 from arachne.types import IndexedOrderedDict
 

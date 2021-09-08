@@ -1,6 +1,6 @@
 from typing import List, Optional, Type
 
-from arachne.pipeline.package import Package
+from arachne.runtime.package import Package
 from arachne.types import Registry
 
 from .module import RuntimeModule

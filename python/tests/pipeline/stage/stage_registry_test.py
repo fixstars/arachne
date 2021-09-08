@@ -4,10 +4,10 @@ from typing import List, Optional
 
 import attr
 
-from arachne.pipeline.package import Package, PackageInfo, import_package
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage import Parameter, Stage
 from arachne.pipeline.stage.registry import get_stage, register_stage
+from arachne.runtime.package import Package, PackageInfo, import_package
 from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 
 
@@ -72,7 +72,8 @@ def test_mystage():
         export_pkg_path = Path(tmp_dir + "/exported.tar")
         pkg.export(export_pkg_path)
 
-        import_pkg = import_package(export_pkg_path)
+        import_dir = Path(tmp_dir + "/imported")
+        import_pkg = import_package(export_pkg_path, import_dir)
         assert pkg.input_info == import_pkg.input_info
         assert pkg.output_info == import_pkg.output_info
         assert pkg.message == import_pkg.message

@@ -8,20 +8,22 @@ from arachne.logger import Logger
 from arachne.pipeline.package import (
     KerasPackage,
     KerasPackageInfo,
-    Package,
-    PackageInfo,
     TF1Package,
     TF1PackageInfo,
     TF2Package,
     TF2PackageInfo,
-    TFLitePackage,
-    TFLitePackageInfo,
 )
 from arachne.pipeline.stage.utils import (
     get_make_dataset_from_params,
     get_preprocess_from_params,
     get_qtype_from_params,
     parse_bool,
+)
+from arachne.runtime.package import (
+    Package,
+    PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
 )
 from arachne.types import IndexedOrderedDict, QType
 

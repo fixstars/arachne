@@ -4,8 +4,6 @@ from typing import Callable, Optional
 
 from arachne.dataset import Dataset
 from arachne.pipeline.package import (
-    Package,
-    PackageInfo,
     PyTorchPackage,
     PyTorchPackageInfo,
     TorchScriptPackage,
@@ -16,6 +14,7 @@ from arachne.pipeline.stage.utils import (
     get_preprocess_from_params,
     get_qtype_from_params,
 )
+from arachne.runtime.package import Package, PackageInfo
 from arachne.types import QType, TensorInfoDict
 
 from .._registry import register_stage, register_stage_candidate

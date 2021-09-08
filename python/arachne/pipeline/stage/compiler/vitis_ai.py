@@ -18,22 +18,24 @@ from arachne.pipeline.package import (
     DarknetPackageInfo,
     ONNXPackage,
     ONNXPackageInfo,
-    Package,
-    PackageInfo,
     TF1Package,
     TF1PackageInfo,
-    TFLitePackage,
-    TFLitePackageInfo,
     TorchScriptPackage,
     TorchScriptPackageInfo,
-    TVMPackage,
-    TVMPackageInfo,
 )
 from arachne.pipeline.stage.utils import (
     get_make_dataset_from_params,
     get_preprocess_from_params,
     get_target_from_params,
     get_target_host_from_params,
+)
+from arachne.runtime.package import (
+    Package,
+    PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
+    TVMPackage,
+    TVMPackageInfo,
 )
 from arachne.types import QType
 

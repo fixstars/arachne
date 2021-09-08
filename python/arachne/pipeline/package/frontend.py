@@ -13,9 +13,9 @@ from arachne.pipeline.package import (
     PyTorchPackage,
     TF1Package,
     TF2Package,
-    TFLitePackage,
+    TorchScriptPackage,
 )
-from arachne.pipeline.package.torchscript import TorchScriptPackage
+from arachne.runtime.package import TFLitePackage
 from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.types.qtype import QType
 from arachne.types.tensor_info import TensorInfo
@@ -180,7 +180,7 @@ def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     import onnxruntime
     onnx_path = output_dir / 'model.onnx'
     onnx.save_model(model, onnx_path)
-    
+
     input_info = TensorInfoDict()
     sess = onnxruntime.InferenceSession(str(onnx_path))
 

@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Union
 import tvm.rpc
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 
-from arachne.pipeline.package.package import Package
+from arachne.runtime.package import Package
 from arachne.types import IndexedOrderedDict
 
 
