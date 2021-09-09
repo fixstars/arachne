@@ -134,7 +134,8 @@ test-sdist-install:
   dependencies:
     - build-sdist
   before_script:
-    - export TVM_CMAKE_CONFIG=${CI_PROJECT_DIR}/tvm_config_sample.cmake
+    - ./docker/install/setup_tvm_config.sh
+    - export TVM_CMAKE_CONFIG=${CI_PROJECT_DIR}/config.cmake
   script:
     - pwd
     - pip install dist/*.tar.gz
