@@ -5,18 +5,16 @@ from arachne.types import Registry
 
 from .module import RuntimeModule
 
-K = Type[Package]
-V = Type[RuntimeModule]
-ModuleClassRegistry = Registry[K, V]
+_module_class_registry: Registry[Type[Package], Type[RuntimeModule]] = Registry()
 
 
-def get_module_class(package: Package) -> Optional[V]:
-    return ModuleClassRegistry.get(type(package))
+def get_module_class(package: Package) -> Optional[Type[RuntimeModule]]:
+    return _module_class_registry.get(type(package))
 
 
-def register_module_class(package_class: K, module_class: V):
-    ModuleClassRegistry.register(package_class, module_class)
+def register_module_class(package_class: Type[Package], module_class: Type[RuntimeModule]):
+    _module_class_registry.register(package_class, module_class)
 
 
-def module_class_list() -> List[K]:
-    return ModuleClassRegistry.list()
+def module_class_list() -> List[Type[Package]]:
+    return _module_class_registry.list()

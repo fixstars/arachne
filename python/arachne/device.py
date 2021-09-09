@@ -34,7 +34,7 @@ class Device:
         return list(self._target_list.values())
 
 
-DeviceRegistry = Registry[str, Device]
+_device_registry: Registry[str, Device] = Registry()
 
 
 def parse_device_name(device_name: str) -> Tuple[str, Set[str]]:
@@ -43,11 +43,11 @@ def parse_device_name(device_name: str) -> Tuple[str, Set[str]]:
 
 
 def get_device(key: str) -> Optional[Device]:
-    return DeviceRegistry.get(key)
+    return _device_registry.get(key)
 
 
 def register_device(device: Device):
-    DeviceRegistry.register(device.get_name(), device)
+    _device_registry.register(device.get_name(), device)
 
 
 def get_target(device_name: str) -> Optional[Target]:
@@ -61,7 +61,7 @@ def get_target(device_name: str) -> Optional[Target]:
 
 
 def device_list() -> List[str]:
-    return DeviceRegistry.list()
+    return _device_registry.list()
 
 
 T = TypeVar("T")
