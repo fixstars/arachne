@@ -7,11 +7,8 @@ from arachne.pipeline.package.frontend import make_tf1_package_from_concrete_fun
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import runner_init
-from arachne.runtime.module import (
-    TFLiteRuntimeModule,
-    TVMRuntimeModule,
-    TVMVMRuntimeModule,
-)
+from arachne.runtime.module.tflite import TFLiteRuntimeModule
+from arachne.runtime.module.tvm import TVMRuntimeModule, TVMVMRuntimeModule
 from arachne.types.indexed_ordered_dict import IndexedOrderedDict
 from arachne.types.qtype import QType
 
@@ -174,8 +171,8 @@ def test_tvmvm_runtime_module():
 
         input_data = np.array(2.0, dtype=np.float32)
         inputs2 = mod.get_input_details()
-        inputs2['x'] = input_data
-        inputs2['y'] = input_data
+        inputs2["x"] = input_data
+        inputs2["y"] = input_data
 
         mod.set_inputs(inputs2)
 

@@ -1,29 +1,21 @@
 from collections import OrderedDict, defaultdict
-from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
+from typing import Dict, Generic, List, Optional, TypeVar
 
-from typing_extensions import Protocol
-
-
-class HasName(Protocol):
-    get_name: Callable[[], str]
+K = TypeVar("K")
+V = TypeVar("V")
 
 
-T = TypeVar("T", bound=HasName)
+class Registry(Generic[K, V]):
+    def __init__(self):
+        self._registries: Dict[K, V] = defaultdict(OrderedDict)
 
+    def register(self, key: K, value: V, override=False):
+        assert override or key not in self._registries.keys()
+        self._registries[key] = value
+        return value
 
-class Registry(Generic[T]):
-    __registries: Dict[Type, Dict[str, T]] = defaultdict(OrderedDict)
+    def get(self, key: K) -> Optional[V]:
+        return self._registries.get(key)
 
-    @classmethod
-    def register(cls, value: T):
-        key = value.get_name()
-        assert key not in cls.__registries.keys()
-        Registry.__registries[cls][key] = value
-
-    @classmethod
-    def get(cls, key: str) -> Optional[T]:
-        return Registry.__registries[cls].get(key)
-
-    @classmethod
-    def list(cls) -> List[str]:
-        return list(Registry.__registries[cls].keys())
+    def list(self) -> List[K]:
+        return list(self._registries.keys())

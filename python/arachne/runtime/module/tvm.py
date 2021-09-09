@@ -1,99 +1,49 @@
-from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, List, Union
+import os
+import tarfile
+import tempfile
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import tvm
-from tvm._ffi.runtime_ctypes import Device as TVMDevice
+import tvm.rpc
+from tvm.contrib import graph_executor
+from tvm.contrib.debugger import debug_executor
 from tvm.contrib.graph_executor import GraphModule
-from tvm.contrib.tflite_runtime import TFLiteModule
+from tvm.runtime.module import Module as TVMModule
 from tvm.runtime.profiler_vm import VirtualMachineProfiler
 from tvm.runtime.vm import VirtualMachine
 
-from arachne.pipeline.package.package import Package
-from arachne.pipeline.package.tflite import TFLitePackage
-from arachne.pipeline.package.tvm import TVMPackage
+from arachne.logger import Logger
+from arachne.pipeline.package import TVMPackage, TVMVMPackage
+from arachne.runtime.session import create_tvmdev
 from arachne.types import IndexedOrderedDict
 
+from ._registry import register_module_class
+from .module import RuntimeModule
 
-class RuntimeModule(metaclass=ABCMeta):
-    """
-    An abstract class for arachne runtime modules.
-    Each subclass for this class represents a corresponding tvm runtime.
-    """
+logger = Logger.logger()
 
-    module: Union[GraphModule, TFLiteModule, VirtualMachine]
-    tvmdev: TVMDevice
-    package: Package
 
-    @abstractmethod
-    def __init__(
-        self,
-        module: Union[GraphModule, TFLiteModule, VirtualMachine],
-        tvmdev: TVMDevice,
-        package: Package,
-    ):
-        pass
+def open_module_file(
+    file: Path, session: tvm.rpc.RPCSession
+) -> Tuple[Optional[str], Optional[bytearray], TVMModule]:
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        logger.debug("extracting module file %s", file)
+        with tarfile.open(file) as t:
+            t.extractall(tmp_dir)
+        graph = None
+        params = None
+        graph_path = os.path.join(tmp_dir, "mod.json")
+        if os.path.exists(graph_path):
+            graph = open(graph_path).read()
+        params_path = os.path.join(tmp_dir, "mod.params")
+        if os.path.exists(params_path):
+            params = bytearray(open(params_path, "rb").read())
+        session.upload(os.path.join(tmp_dir, "mod.tar"))
+        lib = session.load_module("mod.tar")
 
-    @abstractmethod
-    def set_inputs(self, inputs: Union[IndexedOrderedDict, List]):
-        """Set inputs to the module
-
-        Parameters
-        ----------
-        inputs : dict of str to NDArray
-        """
-        pass
-
-    @abstractmethod
-    def run(self):
-        """Run forward execution of the graph"""
-        pass
-
-    @abstractmethod
-    def benchmark(self, repeat: int) -> Dict:
-        """Benchmarking the module with dummy inputs
-
-        Parameters
-        ----------
-        repeats : the number of times to repeat the measurement
-
-        Returns
-        -------
-        Dict : The information of benchmark results
-        """
-        pass
-
-    @abstractmethod
-    def get_outputs(self, output_info: IndexedOrderedDict) -> IndexedOrderedDict:
-        """Get outputs
-
-        Parameters
-        ----------
-        output_info : a dict containing tensor names to be get
-
-        Returns
-        -------
-        IndexedOrderdDict : a dict of output tensors
-        """
-        pass
-
-    def get_input_details(self) -> IndexedOrderedDict:
-        """Get the input tesonr information
-
-        Returns
-        -------
-        IndexedOrderdDict : a dict of tensor name (str) to TensorInfo
-        """
-        return self.package.input_info.copy()
-
-    def get_output_details(self) -> IndexedOrderedDict:
-        """Get the output tesonr information
-
-        Returns
-        -------
-        IndexedOrderdDict : a dict of tensor name (str) to TensorInfo
-        """
-        return self.package.output_info.copy()
+    return graph, params, lib
 
 
 class TVMRuntimeModule(RuntimeModule):
@@ -101,11 +51,29 @@ class TVMRuntimeModule(RuntimeModule):
     A wrapper class for tvm.contrib.graph_executor.GraphModule
     """
 
-    def __init__(self, module: GraphModule, tvmdev: TVMDevice, package: TVMPackage):
-        assert isinstance(module, GraphModule)
+    def __init__(self, package: TVMPackage, session: tvm.rpc.RPCSession, profile: bool):
+        assert isinstance(package, TVMPackage)
+        target = package.target_tvmdev
+        tvmdev = create_tvmdev(target, session)
+        graph, params, lib = open_module_file(package.dir / package.package_file, session)
+
+        if profile:
+            logger.debug("creating runtime with profiling enabled")
+            # TODO(Maruoka): Set dump_root into under '.artifacts/{experiment}'
+            module = debug_executor.create(graph, lib, tvmdev, dump_root="./.prof")
+        else:
+            logger.debug("creating runtime with profiling disabled")
+            module = graph_executor.create(graph, lib, tvmdev)
+
+            logger.debug("load params into the runtime module")
+            module.load_params(params)
+
         self.module: GraphModule = module
         self.tvmdev = tvmdev
         self.package = package
+
+    def get_name(self):
+        return "tvm_runtime_module"
 
     def set_inputs(self, inputs: Union[IndexedOrderedDict, List]):
         if isinstance(inputs, IndexedOrderedDict):
@@ -206,80 +174,29 @@ class TVMRuntimeModule(RuntimeModule):
         return self.module.get_num_outputs()
 
 
-class TFLiteRuntimeModule(RuntimeModule):
-    def __init__(self, module: TFLiteModule, tvmdev: TVMDevice, package: TFLitePackage):
-        assert isinstance(module, TFLiteModule)
-        self.module: TFLiteModule = module
-        self.tvmdev = tvmdev
-        self.package = package
-
-    def set_inputs(self, inputs: Union[IndexedOrderedDict, List]):
-        if isinstance(inputs, IndexedOrderedDict):
-            for i, k in enumerate(self.package.input_info.keys()):
-                if k in inputs:
-                    tvm_array = tvm.nd.array(inputs[k], self.tvmdev)
-                    self.module.set_input(i, tvm_array)
-        elif isinstance(inputs, list):
-            assert len(inputs) == len(self.package.input_info.keys())
-            for i, input in enumerate(inputs):
-                tvm_array = tvm.nd.array(input, self.tvmdev)
-                self.module.set_input(i, tvm_array)
-        else:
-            raise RuntimeError("unreachable")
-
-    def run(self):
-        self.module.invoke()
-
-    def benchmark(self, repeat: int) -> Dict:
-        input_tensors = [
-            np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype)
-            for ispec in self.package.input_info.values()
-        ]
-
-        for i, tensor in enumerate(input_tensors):
-            self.set_input(i, tensor)
-
-        timer = self.module.module.time_evaluator("invoke", self.tvmdev, 1, repeat=repeat)
-
-        self.run()
-
-        prof_result = timer()
-        times = prof_result.results
-
-        mean_ts = np.mean(times) * 1000
-        std_ts = np.std(times) * 1000
-        max_ts = np.max(times) * 1000
-        min_ts = np.min(times) * 1000
-
-        return {"mean": mean_ts, "std": std_ts, "max": max_ts, "min": min_ts}
-
-    def get_outputs(self, output_info: IndexedOrderedDict) -> IndexedOrderedDict:
-        outputs: IndexedOrderedDict = IndexedOrderedDict()
-        for i, name in enumerate(output_info.keys()):
-            outputs[name] = self.module.get_output(i).asnumpy()
-
-        return outputs
-
-    def set_input(self, idx: int, value):
-        """A wrapper for TFLiteModule.set_input()"""
-        tvm_array = tvm.nd.array(value, self.tvmdev)
-        self.module.set_input(idx, tvm_array)
-
-    def get_output(self, idx: int):
-        """A wrapper for TFLiteModule.get_output()"""
-        return self.module.get_output(idx)
-
-    def set_num_threads(self, num_threads):
-        """A wrapper for TFLiteModule.set_num_threads()"""
-        self.module.set_num_threads(num_threads)
+register_module_class(TVMPackage, TVMRuntimeModule)
 
 
 class TVMVMRuntimeModule(RuntimeModule):
-    def __init__(self, module: VirtualMachine, tvmdev: TVMDevice, package: TVMPackage):
-        assert isinstance(module, VirtualMachine)
-        self.module: VirtualMachine = module
+    def __init__(self, package: TVMVMPackage, session: tvm.rpc.RPCSession, profile: bool):
+        assert isinstance(package, TVMVMPackage)
+        target = package.target_tvmdev
+        tvmdev = create_tvmdev(target, session)
+        graph, params, lib = open_module_file(package.dir / package.package_file, session)
+
+        if profile:
+            logger.debug("creating runtime with profiling enabled")
+            module = VirtualMachineProfiler(lib, tvmdev)
+        else:
+            logger.debug("creating runtime with profiling disabled")
+            module = VirtualMachine(lib, tvmdev)
+
+        self.module: GraphModule = module
         self.tvmdev = tvmdev
         self.package = package
+
+    def get_name(self) -> str:
+        return "tvm_vm_runtime_module"
 
     def set_inputs(self, inputs: Union[IndexedOrderedDict, List]):
         if isinstance(inputs, IndexedOrderedDict):
@@ -351,3 +268,6 @@ class TVMVMRuntimeModule(RuntimeModule):
             return [self.__vmobj_to_list(f) for f in output]
         else:
             raise RuntimeError("Unknown object type: %s" % type(output))
+
+
+register_module_class(TVMVMPackage, TVMVMRuntimeModule)

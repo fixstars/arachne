@@ -1,58 +1,9 @@
-from abc import ABCMeta, abstractmethod
 from typing import AbstractSet, Dict, FrozenSet, List, Optional, Set, Tuple, TypeVar
 
-import attr
 from tvm.target import Target as TVMTarget
 
-from arachne.pipeline.package import PackageInfo, TFLitePackageInfo, TVMPackageInfo
+from arachne.target import DPUTarget, EdgeTpuTarget, Target, TFLiteTarget, TVMCTarget
 from arachne.types import Registry
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class Target(metaclass=ABCMeta):
-    default_qtype: str
-
-    @abstractmethod
-    def validate_package(self, package: PackageInfo) -> bool:
-        pass
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class TVMCTarget(Target):
-    target: str
-    target_host: Optional[str] = None
-    cross_compiler: Optional[str] = None
-
-    def validate_package(self, package: PackageInfo) -> bool:
-        if not isinstance(package, TVMPackageInfo):
-            return False
-
-        # NOTE: cross_compiler does not exist in package
-        # So, we exclude the parameter from validation
-        return package.target == self.target and package.target_host == self.target_host
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class DPUTarget(TVMCTarget):
-    default_qtype: str = attr.ib(default="fp32", init=False)
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class TFLiteTarget(Target):
-    def validate_package(self, package: PackageInfo) -> bool:
-        if not isinstance(package, TFLitePackageInfo):
-            return False
-
-        return not package.for_edgetpu
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class EdgeTpuTarget(Target):
-    def validate_package(self, package: PackageInfo) -> bool:
-        if not isinstance(package, TFLitePackageInfo):
-            return False
-
-        return package.for_edgetpu
 
 
 class Device:
@@ -83,7 +34,7 @@ class Device:
         return list(self._target_list.values())
 
 
-DeviceRegistry = Registry[Device]
+_device_registry: Registry[str, Device] = Registry()
 
 
 def parse_device_name(device_name: str) -> Tuple[str, Set[str]]:
@@ -92,7 +43,11 @@ def parse_device_name(device_name: str) -> Tuple[str, Set[str]]:
 
 
 def get_device(key: str) -> Optional[Device]:
-    return DeviceRegistry.get(key)
+    return _device_registry.get(key)
+
+
+def register_device(device: Device):
+    _device_registry.register(device.get_name(), device)
 
 
 def get_target(device_name: str) -> Optional[Target]:
@@ -106,7 +61,7 @@ def get_target(device_name: str) -> Optional[Target]:
 
 
 def device_list() -> List[str]:
-    return DeviceRegistry.list()
+    return _device_registry.list()
 
 
 T = TypeVar("T")
@@ -127,7 +82,7 @@ target_jetson_xavier_nx = "cuda -keys=cuda,gpu -arch=sm_72 -max_num_threads=1024
 
 cc_arm = "aarch64-linux-gnu-gcc"
 
-DeviceRegistry.register(
+register_device(
     Device(
         "host",
         {"cpu"},
@@ -141,7 +96,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "upcore-plus",
         {"cpu"},
@@ -152,7 +107,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "raspi4",
         {"cpu"},
@@ -163,7 +118,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "jetson-nano",
         {"trt", "cuda"},
@@ -181,7 +136,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "jetson-tx2",
         {"trt", "cuda"},
@@ -199,7 +154,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "jetson-xavier-nx",
         {"trt", "cuda"},
@@ -222,7 +177,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "coral",
         {"edgetpu"},
@@ -234,7 +189,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "ultra96",
         {"dpu"},
@@ -246,7 +201,7 @@ DeviceRegistry.register(
     )
 )
 
-DeviceRegistry.register(
+register_device(
     Device(
         "kv260",
         {"dpu"},
