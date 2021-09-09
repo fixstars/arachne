@@ -2,10 +2,10 @@ from typing import Optional
 
 import tvm.rpc
 
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
 from arachne.runtime.module.registry import get_module_class
 from arachne.runtime.package import Package
 from arachne.runtime.session import create_session
-from arachne.types import IndexedOrderedDict
 
 from .module.module import RuntimeModule
 

@@ -5,9 +5,9 @@ import tvm
 from tvm.contrib import tflite_runtime
 from tvm.contrib.tflite_runtime import TFLiteModule
 
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
 from arachne.runtime.package.tflite import TFLitePackage
 from arachne.runtime.session import create_tvmdev
-from arachne.types import IndexedOrderedDict
 
 from ._registry import register_module_class
 from .module import RuntimeModule

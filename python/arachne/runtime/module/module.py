@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Union
 import tvm.rpc
 from tvm._ffi.runtime_ctypes import Device as TVMDevice
 
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
 from arachne.runtime.package import Package
-from arachne.types import IndexedOrderedDict
 
 
 class RuntimeModule(metaclass=ABCMeta):

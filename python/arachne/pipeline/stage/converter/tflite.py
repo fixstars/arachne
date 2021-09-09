@@ -3,6 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+import arachne
 from arachne.dataset import Dataset
 from arachne.logger import Logger
 from arachne.pipeline.package import (
@@ -19,13 +20,14 @@ from arachne.pipeline.stage.utils import (
     get_qtype_from_params,
     parse_bool,
 )
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
 from arachne.runtime.package import (
     Package,
     PackageInfo,
     TFLitePackage,
     TFLitePackageInfo,
 )
-from arachne.types import IndexedOrderedDict, QType
+from arachne.runtime.qtype import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

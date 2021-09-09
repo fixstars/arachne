@@ -2,8 +2,8 @@ from typing import AbstractSet, Dict, FrozenSet, List, Optional, Set, Tuple, Typ
 
 from tvm.target import Target as TVMTarget
 
+from arachne.registry import Registry
 from arachne.target import DPUTarget, EdgeTpuTarget, Target, TFLiteTarget, TVMCTarget
-from arachne.types import Registry
 
 
 class Device:

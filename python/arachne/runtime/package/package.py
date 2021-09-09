@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 
 import attr
 
-from arachne.types import TensorInfoDict
+from arachne.runtime.indexed_ordered_dict import TensorInfoDict
 
 PACKAGE_INFO_NAME = "package_info.pickle"
 

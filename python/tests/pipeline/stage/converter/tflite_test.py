@@ -12,8 +12,8 @@ from arachne.pipeline.package.frontend import (
 )
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage.registry import get_stage
-from arachne.types.indexed_ordered_dict import TensorInfoDict
-from arachne.types.tensor_info import TensorInfo
+from arachne.runtime.indexed_ordered_dict import TensorInfoDict
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def make_dataset():

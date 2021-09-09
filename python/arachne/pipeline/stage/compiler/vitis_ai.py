@@ -37,7 +37,7 @@ from arachne.runtime.package import (
     TVMPackage,
     TVMPackageInfo,
 )
-from arachne.types import QType
+from arachne.runtime.qtype import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

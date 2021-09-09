@@ -15,10 +15,10 @@ from arachne.pipeline.package import (
     TF2Package,
     TorchScriptPackage,
 )
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.runtime.package import TFLitePackage
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
-from arachne.types.qtype import QType
-from arachne.types.tensor_info import TensorInfo
+from arachne.runtime.qtype import QType
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def download(model_urls: Union[List[str], str], output_dir: Path) -> List[Path]:

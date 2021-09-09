@@ -1,7 +1,7 @@
 from typing import Iterable, List, Optional, Tuple, Type
 
 from arachne.pipeline.stage import Parameter, Stage
-from arachne.types import Registry
+from arachne.registry import Registry
 
 _stage_registry: Registry[str, Type[Stage]] = Registry()
 _stage_candidates: List[Tuple[Type[Stage], Parameter]] = []

@@ -6,9 +6,9 @@ from arachne.pipeline.package.frontend import (
     make_tf1_package_from_concrete_func,
     make_torchscript_package_from_script_module,
 )
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.runtime.package import import_package
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
-from arachne.types.tensor_info import TensorInfo
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def test_export_import_torch_script_pkg():

@@ -7,8 +7,8 @@ import attr
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage import Parameter, Stage
 from arachne.pipeline.stage.registry import get_stage, register_stage
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.runtime.package import Package, PackageInfo, import_package
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 
 
 @attr.s(auto_attribs=True, frozen=True)

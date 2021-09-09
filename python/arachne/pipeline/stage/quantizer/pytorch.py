@@ -14,8 +14,9 @@ from arachne.pipeline.stage.utils import (
     get_preprocess_from_params,
     get_qtype_from_params,
 )
+from arachne.runtime.indexed_ordered_dict import TensorInfoDict
 from arachne.runtime.package import Package, PackageInfo
-from arachne.types import QType, TensorInfoDict
+from arachne.runtime.qtype import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

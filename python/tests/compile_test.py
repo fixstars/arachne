@@ -1,7 +1,7 @@
 import tempfile
 
 import arachne.compile
-from arachne.types.tensor_info import TensorInfo
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def test_compile_for_pytorch():

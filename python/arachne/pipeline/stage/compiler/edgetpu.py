@@ -9,7 +9,7 @@ from arachne.runtime.package import (
     TFLitePackage,
     TFLitePackageInfo,
 )
-from arachne.types import QType
+from arachne.runtime.qtype import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

@@ -3,8 +3,8 @@ from typing import Any, Callable, Iterable, List, Set, Type
 from arachne.dataset import Dataset
 from arachne.device import Target, TVMCTarget
 from arachne.logger import Logger
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
 from arachne.runtime.package import Package, PackageInfo
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict
 from arachne.utils import make_artifact_dir
 
 from . import Pipeline

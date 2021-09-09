@@ -11,8 +11,8 @@ from arachne.pipeline.package.frontend import (
 from arachne.pipeline.runner import make_params_for_target, run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.pipeline.stage.stage import Parameter
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
-from arachne.types.tensor_info import TensorInfo
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def compile_for_pytorch(

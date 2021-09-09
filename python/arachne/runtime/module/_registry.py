@@ -1,7 +1,7 @@
 from typing import List, Optional, Type
 
+from arachne.registry import Registry
 from arachne.runtime.package import Package
-from arachne.types import Registry
 
 from .module import RuntimeModule
 

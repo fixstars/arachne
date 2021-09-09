@@ -4,7 +4,7 @@ from typing import List
 import attr
 
 from arachne.runtime.package import Package, PackageInfo
-from arachne.types import QType
+from arachne.runtime.qtype import QType
 
 
 @attr.s(auto_attribs=True, frozen=True)
