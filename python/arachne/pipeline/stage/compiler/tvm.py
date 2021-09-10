@@ -34,6 +34,8 @@ from arachne.pipeline.package import (
     TorchScriptPackageInfo,
     TVMPackage,
     TVMPackageInfo,
+    TVMCModelPackage,
+    TVMCModelPackageInfo,
     TVMVMPackage,
     TVMVMPackageInfo,
 )
@@ -93,6 +95,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 KerasPackageInfo,
                 CaffePackage,
                 CaffePackageInfo,
+                TVMCModelPackageInfo
             ),
         ):
             return False
@@ -163,6 +166,8 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             model = tvmcfrontends.load_model(
                 str(input.dir / input_filename), shape_dict=shape_dict, freeze_params=True
             )
+        elif isinstance(input, TVMCModelPackage):
+            model = tvmcfrontends.TVMCModel(model_path=str(input.dir / input.package_file))
         else:
             model = tvmcfrontends.load_model(str(input.dir / input_filename), shape_dict=shape_dict)
 
@@ -175,9 +180,10 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         model: TVMCModel,
         target: str,
         target_host: str,
-        output_path: Path,
+        output_dir: Path,
+        auto_scheduler_records_path: Optional[Path],
         compile_params: Parameter,
-    ):
+    ) -> Dict[str, Path]:
         raise NotImplementedError()
 
     @classmethod
@@ -196,9 +202,11 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 
         tvmc_model: TVMCModel = cls.__load_tvmc_model(input)
 
-        filename = "tvm_package.tar"
+        auto_scheduler_record_path = None
+        if isinstance(input, TVMCModelPackage) and input.records_path:
+            auto_scheduler_record_path = input.dir / input.records_path
 
-        cls.compile_model(tvmc_model, target, target_host, output_dir / filename, params)
+        files = cls.compile_model(tvmc_model, target, target_host, output_dir, auto_scheduler_record_path, params)
 
         return cls._OutputPackage(
             dir=output_dir,
@@ -207,7 +215,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             target=target,
             target_host=target_host,
             target_tvmdev=target_tvmdev,
-            package_file=Path(filename),
+            **files
         )
 
     @staticmethod
@@ -286,9 +294,10 @@ class TVMCompiler(TVMCompilerBase):
         model: TVMCModel,
         target: str,
         target_host: str,
-        output_path: Path,
+        output_dir: Path,
+        auto_scheduler_records_path: Optional[Path],
         compile_params: Parameter,
-    ):
+    ) -> Dict[str, Path]:
         """Compile a TVMCModel based on tvmc.compile_model()
 
         Parameters
@@ -302,11 +311,17 @@ class TVMCompiler(TVMCompilerBase):
         target_host: str
             The target of the host machine if host-side code needs to be generated.
 
-        output_path: Path
-            The path to export the compiled model to.
+        output_dir: Path
+            The path to generate compiled model to.
 
         compile_params: Parameter
             other parameters to used in compile phase.
+
+        Returns
+        -------
+        files: Dict[str, Path]
+            A dictionary from a name to a Path of a generated file by the compiler.
+            The names must be same as the file fields of _OutputPackage.
 
         """
         mod, params = model.mod, model.params
@@ -321,14 +336,20 @@ class TVMCompiler(TVMCompilerBase):
         disabled_pass = compile_params.get("disabled_pass")
         opt_level = compile_params.get("opt_level", 3)
 
+        # We give priority to records in param over package's one
+        if not tuning_records and auto_scheduler_records_path:
+            tuning_records = str(auto_scheduler_records_path)
+
         if tuning_records and os.path.exists(tuning_records):
             logger.debug("tuning records file provided: %s", tuning_records)
 
-            use_autoscheduler = True
-            try:
-                auto_scheduler.load_records(tuning_records)
-            except tvm._ffi.base.TVMError:
-                use_autoscheduler = False
+            use_autoscheduler = tuning_records is not None
+            if use_autoscheduler:
+                try:
+                    auto_scheduler.load_records(tuning_records)
+                except tvm._ffi.base.TVMError:
+                    logger.info("Cannot load tuning records: %s", tuning_records)
+                    use_autoscheduler = False
 
             if use_autoscheduler:
                 with auto_scheduler.ApplyHistoryBest(tuning_records):
@@ -355,9 +376,12 @@ class TVMCompiler(TVMCompilerBase):
         ### Export a package ###
         # Create a new tvmc model package object from the graph definition.
 
+        filename = "tvm_package.tar"
+        package_path = str(output_dir / filename)
+
         package_path = model.export_package(
             graph_module,
-            str(output_path),
+            str(package_path),
             cross=compile_params["cross"],
             cross_options=compile_params["cross_options"],
             lib_format=compile_params["lib_format"],
@@ -373,6 +397,8 @@ class TVMCompiler(TVMCompilerBase):
 
         if dumps:
             cls.__save_dumps(package_path, dumps)
+
+        return {"package_file": Path(package_path)}
 
     @staticmethod
     def __save_dumps(module_name: str, dumps: Dict[str, str], dump_root: str = "."):
@@ -434,9 +460,10 @@ class TVMVMCompiler(TVMCompilerBase):
         model: TVMCModel,
         target: str,
         target_host: str,
-        output_path: Path,
+        output_dir: Path,
+        auto_scheduler_records_path: Optional[Path],
         compile_params: Parameter,
-    ):
+    ) -> Dict[str, Path]:
         """Compile a TVMCModel into a tvm.runtime.vm.Executable tvmc.compile_model()
 
         Parameters
@@ -450,12 +477,17 @@ class TVMVMCompiler(TVMCompilerBase):
         target_host: str
             The target of the host machine if host-side code needs to be generated.
 
-        output_path: Path
-            The path to export the compiled model to.
+        output_dir: Path
+            The path to generate compiled model to.
 
         compile_params: Parameter
             other parameters to used in compile phase.
 
+        Returns
+        -------
+        files: Dict[str, Path]
+            A dictionary from a name to a Path of a generated file by the compiler.
+            The names must be same as the file fields of _OutputPackage.
         """
 
         mod, params = model.mod, model.params
@@ -473,6 +505,8 @@ class TVMVMCompiler(TVMCompilerBase):
         ):
             vm_exec: VMExecutable = relay.vm.compile(mod, target=tvm_target)
 
+        output_path = output_dir / "tvm_package.tar"
+
         ### Export a package ###
         with tempfile.TemporaryDirectory() as tmpdirname:
             lib = vm_exec.mod
@@ -481,6 +515,8 @@ class TVMVMCompiler(TVMCompilerBase):
             lib.export_library(path_lib)
             with tarfile.open(output_path, "w") as tar:
                 tar.add(path_lib, lib_name)
+
+        return {"package_file": output_path}
 
 
 register_stage(TVMVMCompiler)

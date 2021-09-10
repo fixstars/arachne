@@ -9,4 +9,5 @@ from .tf2 import TF2Package, TF2PackageInfo
 from .tflite import TFLitePackage, TFLitePackageInfo
 from .torchscript import TorchScriptPackage, TorchScriptPackageInfo
 from .tvm import TVMPackage, TVMPackageInfo
+from .tvmc_model import TVMCModelPackage, TVMCModelPackageInfo
 from .tvm_vm import TVMVMPackage, TVMVMPackageInfo
