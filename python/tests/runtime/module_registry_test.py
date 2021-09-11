@@ -4,14 +4,14 @@ from typing import List
 
 import attr
 
-from arachne.pipeline.package import Package
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.runtime.module import RuntimeModule
 from arachne.runtime.module.registry import (
     get_module_class,
     module_class_list,
     register_module_class,
 )
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
+from arachne.runtime.package import Package
 
 
 @attr.s(auto_attribs=True, frozen=True)

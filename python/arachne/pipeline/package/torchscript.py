@@ -3,9 +3,8 @@ from typing import List
 
 import attr
 
-from arachne.types import QType
-
-from .package import Package, PackageInfo
+from arachne.runtime.package import Package, PackageInfo
+from arachne.runtime.qtype import QType
 
 
 @attr.s(auto_attribs=True, frozen=True)

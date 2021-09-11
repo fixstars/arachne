@@ -3,7 +3,7 @@ from typing import List
 
 import attr
 
-from arachne.types import QType
+from arachne.runtime.qtype import QType
 
 from .package import Package, PackageInfo
 

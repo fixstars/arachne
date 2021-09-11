@@ -7,8 +7,7 @@ from typing import Any, Dict, List
 
 import attr
 
-from arachne.types import TensorInfoDict
-from arachne.utils import make_artifact_dir
+from arachne.runtime.indexed_ordered_dict import TensorInfoDict
 
 PACKAGE_INFO_NAME = "package_info.pickle"
 
@@ -42,13 +41,12 @@ class Package(PackageInfo, metaclass=ABCMeta):
             tar.addfile(tar_info, buf)
 
 
-def import_package(input_path: Path) -> Package:
-    output_dir = make_artifact_dir("imported")
+def import_package(input_path: Path, import_dir: Path) -> Package:
 
     with tarfile.open(input_path, "r:gz") as tar:
-        tar.extractall(output_dir)
+        tar.extractall(import_dir)
 
-    with open(output_dir / PACKAGE_INFO_NAME, "rb") as f:
+    with open(import_dir / PACKAGE_INFO_NAME, "rb") as f:
         package: Package = pickle.load(f)
 
-    return attr.evolve(package, dir=output_dir)
+    return attr.evolve(package, dir=import_dir)

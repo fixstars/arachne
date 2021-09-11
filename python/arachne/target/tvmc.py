@@ -2,7 +2,7 @@ from typing import Optional
 
 import attr
 
-from arachne.pipeline.package import PackageInfo, TVMPackageInfo
+from arachne.runtime.package import PackageInfo, TVMPackageInfo
 
 from .target import Target
 

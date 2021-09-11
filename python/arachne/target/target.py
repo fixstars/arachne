@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 import attr
 
-from arachne.pipeline.package import PackageInfo
+from arachne.runtime.package import PackageInfo
 
 
 @attr.s(auto_attribs=True, frozen=True)
