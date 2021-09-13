@@ -13,6 +13,7 @@ from arachne.pipeline.stage.compiler.tvm import TVMCompilerBase
 from arachne.pipeline.stage.utils import (
     get_target_from_params,
     get_target_host_from_params,
+    parse_bool,
 )
 from arachne.runtime.session import parse_rpc_tracker_url
 
@@ -40,41 +41,63 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
     def _OutputPackageInfo(**kwargs):
         return TVMCModelPackageInfo(**kwargs)
 
+    @staticmethod
+    def _to_int(n: Optional[str]) -> Optional[int]:
+        if n is None:
+            return None
+        else:
+            return int(n)
+
+    @staticmethod
+    def _to_float(f: Optional[str]) -> Optional[float]:
+        if f is None:
+            return None
+        else:
+            return float(f)
+
+    @staticmethod
+    def _to_bool(b: Optional[str]) -> Optional[bool]:
+        if b is None:
+            return None
+        else:
+            return parse_bool(b)
+
     @classmethod
     def extract_parameters(cls, params: Parameter) -> Parameter:
         target = get_target_from_params(params)
         target_host = get_target_host_from_params(params)
 
-        new_params = {}
+        new_params: Parameter = {}
         new_params["target"] = target
         new_params["target_host"] = target_host
 
         # Parameters for Runner
         new_params["rpc_key"] = params.get("rpc_key")
         new_params["rpc_host"] = params.get("rpc_host")
-        new_params["priority"] = params.get("priority")
-        new_params["n_parallel"] = params.get("n_parallel")
-        new_params["timeout"] = params.get("timeout")
-        new_params["number"] = params.get("number")
-        new_params["repeat"] = params.get("repeat")
-        new_params["min_repeat_ms"] = params.get("min_repeat_ms")
-        new_params["cooldown_interval"] = params.get("cooldown_interval")
-        new_params["enable_cpu_cache_flush"] = params.get("enable_cpu_cache_flush")
-        new_params["num_measure_trials"] = params.get("num_measure_trials", 1000)
-        new_params["early_stopping"] = params.get("early_stopping")
+        new_params["priority"] = cls._to_int(params.get("priority"))
+        new_params["n_parallel"] = cls._to_int(params.get("n_parallel"))
+        new_params["timeout"] = cls._to_int((params.get("timeout")))
+        new_params["number"] = cls._to_int(params.get("number"))
+        new_params["repeat"] = cls._to_int(params.get("repeat"))
+        new_params["min_repeat_ms"] = cls._to_int(params.get("min_repeat_ms"))
+        new_params["cooldown_interval"] = cls._to_float(params.get("cooldown_interval"))
+        new_params["enable_cpu_cache_flush"] = cls._to_bool(params.get("enable_cpu_cache_flush"))
 
         # Parameters for TaskScheduler
         new_params["strategy"] = params.get("strategy")
         new_params["load_model_file"] = params.get("load_model_file")
         new_params["load_log_file"] = params.get("load_log_file")
-        new_params["alpha"] = params.get("alpha")
-        new_params["beta"] = params.get("beta")
-        new_params["backward_window_size"] = params.get("backward_window_size")
-        new_params["verbose"] = params.get("verbose")
+        new_params["alpha"] = cls._to_float(params.get("alpha"))
+        new_params["beta"] = cls._to_float(params.get("beta"))
+        new_params["backward_window_size"] = cls._to_int(params.get("backward_window_size"))
 
         # Parameters for TuningOptions
-        new_params["early_stopping"] = params.get("early_stopping")
-        new_params["num_measures_per_round"] = params.get("num_measures_per_round")
+        new_params["num_measure_trials"] = cls._to_int(params.get("num_measure_trials", 1000))
+        new_params["early_stopping"] = cls._to_int(params.get("early_stopping"))
+        new_params["num_measures_per_round"] = cls._to_int(params.get("num_measures_per_round"))
+        verbose = cls._to_bool(params.get("verbose"))
+        if verbose is not None:
+            new_params["verbose"] = 1 if verbose else 0
 
         return new_params
 
@@ -141,15 +164,15 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
             "alpha",
             "beta",
             "backward_window_size",
-            "verbose"
         ]
         tuner_args = {
             key: compile_params.get(key) for key in tuner_args_name if compile_params.get(key) is not None
         }
         tuner_option_args_name = [
-            "early_stopping",
             "num_measure_trials",
-            "num_measures_per_round"
+            "early_stopping",
+            "num_measures_per_round",
+            "verbose"
         ]
         tuner_option_args = {
             key: compile_params.get(key) for key in tuner_option_args_name if compile_params.get(key) is not None
