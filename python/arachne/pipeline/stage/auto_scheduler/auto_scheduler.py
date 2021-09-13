@@ -168,6 +168,15 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         tuner_args = {
             key: compile_params.get(key) for key in tuner_args_name if compile_params.get(key) is not None
         }
+
+        if "load_log_file" in tuner_args:
+            shutil.copy(tuner_args.get("load_log_file"), records_path)
+
+        if "load_log_file" not in tuner_args and auto_scheduler_records_path is not None:
+            tuner_args["load_log_file"] = auto_scheduler_records_path
+
+        tuner = auto_scheduler.TaskScheduler(tasks, task_weights, **tuner_args)
+
         tuner_option_args_name = [
             "num_measure_trials",
             "early_stopping",
@@ -177,8 +186,6 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         tuner_option_args = {
             key: compile_params.get(key) for key in tuner_option_args_name if compile_params.get(key) is not None
         }
-
-        tuner = auto_scheduler.TaskScheduler(tasks, task_weights, **tuner_args)
         tune_option = auto_scheduler.TuningOptions(
             runner=runner,
             measure_callbacks=[auto_scheduler.RecordToFile(str(records_path))],
