@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from typing import Dict, Generic, List, Optional, TypeVar
 
 K = TypeVar("K")
@@ -7,7 +7,7 @@ V = TypeVar("V")
 
 class Registry(Generic[K, V]):
     def __init__(self):
-        self._registries: Dict[K, V] = defaultdict(OrderedDict)
+        self._registries: Dict[K, V] = OrderedDict()
 
     def register(self, key: K, value: V, override=False):
         assert override or key not in self._registries.keys()

@@ -3,19 +3,16 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+import arachne
 from arachne.dataset import Dataset
 from arachne.logger import Logger
 from arachne.pipeline.package import (
     KerasPackage,
     KerasPackageInfo,
-    Package,
-    PackageInfo,
     TF1Package,
     TF1PackageInfo,
     TF2Package,
     TF2PackageInfo,
-    TFLitePackage,
-    TFLitePackageInfo,
 )
 from arachne.pipeline.stage.utils import (
     get_make_dataset_from_params,
@@ -23,7 +20,14 @@ from arachne.pipeline.stage.utils import (
     get_qtype_from_params,
     parse_bool,
 )
-from arachne.types import IndexedOrderedDict, QType
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
+from arachne.runtime.package import (
+    Package,
+    PackageInfo,
+    TFLitePackage,
+    TFLitePackageInfo,
+)
+from arachne.runtime.qtype import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

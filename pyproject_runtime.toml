@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "A framework for compile and benchmark DNN inferences on the devices"
 authors = ["Akira Maruoka <akira.maruoka@fixstars.com>"]
 packages = [
-    { include = "arachne", from = "python"},
+    { include = "arachne/runtime", from = "python"},
     { include = "3rdparty/tvm/python/tvm"},
 ]
 include = ["3rdparty/tvm"]

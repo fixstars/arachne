@@ -1,8 +1,7 @@
 import tempfile
 
 import arachne.compile
-from arachne.runtime import runner_init
-from arachne.types import TensorInfo
+from arachne.runtime import TensorInfo, runner_init
 
 
 def test_benchmark_for_pytorch():

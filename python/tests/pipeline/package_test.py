@@ -1,14 +1,14 @@
 import tempfile
 from pathlib import Path
 
-from arachne.pipeline.package import import_package
 from arachne.pipeline.package.frontend import (
     make_keras_package_from_module,
     make_tf1_package_from_concrete_func,
     make_torchscript_package_from_script_module,
 )
-from arachne.types.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
-from arachne.types.tensor_info import TensorInfo
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
+from arachne.runtime.package import import_package
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def test_export_import_torch_script_pkg():
@@ -44,7 +44,8 @@ def test_export_import_torch_script_pkg():
         export_pkg_path = Path(tmp_dir + "/exported.tar")
         pkg.export(export_pkg_path)
 
-        pkg2 = import_package(export_pkg_path)
+        import_dir = Path(tmp_dir + "/imported")
+        pkg2 = import_package(export_pkg_path, import_dir)
 
         assert pkg.input_info == pkg2.input_info
         assert pkg.output_info == pkg2.output_info
@@ -73,7 +74,8 @@ def test_export_import_tf1_pkg():
         export_pkg_path = Path(tmp_dir + "/exported.tar")
         pkg.export(export_pkg_path)
 
-        pkg2 = import_package(export_pkg_path)
+        import_dir = Path(tmp_dir + "/imported")
+        pkg2 = import_package(export_pkg_path, import_dir)
 
         assert pkg.input_info == pkg2.input_info
         assert pkg.output_info == pkg2.output_info
@@ -90,7 +92,8 @@ def test_export_import_keras_pkg():
         export_pkg_path = Path(tmp_dir + "/exported.tar")
         pkg.export(export_pkg_path)
 
-        pkg2 = import_package(export_pkg_path)
+        import_dir = Path(tmp_dir + "/imported")
+        pkg2 = import_package(export_pkg_path, import_dir)
 
         assert pkg.input_info == pkg2.input_info
         assert pkg.output_info == pkg2.output_info

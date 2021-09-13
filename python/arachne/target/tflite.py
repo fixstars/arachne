@@ -1,6 +1,6 @@
 import attr
 
-from arachne.pipeline.package import PackageInfo, TFLitePackageInfo
+from arachne.runtime.package import PackageInfo, TFLitePackageInfo
 
 from .target import Target
 

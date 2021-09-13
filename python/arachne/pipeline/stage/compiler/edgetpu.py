@@ -3,13 +3,13 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
-from arachne.pipeline.package import (
+from arachne.runtime.package import (
     Package,
     PackageInfo,
     TFLitePackage,
     TFLitePackageInfo,
 )
-from arachne.types import QType
+from arachne.runtime.qtype import QType
 
 from .._registry import register_stage, register_stage_candidate
 from ..stage import Parameter, Stage

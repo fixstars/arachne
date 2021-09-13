@@ -3,7 +3,8 @@ import importlib.util
 from typing import Any, Callable, List, Optional, Tuple
 
 from arachne.dataset import Dataset
-from arachne.types import IndexedOrderedDict, QType
+from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
+from arachne.runtime.qtype import QType
 
 from .stage import Parameter
 

@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from arachne.pipeline.package import Package, PackageInfo
+from arachne.runtime.package import Package, PackageInfo
 
 Parameter = Dict[str, Any]
 

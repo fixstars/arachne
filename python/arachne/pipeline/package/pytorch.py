@@ -3,7 +3,7 @@ from typing import List
 
 import attr
 
-from .package import Package, PackageInfo
+from arachne.runtime.package import Package, PackageInfo
 
 
 @attr.s(auto_attribs=True, frozen=True)
