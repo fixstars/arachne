@@ -79,23 +79,16 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         return True
 
     @staticmethod
-    def _validate_input(input: Union[Package, PackageInfo]) -> bool:
+    def _validate_input(input: PackageInfo) -> bool:
         if not isinstance(
             input,
             (
-                TFLitePackage,
                 TFLitePackageInfo,
-                TorchScriptPackage,
                 TorchScriptPackageInfo,
-                DarknetPackage,
                 DarknetPackageInfo,
-                TF1Package,
                 TF1PackageInfo,
-                ONNXPackage,
                 ONNXPackageInfo,
-                KerasPackage,
                 KerasPackageInfo,
-                CaffePackage,
                 CaffePackageInfo,
                 TVMCModelPackageInfo
             ),
