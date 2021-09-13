@@ -116,7 +116,7 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
 
         if rpc_key and rpc_host:
             host, port = parse_rpc_tracker_url(rpc_host)
-            logger.debug(f"Using RPC tracker@{host}:{port}:{rpc_key} ")
+            logger.debug(f"Using RPC tracker: {host}:{port} key: {rpc_key}")
             runner = auto_scheduler.RPCRunner(
                 rpc_key,
                 host,
