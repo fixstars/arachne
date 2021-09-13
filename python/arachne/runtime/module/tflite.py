@@ -47,7 +47,7 @@ class TFLiteRuntimeModule(RuntimeModule):
 
     def benchmark(self, repeat: int) -> Dict:
         input_tensors = [
-            np.random.uniform(-1, 1, size=ispec.shape).astype(ispec.dtype)
+            np.random.uniform(0, 1, size=ispec.shape).astype(ispec.dtype)
             for ispec in self.package.input_info.values()
         ]
 
