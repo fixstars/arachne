@@ -3,7 +3,7 @@ import tarfile
 import tempfile
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 import tvm.autotvm
 import tvm.driver.tvmc.common as tvmccommon
@@ -79,7 +79,12 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         return True
 
     @staticmethod
-    def _validate_input(input: PackageInfo) -> bool:
+    def _validate_input(
+        input: PackageInfo,
+        target: str,
+        target_host: Optional[str],
+        target_tvmdev: str
+    ) -> bool:
         if not isinstance(
             input,
             (
@@ -98,6 +103,13 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         if isinstance(input, TFLitePackageInfo) and input.for_edgetpu:
             return False
 
+        if isinstance(input, TVMCModelPackageInfo) and not (
+            input.target == target
+            and input.target_host == target_host
+            and input.target_tvmdev == target_tvmdev
+        ):
+            return False
+
         return True
 
     @classmethod
@@ -111,7 +123,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         target_host = params["target_host"]
         target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
 
-        if not cls._validate_input(input):
+        if not cls._validate_input(input, target, target_host, target_tvmdev):
             return None
 
         return cls._OutputPackageInfo(
@@ -192,7 +204,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         target_host = params["target_host"]
         target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
 
-        if not cls._validate_input(input):
+        if not cls._validate_input(input, target, target_host, target_tvmdev):
             assert False, ("input must not be {}".format(type(input)))
 
         tvmc_model: TVMCModel = cls.__load_tvmc_model(input)

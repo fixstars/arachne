@@ -197,6 +197,19 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
 
         return {"package_file": package_path, "records_path": records_path}
 
+    @staticmethod
+    def _validate_target(target: str) -> bool:
+        if not TVMCompilerBase._validate_target(target):
+            return False
+
+        tvm_target, extra_targets = tvmccommon.target_from_cli(target)
+        if len(extra_targets) > 0:
+            names = [t["name"] for t in extra_targets]
+            logger.error(f"The auto scheduler stage doesn't support targets with partitioning: {names}")
+            return False
+
+        return True
+
 
 register_stage(AutoScheduler)
 register_stage_candidate(AutoScheduler)

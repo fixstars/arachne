@@ -11,8 +11,6 @@ from arachne.pipeline.package.frontend import (
 )
 from arachne.pipeline.runner import make_params_for_target, run_pipeline
 from arachne.pipeline.stage.registry import get_stage
-from arachne.runtime.indexed_ordered_dict import TensorInfoDict
-from arachne.runtime.tensor_info import TensorInfo
 
 
 def make_dataset():
@@ -29,7 +27,8 @@ def preprocess(image):
     return preprocessed
 
 
-def test_auto_scheduler_stage():
+@pytest.mark.parametrize("device_name", ["host", "host,cuda", "jetson-nano,cuda"])
+def test_auto_scheduler_stage(device_name: str):
     """Test for the auto_scheduler stage"""
     with tempfile.TemporaryDirectory() as tmp_dir:
         mobilenet = tf.keras.applications.mobilenet.MobileNet()
@@ -41,7 +40,7 @@ def test_auto_scheduler_stage():
             "preprocess": preprocess,
         }
 
-        target = get_target("host")
+        target = get_target(device_name)
         tvm_params = make_params_for_target(target)
         tvm_params["num_measure_trials"] = 30
 
@@ -52,3 +51,70 @@ def test_auto_scheduler_stage():
         ]
         input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
         run_pipeline(pipeline, input_pkg, {}, tmp_dir)
+
+
+def test_auto_scheduler_stage_fail1():
+    """
+    Test for the auto_scheduler stage
+    This test checks that invalid target throws an error.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        mobilenet = tf.keras.applications.mobilenet.MobileNet()
+
+        tflite_converter_param = {
+            "qtype": "fp32",
+            "make_dataset": make_dataset,
+            "qsample": 100,
+            "preprocess": preprocess,
+        }
+
+        # Auto scheduler stage doesn't support TensorRT backend
+        target = get_target("host,cuda,trt")
+        tvm_params = make_params_for_target(target)
+        tvm_params["num_measure_trials"] = 30
+
+        pipeline = [
+            (get_stage("tflite_converter"), tflite_converter_param),
+            (get_stage("auto_scheduler"), tvm_params),
+            (get_stage("tvm_compiler"), tvm_params)
+        ]
+        input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
+
+        with pytest.raises(ValueError) as ext:
+            run_pipeline(pipeline, input_pkg, {}, tmp_dir)
+            assert(str(ext) == "Pipeline definition is invalid.")
+
+
+def test_auto_scheduler_stage_fail2():
+    """
+    Test for the auto_scheduler stage
+    This test checks that inconsistent targets between stages causes an error.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        mobilenet = tf.keras.applications.mobilenet.MobileNet()
+
+        tflite_converter_param = {
+            "qtype": "fp32",
+            "make_dataset": make_dataset,
+            "qsample": 100,
+            "preprocess": preprocess,
+        }
+
+        target = get_target("host,cuda")
+        tvm_params = make_params_for_target(target)
+        tvm_params["num_measure_trials"] = 30
+
+        # With different target from the previous stage
+        target2 = get_target("host,cuda,trt")
+        tvm_params2 = make_params_for_target(target2)
+
+        pipeline = [
+            (get_stage("tflite_converter"), tflite_converter_param),
+            (get_stage("auto_scheduler"), tvm_params),
+            (get_stage("tvm_compiler"), tvm_params2)
+        ]
+        input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
+
+        with pytest.raises(ValueError) as ext:
+            run_pipeline(pipeline, input_pkg, {}, tmp_dir)
+            assert(str(ext) == "Pipeline definition is invalid.")
