@@ -134,6 +134,8 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
             key: compile_params.get(key) for key in runner_args_name if compile_params.get(key) is not None
         }
 
+        # LocalRPCMeasureContext object. This is del'ed after used to free RPC server object.
+        measure_ctx = None
         if rpc_key and rpc_host:
             host, port = parse_rpc_tracker_url(rpc_host)
             logger.debug(f"Using RPC tracker: {host}:{port} key: {rpc_key}")
@@ -191,6 +193,10 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
 
         tuner.tune(tune_option)
         model.save(package_path)
+
+        # Free LocalRPCMeasureContext object
+        if measure_ctx is not None:
+            del measure_ctx
 
         return {"package_file": package_path, "records_path": records_path}
 
