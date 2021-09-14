@@ -2,7 +2,6 @@ from abc import ABCMeta
 from pathlib import Path
 from typing import Dict, Optional
 
-import tvm.autotvm
 import tvm.driver.tvmc.common as tvmccommon
 from tvm import auto_scheduler
 from tvm.driver.tvmc import TVMCModel
@@ -111,11 +110,9 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         auto_scheduler_records_path: Optional[Path],
         compile_params: Parameter,
     ) -> Dict[str, Path]:
-        tvm_target, _ = tvmccommon.target_from_cli(target)
-        if tvm_target.kind.name == "cuda" and "arch" in tvm_target.attrs:
-            tvm.autotvm.measure.measure_methods.set_cuda_target_arch(tvm_target.attrs["arch"])
-
         mod, params = model.mod, model.params
+
+        mod = cls._preprocess_model(mod, target, target_host, compile_params)
 
         # Auto schedule
         rpc_key = compile_params.get("rpc_key")

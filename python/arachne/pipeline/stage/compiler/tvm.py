@@ -226,22 +226,24 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         )
 
     @staticmethod
-    def _partition_model(
-        mod, params: Dict, target: str, target_host: str, compile_params: Parameter
-    ):
+    def _preprocess_model(mod, target: str, target_host: str, compile_params: Parameter):
         tvm_target, _ = tvmccommon.target_from_cli(target)
         if tvm_target.kind.name == "cuda" and "arch" in tvm_target.attrs:
             tvm.autotvm.measure.measure_methods.set_cuda_target_arch(tvm_target.attrs["arch"])
-
-        config = {}
 
         desired_layout = compile_params.get("desired_layout")
 
         if desired_layout:
             mod = tvmccommon.convert_graph_layout(mod, desired_layout)
 
+        return mod
+
+    @staticmethod
+    def _partition_model(mod, params: Dict, target: str, target_host: str):
         tvm_target, extra_targets = tvmccommon.target_from_cli(target)
         tvm_target, target_host = Target.check_and_update_host_consist(tvm_target, target_host)
+
+        config = {}
 
         for codegen_from_cli in extra_targets:
             codegen = composite_target.get_codegen_by_target(codegen_from_cli["name"])
@@ -321,6 +323,9 @@ class TVMCompiler(TVMCompilerBase):
         output_dir: Path
             The path to generate compiled model to.
 
+        auto_scheduler_records_path: Optional[Path]
+            The path to auto scheduler records given by previous stage.
+
         compile_params: Parameter
             other parameters to used in compile phase.
 
@@ -334,9 +339,17 @@ class TVMCompiler(TVMCompilerBase):
         mod, params = model.mod, model.params
 
         ### Partition ###
-        mod, tvm_target, tvm_config = cls._partition_model(
-            mod, params, target, target_host, compile_params
-        )
+        mod = cls._preprocess_model(mod, target, target_host, compile_params)
+        # Don't apply any transformations other than `preprocess_model` when auto scheduler
+        # records is given, because it causes inconsistency of compiled model between two stage.
+        if auto_scheduler_records_path is None:
+            mod, tvm_target, tvm_config = cls._partition_model(
+                mod, params, target, target_host
+            )
+        else:
+            tvm_target, extra_targets = tvmccommon.target_from_cli(target)
+            tvm_target, target_host = Target.check_and_update_host_consist(tvm_target, target_host)
+            tvm_config = {}
 
         ### Build ###
         tuning_records = compile_params.get("tuning_records")
@@ -487,6 +500,10 @@ class TVMVMCompiler(TVMCompilerBase):
         output_dir: Path
             The path to generate compiled model to.
 
+        auto_scheduler_records_path: Optional[Path]
+            The path to auto scheduler records given by previous stage.
+            This parameter is just ignored in this stage.
+
         compile_params: Parameter
             other parameters to used in compile phase.
 
@@ -500,8 +517,9 @@ class TVMVMCompiler(TVMCompilerBase):
         mod, params = model.mod, model.params
 
         ### Partition ###
+        mod = cls._preprocess_model(mod, target, target_host, compile_params)
         mod, tvm_target, tvm_config = cls._partition_model(
-            mod, params, target, target_host, compile_params
+            mod, params, target, target_host
         )
 
         ### Build ###
