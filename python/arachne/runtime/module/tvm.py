@@ -51,7 +51,7 @@ class TVMRuntimeModule(RuntimeModule):
     A wrapper class for tvm.contrib.graph_executor.GraphModule
     """
 
-    def __init__(self, package: TVMPackage, session: tvm.rpc.RPCSession, profile: bool):
+    def __init__(self, package: TVMPackage, session: tvm.rpc.RPCSession, profile: bool, **kwargs):
         assert isinstance(package, TVMPackage)
         target = package.target_tvmdev
         tvmdev = create_tvmdev(target, session)
@@ -178,7 +178,7 @@ register_module_class(TVMPackage, TVMRuntimeModule)
 
 
 class TVMVMRuntimeModule(RuntimeModule):
-    def __init__(self, package: TVMVMPackage, session: tvm.rpc.RPCSession, profile: bool):
+    def __init__(self, package: TVMVMPackage, session: tvm.rpc.RPCSession, profile: bool, **kwargs):
         assert isinstance(package, TVMVMPackage)
         target = package.target_tvmdev
         tvmdev = create_tvmdev(target, session)

@@ -1,6 +1,7 @@
 import tempfile
 
 import numpy as np
+from attr.validators import provides
 
 from arachne.device import get_target
 from arachne.pipeline.package.frontend import make_tf1_package_from_concrete_func
@@ -8,9 +9,12 @@ from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import runner_init
 from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
+from arachne.runtime.module.onnx import ONNXRuntimeModule
 from arachne.runtime.module.tflite import TFLiteRuntimeModule
 from arachne.runtime.module.tvm import TVMRuntimeModule, TVMVMRuntimeModule
+from arachne.runtime.package import ONNXPackage
 from arachne.runtime.qtype import QType
+from arachne.runtime.tensor_info import TensorInfo
 
 
 def test_tvm_runtime_module():
@@ -182,5 +186,65 @@ def test_tvmvm_runtime_module():
         t = mod.get_outputs(outputs)
         assert t["Identity"] == 4.0
         del t
+
+        mod.benchmark(10)
+
+
+def test_onnx_runtime_module():
+    from pathlib import Path
+
+    import onnx
+    from onnx import TensorProto, helper
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+
+        node = helper.make_node(
+            "Add",
+            inputs=["in1", "in2"],
+            outputs=["out"],
+        )
+
+        graph = helper.make_graph(
+            [node],
+            "add_test",
+            inputs=[
+                helper.make_tensor_value_info("in1", TensorProto.FLOAT, [1]),
+                helper.make_tensor_value_info("in2", TensorProto.FLOAT, [1]),
+            ],
+            outputs=[helper.make_tensor_value_info("out", TensorProto.FLOAT, [1])],
+        )
+
+        model = helper.make_model(graph, producer_name="add_test")
+
+        onnx.checker.check_model(model)
+
+        onnx.save(model, tmp_dir + "/test.onnx")
+
+        input_info = IndexedOrderedDict(
+            {
+                "in1": TensorInfo(shape=(1), dtype="float32"),
+                "in2": TensorInfo(shape=(1), dtype="float32"),
+            }
+        )
+
+        output_info = IndexedOrderedDict({"out": TensorInfo(shape=(1), dtype="float32")})
+
+        pkg: ONNXPackage = ONNXPackage(
+            dir=Path(tmp_dir),
+            input_info=input_info,
+            output_info=output_info,
+            model_file=Path("test.onnx")
+        )
+
+        mod: ONNXRuntimeModule = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
+
+        mod.set_input(0, np.array([1.0], dtype=np.float32))
+        mod.set_input(1, np.array([1.0], dtype=np.float32))
+
+        mod.run()
+
+        out = mod.get_output(0).numpy()
+        assert out == [2.0]
+        del out
 
         mod.benchmark(10)

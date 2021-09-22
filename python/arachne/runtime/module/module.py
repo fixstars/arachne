@@ -19,7 +19,7 @@ class RuntimeModule(metaclass=ABCMeta):
     package: Package
 
     @abstractmethod
-    def __init__(self, package: Package, session: tvm.rpc.RPCSession, profile: bool):
+    def __init__(self, package: Package, session: tvm.rpc.RPCSession, profile: bool, **kwargs):
         pass
 
     @abstractmethod

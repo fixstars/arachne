@@ -10,13 +10,15 @@ from arachne.runtime.session import create_session
 from .module.module import RuntimeModule
 
 
-def create_runtime(package: Package, session: tvm.rpc.RPCSession, profile: bool) -> RuntimeModule:
+def create_runtime(
+    package: Package, session: tvm.rpc.RPCSession, profile: bool, **kwargs
+) -> RuntimeModule:
     runtime_module_class = get_module_class(package)
 
     if runtime_module_class is None:
         raise RuntimeError(f"This package ({package.__class__.__name__}) cannot run.")
 
-    return runtime_module_class(package, session, profile)
+    return runtime_module_class(package, session, profile, **kwargs)
 
 
 def runner_init(
@@ -24,10 +26,11 @@ def runner_init(
     rpc_tracker: Optional[str] = None,
     rpc_key: Optional[str] = None,
     profile: bool = False,
+    **kwargs,
 ) -> RuntimeModule:
     session = create_session(rpc_tracker, rpc_key)
 
-    module = create_runtime(package, session, profile)
+    module = create_runtime(package, session, profile, **kwargs)
 
     return module
 
