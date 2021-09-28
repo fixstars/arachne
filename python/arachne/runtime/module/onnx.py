@@ -1,34 +1,50 @@
+from struct import pack
 from typing import Dict, List, Union
 
 import numpy as np
 import tvm
-from tvm.contrib import tflite_runtime
-from tvm.contrib.tflite_runtime import TFLiteModule
+from tvm.contrib import onnx_runtime
+from tvm.contrib.onnx_runtime import ONNXModule
 
 from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict
-from arachne.runtime.package.tflite import TFLitePackage
+from arachne.runtime.package import ONNXPackage
 from arachne.runtime.session import create_tvmdev
 
 from ._registry import register_module_class
 from .module import RuntimeModule
 
 
-class TFLiteRuntimeModule(RuntimeModule):
-    def __init__(
-        self, package: TFLitePackage, session: tvm.rpc.RPCSession, profile: bool, **kwargs
-    ):
-        assert isinstance(package, TFLitePackage)
-        tvmdev = create_tvmdev("cpu", session)
-        runtime_target = "edge_tpu" if package.for_edgetpu else "cpu"
-        with open(package.dir / package.model_file, "rb") as model_fin:
-            module = tflite_runtime.create(model_fin.read(), tvmdev, runtime_target)
+class ONNXRuntimeModule(RuntimeModule):
+    """
+    A wrapper class for tvm.contrib.onnx_runtime.ONNXModule
+    """
 
-        self.module: TFLiteModule = module
+    def __init__(
+        self,
+        package: ONNXPackage,
+        session: tvm.rpc.RPCSession,
+        profile: bool,
+        **kwargs
+    ):
+        assert isinstance(package, ONNXPackage)
+
+        import onnxruntime as ort
+
+        providers = kwargs.get('providers', ort.get_available_providers())
+        if 'TensorrtExecutionProvider' in providers or 'CUDAExecutionProvider' in providers:
+            tvmdev = create_tvmdev("cuda", session)
+        else:
+            tvmdev = create_tvmdev("cpu", session)
+
+        with open(package.dir / package.model_file, "rb") as model_fin:
+            module = onnx_runtime.create(model_fin.read(), tvmdev, ';'.join(providers))
+
+        self.module: ONNXModule = module
         self.tvmdev = tvmdev
         self.package = package
 
     def get_name(self) -> str:
-        return "tflite_runtime_module"
+        return "onnx_runtime_module"
 
     def set_inputs(self, inputs: Union[IndexedOrderedDict, List]):
         if isinstance(inputs, IndexedOrderedDict):
@@ -45,7 +61,8 @@ class TFLiteRuntimeModule(RuntimeModule):
             raise RuntimeError("unreachable")
 
     def run(self):
-        self.module.invoke()
+        """A wrapper for ONNXModule.run()"""
+        self.module.run()
 
     def benchmark(self, repeat: int) -> Dict:
         input_tensors = [
@@ -56,7 +73,7 @@ class TFLiteRuntimeModule(RuntimeModule):
         for i, tensor in enumerate(input_tensors):
             self.set_input(i, tensor)
 
-        timer = self.module.module.time_evaluator("invoke", self.tvmdev, 1, repeat=repeat)
+        timer = self.module.module.time_evaluator("run", self.tvmdev, 1, repeat=repeat)
 
         self.run()
 
@@ -78,17 +95,13 @@ class TFLiteRuntimeModule(RuntimeModule):
         return outputs
 
     def set_input(self, idx: int, value):
-        """A wrapper for TFLiteModule.set_input()"""
+        """A wrapper for ONNXModule.set_input()"""
         tvm_array = tvm.nd.array(value, self.tvmdev)
         self.module.set_input(idx, tvm_array)
 
     def get_output(self, idx: int):
-        """A wrapper for TFLiteModule.get_output()"""
+        """A wrapper for ONNXModule.get_output()"""
         return self.module.get_output(idx)
 
-    def set_num_threads(self, num_threads):
-        """A wrapper for TFLiteModule.set_num_threads()"""
-        self.module.set_num_threads(num_threads)
 
-
-register_module_class(TFLitePackage, TFLiteRuntimeModule)
+register_module_class(ONNXPackage, ONNXRuntimeModule)

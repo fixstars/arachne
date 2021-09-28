@@ -9,14 +9,13 @@ from arachne.pipeline.package import (
     CaffePackage,
     DarknetPackage,
     KerasPackage,
-    ONNXPackage,
     PyTorchPackage,
     TF1Package,
     TF2Package,
     TorchScriptPackage,
 )
 from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
-from arachne.runtime.package import TFLitePackage
+from arachne.runtime.package import ONNXPackage, TFLitePackage
 from arachne.runtime.qtype import QType
 from arachne.runtime.tensor_info import TensorInfo
 

@@ -22,8 +22,6 @@ from arachne.pipeline.package import (
     DarknetPackageInfo,
     KerasPackage,
     KerasPackageInfo,
-    ONNXPackage,
-    ONNXPackageInfo,
     TF1Package,
     TF1PackageInfo,
     TorchScriptPackage,
@@ -34,6 +32,8 @@ from arachne.pipeline.stage.utils import (
     get_target_host_from_params,
 )
 from arachne.runtime.package import (
+    ONNXPackage,
+    ONNXPackageInfo,
     Package,
     PackageInfo,
     TFLitePackage,

@@ -16,8 +16,6 @@ from arachne.logger import Logger
 from arachne.pipeline.package import (
     DarknetPackage,
     DarknetPackageInfo,
-    ONNXPackage,
-    ONNXPackageInfo,
     TF1Package,
     TF1PackageInfo,
     TorchScriptPackage,
@@ -30,6 +28,8 @@ from arachne.pipeline.stage.utils import (
     get_target_host_from_params,
 )
 from arachne.runtime.package import (
+    ONNXPackage,
+    ONNXPackageInfo,
     Package,
     PackageInfo,
     TFLitePackage,
