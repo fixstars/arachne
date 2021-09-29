@@ -5,6 +5,7 @@ from ._registry import (
     stage_candidate_list,
     stage_list,
 )
+from .auto_scheduler import *
 from .compiler import *
 from .converter import *
 from .quantizer import *

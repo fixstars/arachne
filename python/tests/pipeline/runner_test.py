@@ -25,12 +25,13 @@ def test_make_pipeline_candidate():
         target = get_target("host")
         pipelines = make_pipeline_candidate(pkg, [target])
 
-        # tvm_compiler, tflite_converter:fp32 -> tvm_compiler
-        assert len(pipelines) == 2
+        # tvm_compiler, tflite_converter:fp32 -> tvm_compiler, auto_scheduler -> tvm_compiler,
+        # tflite_converter:fp32 -> auto_scheduler -> tvm_compiler
+        assert len(pipelines) == 4
 
         exclude = set()
         exclude.add(TFLiteConverter)
         pipelines = make_pipeline_candidate(pkg, [target], {}, exclude)
 
-        # tvm_compiler only
-        assert len(pipelines) == 1
+        # tvm_compiler, auto_scheduler -> tvm_compiler
+        assert len(pipelines) == 2
