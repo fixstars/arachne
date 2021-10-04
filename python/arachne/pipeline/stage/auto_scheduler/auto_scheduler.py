@@ -169,6 +169,7 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         }
 
         if "load_log_file" in tuner_args:
+            import shutil
             shutil.copy(tuner_args.get("load_log_file"), records_path)
 
         if "load_log_file" not in tuner_args and auto_scheduler_records_path is not None:
@@ -198,7 +199,7 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         if measure_ctx is not None:
             del measure_ctx
 
-        return {"package_file": package_path, "records_path": records_path}
+        return {"package_file": package_filename, "records_file": records_name}
 
     @staticmethod
     def _validate_target(target: str) -> bool:
