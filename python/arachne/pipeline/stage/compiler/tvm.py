@@ -210,8 +210,8 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         tvmc_model: TVMCModel = cls.__load_tvmc_model(input)
 
         auto_scheduler_record_path = None
-        if isinstance(input, TVMCModelPackage) and input.records_path:
-            auto_scheduler_record_path = input.dir / input.records_path
+        if isinstance(input, TVMCModelPackage) and input.records_file:
+            auto_scheduler_record_path = input.dir / input.records_file
 
         files = cls.compile_model(tvmc_model, target, target_host, output_dir, auto_scheduler_record_path, params)
 
@@ -418,7 +418,7 @@ class TVMCompiler(TVMCompilerBase):
         if dumps:
             cls.__save_dumps(package_path, dumps)
 
-        return {"package_file": Path(package_path)}
+        return {"package_file": Path(filename)}
 
     @staticmethod
     def __save_dumps(module_name: str, dumps: Dict[str, str], dump_root: str = "."):
@@ -530,7 +530,8 @@ class TVMVMCompiler(TVMCompilerBase):
         ):
             vm_exec: VMExecutable = relay.vm.compile(mod, target=tvm_target)
 
-        output_path = output_dir / "tvm_package.tar"
+        filename = "tvm_package.tar"
+        output_path = output_dir / filename
 
         ### Export a package ###
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -541,7 +542,7 @@ class TVMVMCompiler(TVMCompilerBase):
             with tarfile.open(output_path, "w") as tar:
                 tar.add(path_lib, lib_name)
 
-        return {"package_file": output_path}
+        return {"package_file": filename}
 
 
 register_stage(TVMVMCompiler)

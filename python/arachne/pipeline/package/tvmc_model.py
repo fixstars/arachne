@@ -16,11 +16,11 @@ class TVMCModelPackageInfo(PackageInfo):
 @attr.s(auto_attribs=True, frozen=True)
 class TVMCModelPackage(TVMCModelPackageInfo, Package):
     package_file: Path
-    records_path: Optional[Path]
+    records_file: Optional[Path]
 
     @property
     def files(self) -> List[Path]:
-        if self.records_path:
-            return [self.package_file, self.records_path]
+        if self.records_file:
+            return [self.package_file, self.records_file]
         else:
             return [self.package_file]
