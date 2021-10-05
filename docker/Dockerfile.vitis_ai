@@ -16,7 +16,7 @@
 # under the License.
 
 # use Vitis AI
-FROM gitlab.fixstars.com:5005/arachne/containers/vitis_ai:v0.1.0
+FROM gitlab.fixstars.com:5005/arachne/containers/vitis_ai:v0.1.1
 
 # Install tvm
 COPY 3rdparty/tvm /tvm
