@@ -180,13 +180,13 @@ def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     onnx_path = output_dir / 'model.onnx'
     onnx.save_model(model, onnx_path)
 
-    input_info = TensorInfoDict()
+    input_info = IndexedOrderedDict()
     sess = onnxruntime.InferenceSession(str(onnx_path))
 
     for inp in sess.get_inputs():
         input_info[inp.name] = TensorInfo([1] + inp.shape[1:])
 
-    output_info = TensorInfoDict()
+    output_info = IndexedOrderedDict()
     for out in sess.get_outputs():
         output_info[out.name] = TensorInfo([1] + out.shape[1:])
 
