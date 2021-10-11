@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arachne-tvm-rpc-tracker
+  labels:
+    app: arachne-tvm-rpc-tracker
+  annotations:
+    app.gitlab.com/env: development
+    app.gitlab.com/app: arachne-arachne
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arachne-tvm-rpc-tracker
+  template:
+    metadata:
+      labels:
+        app: arachne-tvm-rpc-tracker
+      annotations:
+        app.gitlab.com/env: development
+        app.gitlab.com/app: arachne-arachne
+    spec:
+      containers:
+        - name: tvm-rpc-tracker
+          image:  gitlab.fixstars.com:5005/arachne/arachne/tvm_rpc_tracker:latest
+          tty: true
+          imagePullPolicy: Always
+      hostNetwork: true
+      nodeSelector:
+        k3s.io/hostname: dgx-1
+      imagePullSecrets:
+        - name: gitlab-registry
