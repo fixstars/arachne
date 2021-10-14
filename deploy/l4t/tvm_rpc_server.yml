@@ -43,6 +43,11 @@ spec:
           image:  gitlab.fixstars.com:5005/arachne/arachne/l4t_tvm_rpc_server:latest
           command: ["/usr/bin/python3"]
           args: ["-m", "tvm.exec.rpc_server", "--tracker=192.168.5.211:9190", "--key=$DEVICE"]
+          env:
+            - name: TVM_TENSORRT_USE_FP16
+              value: "$TVM_TENSORRT_USE_FP16"
+            - name: TVM_TENSORRT_MAX_WORKSPACE_SIZE
+              value: "$TVM_TENSORRT_MAX_WORKSPACE_SIZE"
           tty: true
           imagePullPolicy: Always
       hostNetwork: true

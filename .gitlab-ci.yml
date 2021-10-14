@@ -263,11 +263,20 @@ deploy-tvm-rpc-server:
         - 'jetson-nano'
         - 'jetson-xavier-nx'
         - 'jetson-tx2'
+  variables:
+    TVM_TENSORRT_USE_FP16: 1
+    TVM_TENSORRT_MAX_WORKSPACE_SIZE: 1073741824 # 1GiB for jetson-xavier-nx and jetson-tx2
   needs: ["deploy-tvm-rpc-tracker"]
   script:
     - export NODE_NUM=`kubectl get nodes --selector=device=${DEVICE} | tail -n +2 | wc -l`
     - sed -e s/\$NODE_NUM/${NODE_NUM}/g deploy/l4t/tvm_rpc_server.yml > /tmp/deploy.yml
     - sed -i -e s/\$DEVICE/${DEVICE}/g /tmp/deploy.yml
+    - sed -i -e s/\$TVM_TENSORRT_USE_FP16/${TVM_TENSORRT_USE_FP16}/g /tmp/deploy.yml
+    - > # limit to 128 MiB for jetson-nano
+        if [ "$DEVICE" == "jetson-nano" ]; then
+          export TVM_TENSORRT_MAX_WORKSPACE_SIZE=134217728
+        fi
+    - sed -i -e s/\$TVM_TENSORRT_MAX_WORKSPACE_SIZE/${TVM_TENSORRT_MAX_WORKSPACE_SIZE}/g /tmp/deploy.yml
     - kubectl apply -f /tmp/deploy.yml
   environment:
     name: development
