@@ -73,6 +73,14 @@ We tested the following steps for listed devices.
     * Coral Dev Board
       * Mendel Linux == 5.2
 
+For internal arachne developers, you can use a TVM rpc tracker that is continuously deployed by GitLab.
+The rpc information is as follows:
+* RPC Host: dgx-1.fixstars.com:9190
+* RPC Keys:
+  * jetson-nano
+  * jetson-xavier-nx
+  * jetson-tx2
+
 ### Step 1 (Host): Start RPC tracker in the host PC
 ```sh
 python3 -m tvm.exec.rpc_tracker --host=0.0.0.0 --port=8888 &
