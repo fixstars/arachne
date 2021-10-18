@@ -54,7 +54,7 @@ build-image-l4t-rpc-server:
     - docker
     - dgx1
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   before_script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
   script:
@@ -246,7 +246,7 @@ cleanup-image:
 deploy-tvm-rpc-tracker:
   <<: *deploy-tvm-apps-base
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - kubectl apply -f deploy/tvm_rpc_tracker.yml
   environment:
@@ -256,7 +256,7 @@ deploy-tvm-rpc-tracker:
 deploy-tvm-rpc-server:
   <<: *deploy-tvm-apps-base
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   parallel:
     matrix:
       - DEVICE:
