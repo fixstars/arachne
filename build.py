@@ -23,7 +23,12 @@ class ExtBuilder(build_ext):
         extdir.mkdir(parents=True, exist_ok=True)
 
         # Identify config.cmake for tvm build
-        tvm_dir = Path("3rdparty/tvm")
+
+        # Prefer to use the source dir specified by TVM_SOURCE_DIR
+        tvm_dir = os.environ.get('TVM_SOURCE_DIR', None)
+        if not tvm_dir:
+            tvm_dir = "3rdparty/tvm"
+        tvm_dir = Path(tvm_dir)
         config_file = os.environ.get('TVM_CMAKE_CONFIG', None)
         if not config_file:
             config_file = tvm_dir / "cmake" / "config.cmake"

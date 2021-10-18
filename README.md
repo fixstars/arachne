@@ -175,7 +175,8 @@ We provide the TVM source code as a sdist package to build the TVM library at th
 This is because the TVM build config depends on the environment where arachne will be used.
 For example, if you want to try CPU only mode, GPU features are not required to be built.
 
-To accomplish this, we use two environment variables (i.e., `TVM_CMAKE_CONFIG` and `BUILD_TVM_RUNTIME_ONLY`) to control the install behavior for TVM libraries.
+To accomplish this, we use three environment variables (i.e., `TVM_SOURCE_DIR`, `TVM_CMAKE_CONFIG` and `BUILD_TVM_RUNTIME_ONLY`) to control the install behavior for TVM libraries.
++ `TVM_SOURCE_DIR` allows you to specify the source directory to be built (e.g., `export TVM_SOURCE_DIR=/path/to/tvm`).
 + `TVM_CMAKE_CONFIG` represents a path to `config.cmake` that describes the compilation options.
 Please refer [the default configuration file](https://github.com/apache/tvm/blob/main/cmake/config.cmake) to understand what can be customized.
 + When you specify `BUILD_TVM_RUNTIME_ONLY=1`, only the runtime library will be built.
