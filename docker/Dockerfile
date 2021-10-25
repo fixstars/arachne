@@ -1,4 +1,4 @@
-FROM gitlab.fixstars.com:5005/arachne/containers:v0.1.1
+FROM gitlab.fixstars.com:5005/arachne/containers:v0.1.2
 
 # Setting working directory
 ARG workspace
