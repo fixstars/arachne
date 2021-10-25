@@ -25,6 +25,8 @@ check-format-diff:
   tags:
     - docker
     - dgx1
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
   script:
     - python3 -m pip install black isort
     - isort python/**/*.py --diff --check
