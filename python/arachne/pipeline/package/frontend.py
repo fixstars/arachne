@@ -177,7 +177,8 @@ def make_onnx_package(
 def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     import onnx
     import onnxruntime
-    onnx_path = output_dir / 'model.onnx'
+
+    onnx_path = output_dir / "model.onnx"
     onnx.save_model(model, onnx_path)
 
     input_info = IndexedOrderedDict()

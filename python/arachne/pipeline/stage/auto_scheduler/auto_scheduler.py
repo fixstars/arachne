@@ -128,10 +128,12 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
             "repeat",
             "min_repeat_ms",
             "cooldown_interval",
-            "enable_cpu_cache_flush"
+            "enable_cpu_cache_flush",
         ]
         runner_args = {
-            key: compile_params.get(key) for key in runner_args_name if compile_params.get(key) is not None
+            key: compile_params.get(key)
+            for key in runner_args_name
+            if compile_params.get(key) is not None
         }
 
         # LocalRPCMeasureContext object. This is del'ed after used to free RPC server object.
@@ -139,16 +141,9 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         if rpc_key and rpc_host:
             host, port = parse_rpc_tracker_url(rpc_host)
             logger.debug(f"Using RPC tracker: {host}:{port} key: {rpc_key}")
-            runner = auto_scheduler.RPCRunner(
-                rpc_key,
-                host,
-                port,
-                **runner_args
-            )
+            runner = auto_scheduler.RPCRunner(rpc_key, host, port, **runner_args)
         else:
-            measure_ctx = auto_scheduler.LocalRPCMeasureContext(
-                **runner_args
-            )
+            measure_ctx = auto_scheduler.LocalRPCMeasureContext(**runner_args)
             runner = measure_ctx.runner
 
         package_filename = "tvm_package.tar"
@@ -165,11 +160,14 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
             "backward_window_size",
         ]
         tuner_args = {
-            key: compile_params.get(key) for key in tuner_args_name if compile_params.get(key) is not None
+            key: compile_params.get(key)
+            for key in tuner_args_name
+            if compile_params.get(key) is not None
         }
 
         if "load_log_file" in tuner_args:
             import shutil
+
             shutil.copy(tuner_args.get("load_log_file"), records_path)
 
         if "load_log_file" not in tuner_args and auto_scheduler_records_path is not None:
@@ -181,15 +179,17 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
             "num_measure_trials",
             "early_stopping",
             "num_measures_per_round",
-            "verbose"
+            "verbose",
         ]
         tuner_option_args = {
-            key: compile_params.get(key) for key in tuner_option_args_name if compile_params.get(key) is not None
+            key: compile_params.get(key)
+            for key in tuner_option_args_name
+            if compile_params.get(key) is not None
         }
         tune_option = auto_scheduler.TuningOptions(
             runner=runner,
             measure_callbacks=[auto_scheduler.RecordToFile(str(records_path))],
-            **tuner_option_args
+            **tuner_option_args,
         )
 
         tuner.tune(tune_option)
@@ -209,7 +209,9 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         tvm_target, extra_targets = tvmccommon.target_from_cli(target)
         if len(extra_targets) > 0:
             names = [t["name"] for t in extra_targets]
-            logger.error(f"The auto scheduler stage doesn't support targets with partitioning: {names}")
+            logger.error(
+                f"The auto scheduler stage doesn't support targets with partitioning: {names}"
+            )
             return False
 
         return True

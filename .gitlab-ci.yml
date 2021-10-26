@@ -1,4 +1,5 @@
 stages:
+  - check-format
   - build-image
   - build
   - test
@@ -18,6 +19,18 @@ variables:
   CUDA_VISIBLE_DEVICES: 7
   ARACHNE_CI_RPC_TRACKER: dgx-s.fixstars.com:8889
 
+check-format-diff:
+  stage: check-format
+  image: python:3.6
+  tags:
+    - docker
+    - dgx1
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+  script:
+    - python3 -m pip install black isort
+    - isort python --diff --check
+    - black python --diff --check
 
 #
 # 1. Build Image

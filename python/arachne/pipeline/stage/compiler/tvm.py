@@ -80,10 +80,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 
     @staticmethod
     def _validate_input(
-        input: PackageInfo,
-        target: str,
-        target_host: Optional[str],
-        target_tvmdev: str
+        input: PackageInfo, target: str, target_host: Optional[str], target_tvmdev: str
     ) -> bool:
         if not isinstance(
             input,
@@ -95,7 +92,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
                 ONNXPackageInfo,
                 KerasPackageInfo,
                 CaffePackageInfo,
-                TVMCModelPackageInfo
+                TVMCModelPackageInfo,
             ),
         ):
             return False
@@ -199,13 +196,13 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         target = params["target"]
 
         if not cls._validate_target(target):
-            assert False, ("target must not be {}".format(target))
+            assert False, "target must not be {}".format(target)
 
         target_host = params["target_host"]
         target_tvmdev = tvmccommon.parse_target(params["target"])[-1]["raw"]
 
         if not cls._validate_input(input, target, target_host, target_tvmdev):
-            assert False, ("input must not be {}".format(type(input)))
+            assert False, "input must not be {}".format(type(input))
 
         tvmc_model: TVMCModel = cls.__load_tvmc_model(input)
 
@@ -213,7 +210,9 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
         if isinstance(input, TVMCModelPackage) and input.records_file:
             auto_scheduler_record_path = input.dir / input.records_file
 
-        files = cls.compile_model(tvmc_model, target, target_host, output_dir, auto_scheduler_record_path, params)
+        files = cls.compile_model(
+            tvmc_model, target, target_host, output_dir, auto_scheduler_record_path, params
+        )
 
         return cls._OutputPackage(
             dir=output_dir,
@@ -222,7 +221,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             target=target,
             target_host=target_host,
             target_tvmdev=target_tvmdev,
-            **files
+            **files,
         )
 
     @staticmethod
@@ -343,9 +342,7 @@ class TVMCompiler(TVMCompilerBase):
         # Don't apply any transformations other than `preprocess_model` when auto scheduler
         # records is given, because it causes inconsistency of compiled model between two stage.
         if auto_scheduler_records_path is None:
-            mod, tvm_target, tvm_config = cls._partition_model(
-                mod, params, target, target_host
-            )
+            mod, tvm_target, tvm_config = cls._partition_model(mod, params, target, target_host)
         else:
             tvm_target, extra_targets = tvmccommon.target_from_cli(target)
             tvm_target, target_host = Target.check_and_update_host_consist(tvm_target, target_host)
@@ -518,9 +515,7 @@ class TVMVMCompiler(TVMCompilerBase):
 
         ### Partition ###
         mod = cls._preprocess_model(mod, target, target_host, compile_params)
-        mod, tvm_target, tvm_config = cls._partition_model(
-            mod, params, target, target_host
-        )
+        mod, tvm_target, tvm_config = cls._partition_model(mod, params, target, target_host)
 
         ### Build ###
         disabled_pass = compile_params.get("disabled_pass")

@@ -91,7 +91,7 @@ def make_params_for_target(target: Target) -> Parameter:
 
 def make_base_params(
     preprocess: Callable[[Any, IndexedOrderedDict], IndexedOrderedDict],
-    make_dataset: Callable[[], Dataset]
+    make_dataset: Callable[[], Dataset],
 ) -> Parameter:
     return {"_quantizer_preprocess": preprocess, "_quantizer_make_dataset": make_dataset}
 

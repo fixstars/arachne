@@ -45,7 +45,7 @@ def test_auto_scheduler_stage(device_name: str):
         pipeline = [
             (get_stage("tflite_converter"), tflite_converter_param),
             (get_stage("auto_scheduler"), tvm_params),
-            (get_stage("tvm_compiler"), tvm_params)
+            (get_stage("tvm_compiler"), tvm_params),
         ]
         input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
         run_pipeline(pipeline, input_pkg, {}, tmp_dir)
@@ -71,7 +71,7 @@ def test_auto_scheduler_stage_layout_transformation():
         pipeline = [
             (get_stage("tflite_converter"), tflite_converter_param),
             (get_stage("auto_scheduler"), tvm_params),
-            (get_stage("tvm_compiler"), tvm_params)
+            (get_stage("tvm_compiler"), tvm_params),
         ]
         input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
         run_pipeline(pipeline, input_pkg, {}, tmp_dir)
@@ -100,13 +100,13 @@ def test_auto_scheduler_stage_backend_check():
         pipeline = [
             (get_stage("tflite_converter"), tflite_converter_param),
             (get_stage("auto_scheduler"), tvm_params),
-            (get_stage("tvm_compiler"), tvm_params)
+            (get_stage("tvm_compiler"), tvm_params),
         ]
         input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
 
         with pytest.raises(ValueError) as ext:
             run_pipeline(pipeline, input_pkg, {}, tmp_dir)
-            assert(str(ext) == "Pipeline definition is invalid.")
+            assert str(ext) == "Pipeline definition is invalid."
 
 
 def test_auto_scheduler_stage_target_consistency_check():
@@ -135,10 +135,10 @@ def test_auto_scheduler_stage_target_consistency_check():
         pipeline = [
             (get_stage("tflite_converter"), tflite_converter_param),
             (get_stage("auto_scheduler"), tvm_params),
-            (get_stage("tvm_compiler"), tvm_params2)
+            (get_stage("tvm_compiler"), tvm_params2),
         ]
         input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
 
         with pytest.raises(ValueError) as ext:
             run_pipeline(pipeline, input_pkg, {}, tmp_dir)
-            assert(str(ext) == "Pipeline definition is invalid.")
+            assert str(ext) == "Pipeline definition is invalid."

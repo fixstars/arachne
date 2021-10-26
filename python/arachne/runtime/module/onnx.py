@@ -19,25 +19,19 @@ class ONNXRuntimeModule(RuntimeModule):
     A wrapper class for tvm.contrib.onnx_runtime.ONNXModule
     """
 
-    def __init__(
-        self,
-        package: ONNXPackage,
-        session: tvm.rpc.RPCSession,
-        profile: bool,
-        **kwargs
-    ):
+    def __init__(self, package: ONNXPackage, session: tvm.rpc.RPCSession, profile: bool, **kwargs):
         assert isinstance(package, ONNXPackage)
 
         import onnxruntime as ort
 
-        providers = kwargs.get('providers', ort.get_available_providers())
-        if 'TensorrtExecutionProvider' in providers or 'CUDAExecutionProvider' in providers:
+        providers = kwargs.get("providers", ort.get_available_providers())
+        if "TensorrtExecutionProvider" in providers or "CUDAExecutionProvider" in providers:
             tvmdev = create_tvmdev("cuda", session)
         else:
             tvmdev = create_tvmdev("cpu", session)
 
         with open(package.dir / package.model_file, "rb") as model_fin:
-            module = onnx_runtime.create(model_fin.read(), tvmdev, ';'.join(providers))
+            module = onnx_runtime.create(model_fin.read(), tvmdev, ";".join(providers))
 
         self.module: ONNXModule = module
         self.tvmdev = tvmdev
