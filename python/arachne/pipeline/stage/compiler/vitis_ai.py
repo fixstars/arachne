@@ -82,7 +82,9 @@ class VitisAICompiler(Stage):
                 outputs=input.output_info.keys(),
             )
         elif isinstance(input, ONNXPackage):
-            tvmcmodel = tvmcfrontends.load_model(str(model_path), shape_dict=shape_dict, freeze_params=True)
+            tvmcmodel = tvmcfrontends.load_model(
+                str(model_path), shape_dict=shape_dict, freeze_params=True
+            )
         else:
             tvmcmodel = tvmcfrontends.load_model(str(model_path), shape_dict=shape_dict)
         tvmcmodel = tvmcfrontends.load_model(model_path, shape_dict=shape_dict)

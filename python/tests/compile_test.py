@@ -17,6 +17,7 @@ def test_compile_for_pytorch():
             resnet18, [TensorInfo(input_shape, "float32")], target_device, compile_pipeline, tmp_dir
         )
 
+
 def test_compile_for_onnx_vm():
     import onnx
     import torch
@@ -25,12 +26,13 @@ def test_compile_for_onnx_vm():
     resnet18 = models.resnet18(pretrained=True)
     with tempfile.TemporaryDirectory() as tmp_dir:
         dummy_input = torch.randn(1, 3, 224, 224)
-        onnx_model_path = tmp_dir + '/resnet18.onnx'
+        onnx_model_path = tmp_dir + "/resnet18.onnx"
         torch.onnx.export(resnet18, dummy_input, onnx_model_path)
         onnx_model = onnx.load_model(onnx_model_path)
         target_device = "host"
         compile_pipeline = [("tvm_vm_compiler", {})]
         arachne.compile.compile_for_onnx(onnx_model, target_device, compile_pipeline, tmp_dir)
+
 
 def test_compile_for_keras():
     import tensorflow as tf

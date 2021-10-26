@@ -233,7 +233,7 @@ def test_onnx_runtime_module():
             dir=Path(tmp_dir),
             input_info=input_info,
             output_info=output_info,
-            model_file=Path("test.onnx")
+            model_file=Path("test.onnx"),
         )
 
         mod: ONNXRuntimeModule = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
