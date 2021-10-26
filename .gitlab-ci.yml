@@ -29,8 +29,8 @@ check-format-diff:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
   script:
     - python3 -m pip install black isort
-    - isort python/**/*.py --diff --check
-    - black python/**/*.py --diff --check
+    - isort python --diff --check
+    - black python --diff --check
 
 #
 # 1. Build Image
