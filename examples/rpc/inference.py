@@ -1,4 +1,5 @@
 import tempfile
+from pathlib import Path
 
 import tensorflow as tf
 
@@ -9,7 +10,6 @@ from arachne.pipeline.package.tf1 import TF1Package
 from arachne.pipeline.runner import make_params_for_target, run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import TVMRuntimeModule, runner_init
-from arachne.target import TVMCTarget
 
 RPC_TRACKER = '0.0.0.0:9190'
 
@@ -32,20 +32,24 @@ def inference():
             return x + y
         cfunc = add.get_concrete_function()
 
-        pkg: TF1Package = make_tf1_package_from_concrete_func(cfunc, tmp_dir)
+        pkg: TF1Package = make_tf1_package_from_concrete_func(cfunc, Path(tmp_dir))
 
         ## ==== Unique to RPC usage ====
 
         ### You have to specify the appropreate device for runtime environment
-        target: TVMCTarget = get_target("jetson-nano")
+        target = get_target("jetson-nano")
+        assert target is not None
         default_params = make_params_for_target(target)
-        compile_pipeline: Pipeline = [(get_stage("tvm_compiler"), {})]
+        tvm_compiler = get_stage("tvm_compiler")
+        assert tvm_compiler is not None
+        compile_pipeline: Pipeline = [(tvm_compiler, {})]
 
         outputs = run_pipeline(compile_pipeline, pkg, default_params, tmp_dir)
         compiled_pkg = outputs[-1]
 
         ### When using RPC, you have to set rpc_tracker and rpc_key information to runner_init()
-        mod: TVMRuntimeModule = runner_init(compiled_pkg, rpc_tracker=RPC_TRACKER, rpc_key=RPC_KEY)
+        mod = runner_init(compiled_pkg, rpc_tracker=RPC_TRACKER, rpc_key=RPC_KEY)
+        assert isinstance(mod, TVMRuntimeModule)
 
         ## ==== End of Unique to RPC usage ====
 

@@ -6,6 +6,9 @@ from arachne.pipeline.package.frontend import (
     make_tf1_package_from_concrete_func,
     make_torchscript_package_from_script_module,
 )
+from arachne.pipeline.package.keras import KerasPackage
+from arachne.pipeline.package.tf1 import TF1Package
+from arachne.pipeline.package.torchscript import TorchScriptPackage
 from arachne.runtime.indexed_ordered_dict import IndexedOrderedDict, TensorInfoDict
 from arachne.runtime.package import import_package
 from arachne.runtime.tensor_info import TensorInfo
@@ -22,14 +25,13 @@ def test_export_import_torch_script_pkg():
         input_spec = [TensorInfo(shape=[1, 3, 224, 224])]
 
         # Make an input package
-        input_info = {
-            f"input{n}": TensorInfo(shape=ispec.shape, dtype=ispec.dtype)
-            for n, ispec in enumerate(input_spec)
-        }
+        input_info: TensorInfoDict = IndexedOrderedDict()
+        for n, ispec in enumerate(input_spec):
+            input_info["input" + str(n)] = TensorInfo(shape=ispec.shape, dtype=ispec.dtype)
 
         inps = tuple(torch.zeros(i.shape) for i in input_spec)
         model.eval()
-        script_model = torch.jit.trace(model.forward, inps).eval()
+        script_model = torch.jit.trace(model.forward, inps).eval()  # type: ignore
 
         output_info: TensorInfoDict = IndexedOrderedDict()
         for i, t in enumerate(script_model(*inps)):
@@ -46,6 +48,7 @@ def test_export_import_torch_script_pkg():
 
         import_dir = Path(tmp_dir + "/imported")
         pkg2 = import_package(export_pkg_path, import_dir)
+        assert isinstance(pkg2, TorchScriptPackage)
 
         assert pkg.input_info == pkg2.input_info
         assert pkg.output_info == pkg2.output_info
@@ -69,13 +72,14 @@ def test_export_import_tf1_pkg():
 
         concrete_func = add.get_concrete_function()
 
-        pkg = make_tf1_package_from_concrete_func(concrete_func, tmp_dir)
+        pkg = make_tf1_package_from_concrete_func(concrete_func, Path(tmp_dir))
 
         export_pkg_path = Path(tmp_dir + "/exported.tar")
         pkg.export(export_pkg_path)
 
         import_dir = Path(tmp_dir + "/imported")
         pkg2 = import_package(export_pkg_path, import_dir)
+        assert isinstance(pkg2, TF1Package)
 
         assert pkg.input_info == pkg2.input_info
         assert pkg.output_info == pkg2.output_info
@@ -94,6 +98,7 @@ def test_export_import_keras_pkg():
 
         import_dir = Path(tmp_dir + "/imported")
         pkg2 = import_package(export_pkg_path, import_dir)
+        assert isinstance(pkg2, KerasPackage)
 
         assert pkg.input_info == pkg2.input_info
         assert pkg.output_info == pkg2.output_info

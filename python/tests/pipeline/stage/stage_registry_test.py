@@ -74,6 +74,7 @@ def test_mystage():
 
         import_dir = Path(tmp_dir + "/imported")
         import_pkg = import_package(export_pkg_path, import_dir)
+        assert isinstance(import_pkg, MyPackage)
         assert pkg.input_info == import_pkg.input_info
         assert pkg.output_info == import_pkg.output_info
         assert pkg.message == import_pkg.message
@@ -81,11 +82,14 @@ def test_mystage():
         # Compile test
         new_message = "compiled"
         mystage_param = {"message": new_message}
-        pipeline = [(get_stage("mystage"), mystage_param)]
+        mystage = get_stage("mystage")
+        assert mystage is not None
+        pipeline = [(mystage, mystage_param)]
         output_pkgs = run_pipeline(pipeline, pkg, {}, tmp_dir)
         assert len(output_pkgs) > 0
 
         output_pkg = output_pkgs[-1]
+        assert isinstance(output_pkg, MyPackage)
         assert output_pkg.input_info == import_pkg.input_info
         assert output_pkg.output_info == import_pkg.output_info
         assert output_pkg.message == new_message

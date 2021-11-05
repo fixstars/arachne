@@ -1,8 +1,8 @@
-from struct import pack
 from typing import Dict, List, Union
 
 import numpy as np
 import tvm
+import tvm.rpc
 from tvm.contrib import onnx_runtime
 from tvm.contrib.onnx_runtime import ONNXModule
 

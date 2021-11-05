@@ -2,6 +2,7 @@ from typing import Dict, List, Union
 
 import numpy as np
 import tvm
+import tvm.rpc
 from tvm.contrib import tflite_runtime
 from tvm.contrib.tflite_runtime import TFLiteModule
 

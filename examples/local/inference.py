@@ -1,4 +1,5 @@
 import tempfile
+from pathlib import Path
 
 import tensorflow as tf
 
@@ -9,7 +10,6 @@ from arachne.pipeline.package.tf1 import TF1Package
 from arachne.pipeline.runner import make_params_for_target, run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import TVMRuntimeModule, runner_init
-from arachne.target import TVMCTarget
 
 
 def inference():
@@ -32,23 +32,27 @@ def inference():
         ### We provide some usefule frontend functions for craeting packages from variable dnn models.
         ### Plz refer python/arachne/pipeline/frontend.py
         ### The definition of Packages are python/arachne/pipeline/package/*.py and python/arachne/runtime/package/*.py
-        pkg: TF1Package = make_tf1_package_from_concrete_func(cfunc, tmp_dir)
+        pkg: TF1Package = make_tf1_package_from_concrete_func(cfunc, Path(tmp_dir))
 
         ## To compile the input model (as a package) for specific devices, you have to prepare the information of target, pipeline, and default parameters.
-        target: TVMCTarget = get_target("host")  # create target from the device information (available devices are listed on python/arachne/device.py).
+        target = get_target("host")  # create target from the device information (available devices are listed on python/arachne/device.py)
+        assert target is not None
         default_params = make_params_for_target(target)  # create defualt parameters from target
 
         ## define compile pipeline
         ### arachne define a compile pipline as a list of (stage, params).
         ### avaiable stages are python/arachne/pipeline/stage/*
-        compile_pipeline: Pipeline = [(get_stage("tvm_compiler"), {})]
+        tvm_compiler = get_stage("tvm_compiler")
+        assert tvm_compiler is not None
+        compile_pipeline: Pipeline = [(tvm_compiler, {})]
 
         outputs = run_pipeline(compile_pipeline, pkg, default_params, tmp_dir)
         compiled_pkg = outputs[-1]  # the final result is placed at the last element of outputs
 
         ## To run inference of the compile model, you first init a runtime module for this model.
         ### avaiable runtime modules are listed in python/arachne/runtime/module/*
-        mod: TVMRuntimeModule = runner_init(compiled_pkg)
+        mod = runner_init(compiled_pkg)
+        assert isinstance(mod, TVMRuntimeModule)
 
         # Index-based usage
         mod.set_input(0, 1.0)

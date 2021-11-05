@@ -179,7 +179,7 @@ def make_onnx_package_from_module(model, output_dir: Path) -> ONNXPackage:
     import onnxruntime
 
     onnx_path = output_dir / "model.onnx"
-    onnx.save_model(model, onnx_path)
+    onnx.save_model(model, str(onnx_path))
 
     input_info = IndexedOrderedDict()
     sess = onnxruntime.InferenceSession(str(onnx_path))

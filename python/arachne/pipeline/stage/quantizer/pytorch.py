@@ -45,7 +45,7 @@ class PyTorchQuantizer(Stage):
                 preprocessed = torch.from_numpy(preprocessed)
                 target = torch.tensor([target])
                 output = qmodel(preprocessed)
-                loss = criterion(output, target)
+                _ = criterion(output, target)
 
     @classmethod
     def get_name(cls) -> str:
@@ -95,6 +95,7 @@ class PyTorchQuantizer(Stage):
     @classmethod
     def process(cls, input: Package, params: Parameter, output_dir: Path) -> Package:
         import torch
+        import torch.jit
         import torch.nn
         import torch.quantization
 
@@ -132,7 +133,7 @@ class PyTorchQuantizer(Stage):
         filename = "quantized.pth"
         dst_path = output_dir / filename
         input_data = [torch.randn(info.shape) for name, info in input.input_info.items()]
-        scripted_model = torch.jit.trace(model, input_data).eval()
+        scripted_model = torch.jit.trace(model, input_data).eval()  # type: ignore
         scripted_model.save(dst_path)
 
         return TorchScriptPackage(

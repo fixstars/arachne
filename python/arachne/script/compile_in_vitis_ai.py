@@ -41,6 +41,7 @@ class VAI_compiler:
         npz = np.load(npz_path, allow_pickle=True)
         if self.input_layer_name not in npz:
             raise KeyError(f"input_layer_name {self.input_layer_name} is not found in {npz_path}")
+        assert npz is not None
         return npz[self.input_layer_name]
 
     def prepare_quantization(self, tvmcmodel):

@@ -1,9 +1,8 @@
 import itertools
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
-import arachne
 from arachne.dataset import Dataset
 from arachne.logger import Logger
 from arachne.pipeline.package import (
@@ -99,7 +98,7 @@ class TFLiteConverter(Stage):
             model = tf.keras.models.load_model(h5_model_path)
             converter = tf.lite.TFLiteConverter.from_keras_model(model)
         elif isinstance(input, TF1Package):
-            import tensorflow.compat.v1 as tf1
+            import tensorflow.compat.v1 as tf1  # type: ignore
 
             input_tensors = {name: info.shape for (name, info) in input.input_info.items()}
             converter = tf1.lite.TFLiteConverter.from_frozen_graph(
@@ -116,7 +115,7 @@ class TFLiteConverter(Stage):
                 if not saved_model:
                     raise RuntimeError(f"Failed load saved_model from: {saved_model_path}")
 
-                concrete_func = saved_model.signatures[
+                concrete_func = saved_model.signatures[  # type: ignore
                     tf.saved_model.DEFAULT_SERVING_SIGNATURE_DEF_KEY
                 ]
                 input_tensors = [
@@ -156,13 +155,13 @@ class TFLiteConverter(Stage):
             assert make_dataset is not None
             dataset = make_dataset()
             assert isinstance(dataset, Dataset)
-            preprocess = params["preprocess"]
+            preprocess: Callable = params["preprocess"]
             assert preprocess is not None
 
             def representative_dataset_gen():
                 if isinstance(dataset, tf.data.Dataset):
-                    for dat in dataset.take(samples):
-                        preprocessed = preprocess(dat["image"])
+                    for dat in list(dataset.take(samples).as_numpy_iterator()):
+                        preprocessed = preprocess(dat["image"])  # type: ignore
                         yield [preprocessed]
                 else:
                     import torch
@@ -175,7 +174,7 @@ class TFLiteConverter(Stage):
                         yield [preprocessed[input.input_info.get_by_index(0)[0]]]
 
             converter.optimizations = [tf.lite.Optimize.DEFAULT]
-            converter.representative_dataset = representative_dataset_gen
+            converter.representative_dataset = tf.lite.RepresentativeDataset(representative_dataset_gen)  # type: ignore
         elif quantize_type is QType.INT8_FULL:
             # converter.optimizations = [tf.lite.Optimize.DEFAULT]
             # converter.representative_dataset = functools.partial(

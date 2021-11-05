@@ -2,14 +2,15 @@ import os
 import shutil
 from pathlib import Path
 
-if not os.environ.get("HOME"):
+_HOME_DIR = os.environ.get("HOME")
+if not _HOME_DIR:
     raise RuntimeError(
         "You have to setup ${HOME} directory because the arachne library follow the XDG Base Directory specification"
     )
 
 
 class Env(object):
-    CACHE_HOME = Path(os.environ.get("HOME")) / ".cache" / "arachne"
+    CACHE_HOME = Path(_HOME_DIR) / ".cache" / "arachne"
     ARTIFACT_DIR = CACHE_HOME / "artifacts"
 
 

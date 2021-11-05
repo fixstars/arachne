@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Tuple
 
-from arachne.device import Device, get_device, get_target, parse_device_name
+from arachne.device import get_target
 from arachne.pipeline.package.frontend import (
     make_keras_package_from_module,
     make_onnx_package_from_module,
@@ -23,6 +23,8 @@ def compile_for_pytorch(
     output_dir: str,
 ):
     import torch
+    import torch.jit
+    import torch.nn
 
     assert isinstance(model, torch.nn.Module)
 
@@ -31,14 +33,13 @@ def compile_for_pytorch(
         compile_pipeline.append((get_stage(stage[0]), stage[1]))
 
     # Make an input package
-    input_info = {
-        f"input{n}": TensorInfo(shape=ispec.shape, dtype=ispec.dtype)
-        for n, ispec in enumerate(input_spec)
-    }
+    input_info: TensorInfoDict = IndexedOrderedDict()
+    for n, ispec in enumerate(input_spec):
+        input_info["input" + str(n)] = TensorInfo(shape=ispec.shape, dtype=ispec.dtype)
 
     inps = tuple(torch.zeros(i.shape) for i in input_spec)
     model.eval()
-    script_model = torch.jit.trace(model.forward, inps).eval()
+    script_model = torch.jit.trace(model.forward, inps).eval()  # type:ignore
 
     output_info: TensorInfoDict = IndexedOrderedDict()
     for i, t in enumerate(script_model(*inps)):
@@ -52,6 +53,7 @@ def compile_for_pytorch(
 
     # Run compile pipeline
     target = get_target(target_device)
+    assert target is not None
 
     default_params = make_params_for_target(target)
 
@@ -74,6 +76,7 @@ def compile_for_keras(
 
     # Run pipeline
     target = get_target(target_device)
+    assert target is not None
 
     default_params = make_params_for_target(target)
 
@@ -95,6 +98,7 @@ def compile_for_onnx(
 
         # run pipeline
         target = get_target(target_device)
+        assert target is not None
 
         default_params = make_params_for_target(target)
 
@@ -118,6 +122,7 @@ def compile_for_tf_concrete_function(
 
     # Run pipeline
     target = get_target(target_device)
+    assert target is not None
 
     default_params = make_params_for_target(target)
 

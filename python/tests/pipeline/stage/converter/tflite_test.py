@@ -15,11 +15,14 @@ from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime.indexed_ordered_dict import TensorInfoDict
 from arachne.runtime.tensor_info import TensorInfo
 
+tflite_converter = get_stage("tflite_converter")
+assert tflite_converter is not None
+
 
 def make_dataset():
     return tfds.load(
-        name="coco/2017", split="validation", data_dir="/datasets/TFDS", download=False
-    )
+        name="coco/2017", split=["validation"], data_dir="/datasets/TFDS", download=False
+    )[0]
 
 
 def preprocess(image):
@@ -43,7 +46,7 @@ def test_tflite_converter_from_keras(qtype: str):
             "preprocess": preprocess,
         }
 
-        pipeline = [(get_stage("tflite_converter"), tflite_converter_param)]
+        pipeline = [(tflite_converter, tflite_converter_param)]
         input_pkg = make_keras_package_from_module(mobilenet, Path(tmp_dir))
         run_pipeline(pipeline, input_pkg, {}, tmp_dir)
 
@@ -68,7 +71,7 @@ def test_tflite_converter_from_tf1(qtype: str):
 
         concrete_func = wrap.get_concrete_function()
 
-        pipeline = [(get_stage("tflite_converter"), tflite_converter_param)]
+        pipeline = [(tflite_converter, tflite_converter_param)]
         input_pkg = make_tf1_package_from_concrete_func(concrete_func, Path(tmp_dir))
         run_pipeline(pipeline, input_pkg, {}, tmp_dir)
 
@@ -92,6 +95,6 @@ def test_tflite_converter_from_tf2(qtype: str):
         output_info = TensorInfoDict()
         output_info["predictions/Softmax:0"] = TensorInfo(shape=[1, 1000])
 
-        pipeline = [(get_stage("tflite_converter"), tflite_converter_param)]
+        pipeline = [(tflite_converter, tflite_converter_param)]
         input_pkg = make_tf2_package_from_module(mobilenet, input_info, output_info, Path(tmp_dir))
         run_pipeline(pipeline, input_pkg, {}, tmp_dir)
