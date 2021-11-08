@@ -161,7 +161,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             input, (TFLitePackage, TorchScriptPackage, TF1Package, KerasPackage, ONNXPackage)
         ):
             input_filename = input.model_file
-        elif isinstance(input , TVMCModelPackage):
+        elif isinstance(input, TVMCModelPackage):
             input_filename = input.package_file
 
         assert input_filename is not None
