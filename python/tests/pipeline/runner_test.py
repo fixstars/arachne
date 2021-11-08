@@ -1,4 +1,5 @@
 import tempfile
+from pathlib import Path
 
 from arachne.device import get_target
 from arachne.pipeline.package.frontend import make_tf1_package_from_concrete_func
@@ -21,8 +22,9 @@ def test_make_pipeline_candidate():
 
         concrete_func = add.get_concrete_function()
 
-        pkg = make_tf1_package_from_concrete_func(concrete_func, tmp_dir)
+        pkg = make_tf1_package_from_concrete_func(concrete_func, Path(tmp_dir))
         target = get_target("host")
+        assert target is not None
         pipelines = make_pipeline_candidate(pkg, [target])
 
         # tvm_compiler, tflite_converter:fp32 -> tvm_compiler, auto_scheduler -> tvm_compiler,

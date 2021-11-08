@@ -191,7 +191,7 @@ class TVMVMRuntimeModule(RuntimeModule):
             logger.debug("creating runtime with profiling disabled")
             module = VirtualMachine(lib, tvmdev)
 
-        self.module: GraphModule = module
+        self.module: Union[VirtualMachine, VirtualMachineProfiler] = module
         self.tvmdev = tvmdev
         self.package = package
 

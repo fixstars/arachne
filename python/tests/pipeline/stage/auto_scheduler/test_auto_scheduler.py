@@ -13,8 +13,8 @@ from arachne.pipeline.stage.registry import get_stage
 
 def make_dataset():
     return tfds.load(
-        name="coco/2017", split="validation", data_dir="/datasets/TFDS", download=False
-    )
+        name="coco/2017", split=["validation"], data_dir="/datasets/TFDS", download=False
+    )[0]
 
 
 def preprocess(image):
@@ -39,6 +39,7 @@ def test_auto_scheduler_stage(device_name: str):
         }
 
         target = get_target(device_name)
+        assert target is not None
         tvm_params = make_params_for_target(target)
         tvm_params["num_measure_trials"] = 30
 
@@ -64,6 +65,7 @@ def test_auto_scheduler_stage_layout_transformation():
         }
 
         target = get_target("host,cuda")
+        assert target is not None
         tvm_params = make_params_for_target(target)
         tvm_params["num_measure_trials"] = 30
         tvm_params["desired_layout"] = "NHWC"
@@ -94,6 +96,7 @@ def test_auto_scheduler_stage_backend_check():
 
         # Auto scheduler stage doesn't support TensorRT backend
         target = get_target("host,cuda,trt")
+        assert target is not None
         tvm_params = make_params_for_target(target)
         tvm_params["num_measure_trials"] = 30
 
@@ -125,11 +128,13 @@ def test_auto_scheduler_stage_target_consistency_check():
         }
 
         target = get_target("host,cuda")
+        assert target is not None
         tvm_params = make_params_for_target(target)
         tvm_params["num_measure_trials"] = 30
 
         # With different target from the previous stage
         target2 = get_target("host,cuda,trt")
+        assert target2 is not None
         tvm_params2 = make_params_for_target(target2)
 
         pipeline = [

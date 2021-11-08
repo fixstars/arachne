@@ -1,10 +1,11 @@
 import tempfile
+from pathlib import Path
 
 import numpy as np
-from attr.validators import provides
 
-from arachne.device import get_target
+from arachne.device import TVMCTarget, get_target
 from arachne.pipeline.package.frontend import make_tf1_package_from_concrete_func
+from arachne.pipeline.pipeline import Pipeline
 from arachne.pipeline.runner import run_pipeline
 from arachne.pipeline.stage.registry import get_stage
 from arachne.runtime import runner_init
@@ -33,10 +34,13 @@ def test_tvm_runtime_module():
 
         concrete_func = add.get_concrete_function()
 
-        pkg = make_tf1_package_from_concrete_func(concrete_func, tmp_dir)
-        pipeline = [(get_stage("tvm_compiler"), {})]
+        pkg = make_tf1_package_from_concrete_func(concrete_func, Path(tmp_dir))
+        tvm_compiler = get_stage("tvm_compiler")
+        assert tvm_compiler is not None
+        pipeline: Pipeline = [(tvm_compiler, {})]
 
         target = get_target("host")
+        assert isinstance(target, TVMCTarget)
         default_params = dict()
         default_params.update(
             {
@@ -48,7 +52,8 @@ def test_tvm_runtime_module():
 
         pkg = run_pipeline(pipeline, pkg, default_params, tmp_dir)[-1]
 
-        mod: TVMRuntimeModule = runner_init(pkg)
+        mod = runner_init(pkg)
+        assert isinstance(mod, TVMRuntimeModule)
 
         # Check primitive methods work correctly
         assert mod.get_num_inputs() == 2
@@ -102,16 +107,19 @@ def test_tflite_runtime_module():
 
         concrete_func = add.get_concrete_function()
 
-        pkg = make_tf1_package_from_concrete_func(concrete_func, tmp_dir)
-        pipeline = [(get_stage("tflite_converter"), {"qtype": QType.FP32})]
+        pkg = make_tf1_package_from_concrete_func(concrete_func, Path(tmp_dir))
+        tflite_converter = get_stage("tflite_converter")
+        assert tflite_converter is not None
+        pipeline = [(tflite_converter, {"qtype": QType.FP32})]
 
         pkg = run_pipeline(pipeline, pkg, {}, tmp_dir)[-1]
 
         # NOTE: dtype is required.
         # Otherwise, tvm will cause a SEGV at set_input
-        input_data = np.array(1.0, dtype=np.float32)
+        input_data = np.array(1.0, dtype=np.float32)  # type: ignore
 
-        mod: TFLiteRuntimeModule = runner_init(pkg)
+        mod = runner_init(pkg)
+        assert isinstance(mod, TFLiteRuntimeModule)
 
         mod.set_input(0, input_data)
         mod.set_input(1, input_data)
@@ -142,10 +150,13 @@ def test_tvmvm_runtime_module():
 
         concrete_func = add.get_concrete_function()
 
-        pkg = make_tf1_package_from_concrete_func(concrete_func, tmp_dir)
-        pipeline = [(get_stage("tvm_vm_compiler"), {})]
+        pkg = make_tf1_package_from_concrete_func(concrete_func, Path(tmp_dir))
+        tvm_vm_compiler = get_stage("tvm_vm_compiler")
+        assert tvm_vm_compiler is not None
+        pipeline = [(tvm_vm_compiler, {})]
 
         target = get_target("host")
+        assert isinstance(target, TVMCTarget)
         default_params = dict()
         default_params.update(
             {
@@ -157,11 +168,12 @@ def test_tvmvm_runtime_module():
 
         pkg = run_pipeline(pipeline, pkg, default_params, tmp_dir)[-1]
 
-        mod: TVMVMRuntimeModule = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
+        mod = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
+        assert isinstance(mod, TVMVMRuntimeModule)
 
         # NOTE: dtype is required.
         # Otherwise, tvm will cause a SEGV at set_input
-        input_data = np.array(1.0, dtype=np.float32)
+        input_data = np.array(1.0, dtype=np.float32)  # type: ignore
         inputs = [input_data, input_data]
 
         mod.set_inputs(inputs)
@@ -173,7 +185,7 @@ def test_tvmvm_runtime_module():
         assert t["Identity"] == 2.0
         del t
 
-        input_data = np.array(2.0, dtype=np.float32)
+        input_data = np.array(2.0, dtype=np.float32)  # type: ignore
         inputs2 = mod.get_input_details()
         inputs2["x"] = input_data
         inputs2["y"] = input_data
@@ -194,6 +206,7 @@ def test_onnx_runtime_module():
     from pathlib import Path
 
     import onnx
+    import onnx.checker
     from onnx import TensorProto, helper
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -208,10 +221,10 @@ def test_onnx_runtime_module():
             [node],
             "add_test",
             inputs=[
-                helper.make_tensor_value_info("in1", TensorProto.FLOAT, [1]),
-                helper.make_tensor_value_info("in2", TensorProto.FLOAT, [1]),
+                helper.make_tensor_value_info("in1", TensorProto.FLOAT, [1]),  # type: ignore
+                helper.make_tensor_value_info("in2", TensorProto.FLOAT, [1]),  # type: ignore
             ],
-            outputs=[helper.make_tensor_value_info("out", TensorProto.FLOAT, [1])],
+            outputs=[helper.make_tensor_value_info("out", TensorProto.FLOAT, [1])],  # type: ignore
         )
 
         model = helper.make_model(graph, producer_name="add_test")
@@ -222,12 +235,12 @@ def test_onnx_runtime_module():
 
         input_info = IndexedOrderedDict(
             {
-                "in1": TensorInfo(shape=(1), dtype="float32"),
-                "in2": TensorInfo(shape=(1), dtype="float32"),
+                "in1": TensorInfo(shape=[1], dtype="float32"),
+                "in2": TensorInfo(shape=[1], dtype="float32"),
             }
         )
 
-        output_info = IndexedOrderedDict({"out": TensorInfo(shape=(1), dtype="float32")})
+        output_info = IndexedOrderedDict({"out": TensorInfo(shape=[1], dtype="float32")})
 
         pkg: ONNXPackage = ONNXPackage(
             dir=Path(tmp_dir),
@@ -236,10 +249,11 @@ def test_onnx_runtime_module():
             model_file=Path("test.onnx"),
         )
 
-        mod: ONNXRuntimeModule = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
+        mod = runner_init(pkg, rpc_tracker=None, rpc_key=None, profile=False)
+        assert isinstance(mod, ONNXRuntimeModule)
 
-        mod.set_input(0, np.array([1.0], dtype=np.float32))
-        mod.set_input(1, np.array([1.0], dtype=np.float32))
+        mod.set_input(0, np.array([1.0], dtype=np.float32))  # type: ignore
+        mod.set_input(1, np.array([1.0], dtype=np.float32))  # type: ignore
 
         mod.run()
 

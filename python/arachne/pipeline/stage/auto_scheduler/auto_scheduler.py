@@ -91,7 +91,7 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         new_params["backward_window_size"] = cls._to_int(params.get("backward_window_size"))
 
         # Parameters for TuningOptions
-        new_params["num_measure_trials"] = cls._to_int(params.get("num_measure_trials", 1000))
+        new_params["num_measure_trials"] = cls._to_int(params.get("num_measure_trials", "1000"))
         new_params["early_stopping"] = cls._to_int(params.get("early_stopping"))
         new_params["num_measures_per_round"] = cls._to_int(params.get("num_measures_per_round"))
         verbose = cls._to_bool(params.get("verbose"))
@@ -168,7 +168,9 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         if "load_log_file" in tuner_args:
             import shutil
 
-            shutil.copy(tuner_args.get("load_log_file"), records_path)
+            load_log_file = tuner_args["load_log_file"]
+            assert load_log_file is not None
+            shutil.copy(load_log_file, records_path)
 
         if "load_log_file" not in tuner_args and auto_scheduler_records_path is not None:
             tuner_args["load_log_file"] = auto_scheduler_records_path
@@ -193,13 +195,13 @@ class AutoScheduler(TVMCompilerBase, metaclass=ABCMeta):
         )
 
         tuner.tune(tune_option)
-        model.save(package_path)
+        model.save(str(package_path))
 
         # Free LocalRPCMeasureContext object
         if measure_ctx is not None:
             del measure_ctx
 
-        return {"package_file": package_filename, "records_file": records_name}
+        return {"package_file": Path(package_filename), "records_file": Path(records_name)}
 
     @staticmethod
     def _validate_target(target: str) -> bool:

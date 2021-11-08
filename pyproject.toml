@@ -54,3 +54,6 @@ multi_line_output = 3
 src_paths = ["python/arachne"]
 filter_files = true
 skip_glob = "*/3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*"
+
+[tool.pyright]
+ignore = ["./3rdparty/**/*.py"]

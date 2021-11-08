@@ -16,8 +16,10 @@ def get_function_from_string(text: str) -> Callable:
     if ":" in text:
         file_path, func_name = text.rsplit(":", 1)
         spec = importlib.util.spec_from_file_location(f"imported_module_{module_suffix}", file_path)
+        assert spec is not None
         module_suffix += 1
         mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
         spec.loader.exec_module(mod)
     else:
         mod_name, func_name = text.rsplit(".", 1)

@@ -1,9 +1,11 @@
 {
     "python.formatting.provider": "black",
     "python.linting.flake8Enabled": true,
-    "python.linting.mypyEnabled": true,
+    "python.linting.mypyEnabled": false,
     "python.sortImports.path": "isort",
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace",
 }

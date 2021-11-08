@@ -5,12 +5,14 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import Dict, Optional
 
+import tvm
 import tvm.autotvm
 import tvm.driver.tvmc.common as tvmccommon
 import tvm.driver.tvmc.frontends as tvmcfrontends
 from tvm import auto_scheduler, autotvm, relay
 from tvm.driver.tvmc import composite_target
 from tvm.driver.tvmc.model import TVMCModel
+from tvm.relay.backend.executor_factory import GraphExecutorFactoryModule
 from tvm.runtime.vm import Executable as VMExecutable
 from tvm.target import Target
 
@@ -150,6 +152,7 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
 
         shape_dict = {key: tensorinfo.shape for key, tensorinfo in input.input_info.items()}
 
+        input_filename = None
         if isinstance(input, DarknetPackage):
             input_filename = input.weight_file
         elif isinstance(input, CaffePackage):
@@ -158,6 +161,10 @@ class TVMCompilerBase(Stage, metaclass=ABCMeta):
             input, (TFLitePackage, TorchScriptPackage, TF1Package, KerasPackage, ONNXPackage)
         ):
             input_filename = input.model_file
+        elif isinstance(input, TVMCModelPackage):
+            input_filename = input.package_file
+
+        assert input_filename is not None
 
         if isinstance(input, TF1Package):
             # When tvmc.frontends loads a tf1 model (*.pb) that outputs multiple tensors, we have to specify output tensor names
@@ -396,6 +403,7 @@ class TVMCompiler(TVMCompilerBase):
         filename = "tvm_package.tar"
         package_path = str(output_dir / filename)
 
+        assert isinstance(graph_module, GraphExecutorFactoryModule)
         package_path = model.export_package(
             graph_module,
             str(package_path),
@@ -403,6 +411,8 @@ class TVMCompiler(TVMCompilerBase):
             cross_options=compile_params["cross_options"],
             lib_format=compile_params["lib_format"],
         )
+
+        assert package_path is not None
 
         # Write dumps to file.
         dump_code = ["relay"]
@@ -537,7 +547,7 @@ class TVMVMCompiler(TVMCompilerBase):
             with tarfile.open(output_path, "w") as tar:
                 tar.add(path_lib, lib_name)
 
-        return {"package_file": filename}
+        return {"package_file": Path(filename)}
 
 
 register_stage(TVMVMCompiler)

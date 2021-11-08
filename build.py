@@ -63,8 +63,9 @@ class ExtBuilder(build_ext):
             self.spawn(["cmake", "--build", "."])
 
         ## Save libtvm.so & libtvm_runtime.so to $HOME/.local/lib/tvm
-        home_dir = Path(os.environ.get("HOME"))
-        assert home_dir.exists()
+        home_dir = os.environ.get("HOME")
+        assert home_dir is not None
+        home_dir = Path(home_dir)
         tvm_lib_dir = home_dir / ".local" / "lib" / "tvm"
         tvm_lib_dir.mkdir(parents=True, exist_ok=True)
         self.spawn(["cp", str(extdir.parent.absolute()) + "/libtvm_runtime.so", str(tvm_lib_dir)])

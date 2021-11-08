@@ -9,7 +9,7 @@ import docker
 import numpy as np
 import tvm.driver.tvmc.common as tvmccommon
 import tvm.driver.tvmc.frontends as tvmcfrontends
-from docker.models.containers import ExecResult
+from docker.models.containers import Container, ExecResult
 
 from arachne.dataset import Dataset
 from arachne.logger import Logger
@@ -290,6 +290,7 @@ class VitisAICompiler(Stage):
             input_filename = input.model_file
 
         container = client.containers.get(vai_container_id)
+        assert isinstance(container, Container)
         try:
             # save calibration images to .npz
             VitisAICompiler._save_calib_inputs(

@@ -8,7 +8,7 @@ def test_compile_for_pytorch():
     from torchvision import models
 
     resnet18 = models.resnet18(pretrained=True)
-    input_shape = (1, 3, 224, 224)
+    input_shape = [1, 3, 224, 224]
     target_device = "host"
     compile_pipeline = [("tvm_compiler", {})]
 
@@ -21,6 +21,7 @@ def test_compile_for_pytorch():
 def test_compile_for_onnx_vm():
     import onnx
     import torch
+    import torch.onnx
     from torchvision import models
 
     resnet18 = models.resnet18(pretrained=True)
