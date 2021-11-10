@@ -46,6 +46,7 @@ touch /etc/sudoers.d/90-nopasswd-sudo
 echo "${HOST_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-nopasswd-sudo
 
 # PYTHONPATH is an environment varaible to be reset after sudo -u
+echo "export PATH=${PATH}" >> /home/${HOST_USER}/.bashrc
 echo "export PYTHONPATH=${PYTHONPATH}" >> /home/${HOST_USER}/.bashrc
 
 # Run
