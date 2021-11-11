@@ -38,7 +38,7 @@ RUN mkdir /tvm_python && tar xf /tvm_python.tar.gz -C /tvm_python --strip-compon
 
 ENV TVM_LIBRARY_PATH=/
 ENV PYTHONPATH=/tvm_python
-EXPOSE 9190
+EXPOSE 9100
 STOPSIGNAL SIGINT
 
-CMD [ "/usr/bin/python3", "-m", "tvm.exec.rpc_tracker" ]
+CMD [ "/usr/bin/python3", "-m", "tvm.exec.rpc_tracker", "--port=9100"]
