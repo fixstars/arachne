@@ -75,7 +75,7 @@ We tested the following steps for listed devices.
 
 For internal arachne developers, you can use a TVM rpc tracker that is continuously deployed by GitLab.
 The rpc information is as follows:
-* RPC Host: dgx-1.fixstars.com:9190
+* RPC Host: dgx-1.fixstars.com:9100
 * RPC Keys:
   * jetson-nano
   * jetson-xavier-nx
