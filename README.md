@@ -190,3 +190,25 @@ $ pip show arachne
 Location: </path/to/site-packages>
 $ export TVM_LIBRARY_PATH=</path/to/site-packages> # to identify which tvm library should be used
 ```
+
+### Install with editable mode
+
+If you want to install the arachne package with editable mode (i.e., `pip install -e`), please follow the bellow steps.
+Note that, in this case, you should install the tvm python package independently.
+
+```sh
+$ pwd
+/path/to/arachne/python
+$ python3 -m pip install -e .
+$ python3 -m pip show arachne
+Name: arachne
+Version: 0.0.0.dev0
+Summary: UNKNOWN
+Home-page: UNKNOWN
+Author:
+Author-email:
+License: UNKNOWN
+Location: /workspace/python
+Requires:
+Required-by:
+```
