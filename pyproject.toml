@@ -1,34 +1,32 @@
 [tool.poetry]
 name = "arachne"
 version = "0.0.0"
-description = "A framework for compile and benchmark DNN inferences on the devices"
-authors = ["Akira Maruoka <akira.maruoka@fixstars.com>"]
-packages = [
-    { include = "arachne", from = "python"},
-    { include = "3rdparty/tvm/python/tvm"},
-]
-include = ["3rdparty/tvm"]
-build = "build.py"
+description = "A library for accelerating deploying your DNN models to your edge devices."
+authors = ["Takafumi Kubota <takafumi.kubota@fixstars.com>"]
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.6.2"
+python = "^3.6.3"
+tensorflow = "2.4.1"
 numpy = "1.19.4"
-decorator = "<5,>=4.3"
-attrs = "^21.2.0"
-tornado = "^6.1"
-psutil = "^5.8.0"
-xgboost = "^1.4.2"
-cloudpickle = "^2.0.0"
+torch = "1.8.0"
+torchvision = "0.9.0"
+tensorflow-datasets = "^4.4.0"
+onnx = "1.8.0"
+onnxruntime = "1.8.0"
+hydra-core = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 flake8 = "^3.9.2"
 black = "~20.8b1"
-pre-commit = "*"
-mypy = "^0.910"
+isort = "^5.10.1"
+cmake = "^3.22.1"
+ninja = "^1.10.2"
+
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "wheel", "setuptools", "cmake", "ninja"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
@@ -56,4 +54,4 @@ filter_files = true
 skip_glob = "*/3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*"
 
 [tool.pyright]
-ignore = ["./3rdparty/**/*.py"]
+ignore = ["./3rdparty/**/*.py", ".venv/**/*"]
