@@ -5,6 +5,7 @@
     "remoteEnv": { "PYTHONPATH": "/workspaces/arachne/python", "TVM_LIBRARY_PATH": "/workspaces/arachne/build/tvm"},
     "workspaceFolder": "/workspaces/arachne",
     "remoteUser": "developer",
+    "mounts": ["source=/raid/datasets,target=/datasets,type=bind,consistency=cached"],
     "forwardPorts": [
         8888
     ],
