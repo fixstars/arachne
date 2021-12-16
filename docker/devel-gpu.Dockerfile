@@ -86,13 +86,13 @@ RUN [[ "${ARCH}" = "ppc64le" ]] || { apt-get update && \
         && rm -rf /var/lib/apt/lists/*; }
 
 ## TODO host other versions
-RUN curl -O https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
+# RUN curl -O https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
 
-RUN dpkg -i nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb \
-    && apt-key add /var/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226/7fa2af80.pub \
-    && apt-get update \
-    && apt-get install -y tensorrt \
-    && rm nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
+# RUN dpkg -i nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb \
+#     && apt-key add /var/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226/7fa2af80.pub \
+#     && apt-get update \
+#     && apt-get install -y tensorrt \
+#     && rm nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
 
 
 # For CUDA profiling, TensorFlow requires CUPTI.
