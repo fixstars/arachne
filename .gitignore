@@ -26,3 +26,9 @@ __pycache__
 
 # Poetry
 .venv/
+
+# Hydra
+outputs/
+
+# Temporary data
+tmp/
