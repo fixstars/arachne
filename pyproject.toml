@@ -1,15 +1,57 @@
 [tool.poetry]
 name = "arachne"
 version = "0.0.0"
-description = "\"A library for testing your DNN models on your edge devices\""
+description = "A library for accelerating deploying your DNN models to your edge devices."
 authors = ["Takafumi Kubota <takafumi.kubota@fixstars.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.3"
+tensorflow = "2.4.1"
+numpy = "1.19.4"
+torch = "1.8.0"
+torchvision = "0.9.0"
+tensorflow-datasets = "^4.4.0"
+onnx = "1.8.0"
+onnxruntime = "1.8.0"
+hydra-core = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
+pytest = "^3.0"
+flake8 = "^3.9.2"
+black = "~20.8b1"
+isort = "^5.10.1"
+cmake = "^3.22.1"
+ninja = "^1.10.2"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py36']
+include = '(\.pyi?$)'
+exclude = '''
+
+(
+  /(
+      \.github
+    | \.git
+    | \.vscode
+    | 3rdparty
+    | docker\/
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["python/arachne"]
+filter_files = true
+skip_glob = "*/3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*"
+
+[tool.pyright]
+ignore = ["./3rdparty/**/*.py", ".venv/**/*"]

@@ -14,8 +14,6 @@ examples/out
 .bash_history
 .python_history
 
-.prof/
-
 # Python
 arachne-*-py*.whl
 arachne-*.tar.gz
@@ -25,3 +23,6 @@ __pycache__
 .vscode-server
 
 *.tsv
+
+# Poetry
+.venv/
