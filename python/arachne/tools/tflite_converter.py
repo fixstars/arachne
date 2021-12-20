@@ -125,8 +125,9 @@ def main(cfg: DictConfig) -> None:
 
     input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
 
-    if cfg.input_spec and input_model.spec is None:
-        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))   # type: ignore
+    # overwrite model spec if input_spec is specified
+    if cfg.input_spec:
+        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))  # type: ignore
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.tflite_converter)

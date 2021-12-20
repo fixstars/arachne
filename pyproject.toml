@@ -15,6 +15,7 @@ tensorflow-datasets = "^4.4.0"
 onnx = "1.8.0"
 onnxruntime = "1.8.0"
 hydra-core = "^1.1.1"
+tflite = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

@@ -1,13 +1,14 @@
+import platform
+import subprocess
 import tarfile
 import tempfile
-from dataclasses import asdict
 from typing import Optional
 
 import onnx
 import onnxruntime
 import tensorflow as tf
 import yaml
-from omegaconf.dictconfig import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 from .data import Model, ModelSpec, TensorSpec
 
@@ -77,25 +78,48 @@ def get_model_spec(model_file: str) -> Optional[ModelSpec]:
             elif dtype == "double":
                 dtype = "float64"
             outputs.append(TensorSpec(name=out.name, shape=out.shape, dtype=dtype))
+    elif model_file.endswith(".pth"):
+        return None
 
     return ModelSpec(inputs=inputs, outputs=outputs)
 
 
-def save_model(model: Model, output_path: str, cfg: DictConfig):
-    env = {"model_spec": asdict(model.spec), "dependencies": []}
-    # if list(cfg.pipeline.stage)[-1] == "tvm":
-    #     env["tvm_device"] = "cpu"
-    #     if "tensorrt" in cfg.pipeline.stage.tvm.target:
-    #         import tensorrt
+def get_tensorrt_version():
+    dist = platform.linux_distribution()[0]
+    if dist == "Ubuntu" or dist == "Debian":
+        result = subprocess.check_output("dpkg -l | grep libnvinfer-dev", shell=True)
+        return result.decode().strip().split()[2]
+    else:
+        # TODO: Support Fedora (RedHat)
+        assert False, "Unsupported OS distribution"
 
-    #         env["dependencies"].append({"tensorrt": tensorrt.__version__})
-    #     if "cuda" in cfg.pipeline.stage.tvm.target:
-    #         sys_details = tf.sysconfig.get_build_info()
-    #         cuda_version = sys_details["cuda_version"]
-    #         cudnn_version = sys_details["cudnn_version"]
-    #         env["dependencies"].append({"cuda": cuda_version})
-    #         env["dependencies"].append({"cudnn": cudnn_version})
-    #         env["tvm_device"] = "cuda"
+
+def get_cuda_version():
+    result = subprocess.check_output("nvcc --version", shell=True)
+    return result.decode().strip().split("\n")[-1].replace(",", "").split()[-2]
+
+
+def get_cudnn_version():
+    dist = platform.linux_distribution()[0]
+    if dist == "Ubuntu" or dist == "Debian":
+        result = subprocess.check_output("dpkg -l | grep libcudnn", shell=True)
+        return result.decode().strip().split()[2]
+    else:
+        # TODO: Support Fedora (RedHat)
+        assert False, "Unsupported OS distribution"
+
+
+def save_model(model: Model, output_path: str, cfg: DictConfig):
+    env = {"model_spec": OmegaConf.to_object(model.spec), "dependencies": []}
+    if "tvm" in cfg.tools.keys():
+        env["tvm_device"] = "cpu"
+        targets = list(cfg.tools.tvm.composite_target)
+        if "tensorrt" in targets:
+            env["dependencies"].append({"tensorrt": get_tensorrt_version()})
+        if "cuda" in targets:
+            env["dependencies"].append({"cuda": get_cuda_version()})
+            env["dependencies"].append({"cudnn": get_cudnn_version()})
+            env["tvm_device"] = "cuda"
 
     pip_deps = []
     if model.file.endswith(".tflite"):

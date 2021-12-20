@@ -5,7 +5,7 @@ from omegaconf import MISSING
 
 
 @dataclass
-class BaseConfig():
+class BaseConfig:
     input: str = MISSING
     input_spec: Optional[str] = None
     output: str = MISSING

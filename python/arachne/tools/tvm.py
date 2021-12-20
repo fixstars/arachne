@@ -1,0 +1,259 @@
+import itertools
+import os
+from dataclasses import dataclass, field
+from typing import Any, List, Optional
+
+import hydra
+import tvm
+import tvm.autotvm
+import tvm.target
+import tvm.target.tag
+from hydra.core.config_store import ConfigStore
+from hydra.utils import to_absolute_path
+from omegaconf import MISSING, DictConfig, OmegaConf
+from tvm import relay
+from tvm.driver.tvmc.common import convert_graph_layout, target_from_cli
+from tvm.driver.tvmc.composite_target import get_codegen_by_target
+from tvm.driver.tvmc.frontends import load_model
+from tvm.driver.tvmc.model import TVMCModel
+from tvm.relay.backend.executor_factory import GraphExecutorFactoryModule
+
+from arachne.utils import get_model_spec, save_model
+
+from ..data import Model
+
+
+@dataclass
+class TVMConfig:
+    cpu_target: str = "x86-64"
+    cpu_attr: List[str] = field(default_factory=list)
+    cpu_name: Optional[str] = None
+    cuda_target_device: str = "cuda"
+    composite_target: List[str] = field(default_factory=list)
+
+    # these two configs will be updated by above configurations
+    target: Optional[str] = None
+    target_host: Optional[str] = None
+
+    desired_layout: Optional[str] = None
+    disabled_pass: Optional[str] = None
+    opt_level: int = 3
+    export_format: str = "tar"
+    cross_compiler: Optional[str] = None
+    cross_compiler_options: Optional[str] = None
+
+
+def register_tvm_config() -> None:
+    cs = ConfigStore.instance()
+    group_name = "tools"
+    cs.store(
+        group=group_name,
+        name="tvm",
+        package="tools.tvm",
+        node=TVMConfig,
+    )
+
+
+def _load_as_tvmc_model(input: Model) -> TVMCModel:
+    assert input.spec is not None
+
+    input_shape_dict = {}
+    for ti in input.spec.inputs:
+        input_shape_dict[ti.name] = ti.shape
+    if input.file.endswith(".pb"):
+        outputs = [out.name for out in input.spec.outputs]
+        model = load_model(
+            path=input.file,
+            shape_dict=input_shape_dict,
+            outputs=outputs,
+        )
+    elif input.file.endswith(".onnx"):
+        model = load_model(path=input.file, shape_dict=input_shape_dict, freeze_params=True)
+    elif input.file.endswith(".tar"):
+        model = TVMCModel(model_path=input.file)
+    else:
+        model = load_model(path=input.file, shape_dict=input_shape_dict)
+
+    return model
+
+
+def _add_additional_cuda_tag():
+    tags = tvm.target.tag.list_tags()
+    if tags and "nvidia/jetson-xavier-nx" not in tags:
+        tvm.target.tag.register_tag(
+            "nvidia/jetson-xavier-nx",
+            config={
+                "kind": "cuda",
+                "arch": "sm_72",
+                "shared_memory_per_block": 49152,
+                "registers_per_block": 65536,
+                "max_threads_per_block": 1024,
+                "thread_warp_size": 32,
+            },
+        )
+
+
+def _get_cpu_target(cfg: TVMConfig):
+    mattrs = list(cfg.cpu_attr)
+    if cfg.cpu_target == "x86-64":
+        base = "llvm -mtriple=x86_64-linux-gnu"
+        if len(mattrs) > 0:
+            base = base + " -mattr=" + ",".join(mattrs)
+        if cfg.cpu_name:
+            base = base + " -mcpu=" + str(cfg.cpu_name)
+        return base
+    elif cfg.cpu_target == "aarch64":
+        base = "llvm -device=arm_cpu -mtriple=aarch64-linux-gnu"
+        if len(mattrs) > 0:
+            base = base + " -mattr=" + ",".join(mattrs)
+        if cfg.cpu_name:
+            base = base + " -mcpu=" + str(cfg.cpu_name)
+        return base
+    else:
+        # TODO support other targets
+        assert False, "untested cpu-target"
+
+
+def _process_composite_targets(cfg: TVMConfig):
+    _add_additional_cuda_tag()
+    composit_targets = list(cfg.composite_target)
+    if len(composit_targets) == 0:
+        return
+    target = []
+    target_host = None
+    assert len(composit_targets) <= 2, "len(composite targets) is up to 2"
+
+    for t in composit_targets:
+        if t == "tensorrt":
+            target.append("tensorrt --remove_no_mac_subgraphs")
+        elif t == "cuda":
+            target.append(str(tvm.target.Target(cfg.cuda_target_device)))
+        elif t == "cpu":
+            target.append(_get_cpu_target(cfg))
+        else:
+            assert False, f"unsupported composite target: {t}"
+
+    last_target = composit_targets[-1]
+    if last_target != "cpu":
+        target_host = _get_cpu_target(cfg)
+
+    cfg.target = ",".join(target)
+    if target_host is not None:
+        cfg.target_host = target_host
+
+
+def _save_relay(graph_module, module, module_path):
+    dump_code = ["relay"]
+    dumps = {}
+    for source_type in dump_code:
+        lib = graph_module.get_lib()
+        source = str(module) if source_type == "relay" else lib.get_source(source_type)
+        dumps[source_type] = source
+
+    if dumps:
+        for dump_format in dumps:
+            dump_path = module_path + "." + dump_format
+            with open(dump_path, "w") as f:
+                f.write(dumps[dump_format])
+
+
+def run(input: Model, cfg: TVMConfig) -> Model:
+    idx = itertools.count().__next__()
+
+    # Load as a TVMC model
+    tvmc_model = _load_as_tvmc_model(input)
+
+    _process_composite_targets(cfg)
+
+    # Check target consistency
+    tvm_target, extra_targets = target_from_cli(cfg.target)
+    tvm_target, target_host = tvm.target.Target.check_and_update_host_consist(
+        target=tvm_target, host=cfg.target_host
+    )
+
+    module = tvmc_model.mod
+    params = tvmc_model.params
+
+    assert isinstance(tvm_target, tvm.target.Target)
+    if tvm_target.kind.name == "cuda" and "arch" in tvm_target.attrs:
+        tvm.autotvm.measure.measure_methods.set_cuda_target_arch(tvm_target.attrs["arch"])
+
+    # Convert graph layout if needed
+    if cfg.desired_layout:
+        module = convert_graph_layout(module, cfg.desired_layout)
+
+    # Partitioning depends on extra targets
+    tvm_config = {}
+    for extra in extra_targets:
+        codegen = get_codegen_by_target(extra["name"])
+        partition_function = codegen["pass_pipeline"]
+        module, codegen_config = partition_function(module, params, **extra["opts"])
+        if codegen["config_key"] is not None:
+            tvm_config[codegen["config_key"]] = codegen_config if codegen_config else extra["opts"]
+
+    with tvm.transform.PassContext(
+        opt_level=cfg.opt_level, config=tvm_config, disabled_pass=cfg.disabled_pass
+    ):
+        graph_module = relay.build(module, target=tvm_target, params=params)
+
+    # Export as a tvm package
+    filename = f"tvm_package_{idx}.tar"
+    output_path = os.getcwd() + "/" + filename
+
+    assert isinstance(graph_module, GraphExecutorFactoryModule)
+
+    cc = None
+    cc_opts = None
+    if cfg.export_format == "so":
+        assert cfg.cross_compiler is not None
+        cc = cfg.cross_compiler
+        cc_opts = cfg.cross_compiler_options
+
+    package_path = tvmc_model.export_package(
+        graph_module,
+        output_path,
+        cross=cc,
+        cross_options=cc_opts,
+        output_format=cfg.export_format,
+    )
+
+    assert package_path is not None
+
+    _save_relay(graph_module=graph_module, module=module, module_path=package_path)
+
+    return Model(file=package_path, spec=input.spec)
+
+
+@hydra.main(config_path=None, config_name="config")
+def main(cfg: DictConfig) -> None:
+    print(OmegaConf.to_yaml(cfg))
+
+    input_model_path = to_absolute_path(cfg.input)
+    output_path = to_absolute_path(cfg.output)
+
+    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+
+    # overwrite model spec if input_spec is specified
+    if cfg.input_spec:
+        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))  # type: ignore
+
+    assert input_model.spec is not None
+    output_model = run(input=input_model, cfg=cfg.tools.tvm)
+    save_model(model=output_model, output_path=output_path, cfg=cfg)
+
+
+if __name__ == "__main__":
+    register_tvm_config()
+
+    from ..config.base import BaseConfig
+
+    defaults = [{"tools": "tvm"}, "_self_"]
+
+    @dataclass
+    class Config(BaseConfig):
+        defaults: List[Any] = field(default_factory=lambda: defaults)
+        tools: Any = MISSING
+
+    cs = ConfigStore.instance()
+    cs.store(name="config", node=Config)
+    main()
