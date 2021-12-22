@@ -172,6 +172,8 @@ def save_model(model: Model, output_path: str, cfg: DictConfig):
     pip_deps = []
     if model.file.endswith(".tflite"):
         pip_deps.append({"tensorflow": tf.__version__})
+    if model.file.endswith("saved_model"):
+        pip_deps.append({"tensorflow": tf.__version__})
     if model.file.endswith(".onnx"):
         pip_deps.append({"onnx": onnx.__version__})
         pip_deps.append({"onnxruntime": onnxruntime.__version__})
