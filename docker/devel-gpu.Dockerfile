@@ -78,6 +78,7 @@ RUN [[ "${ARCH}" = "ppc64le" ]] || { apt-get update && \
         libnvparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
         libnvonnxparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
         python3-libnvinfer=${LIBNVINFER_APT_VER} \
+        python3-libnvinfer-dev=${LIBNVINFER_APT_VER} \
         libnvinfer-dev=${LIBNVINFER_APT_VER} \
         libnvinfer-plugin-dev=${LIBNVINFER_APT_VER} \
         libnvparsers-dev=${LIBNVINFER_APT_VER} \
