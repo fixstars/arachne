@@ -16,7 +16,7 @@ def test_tftrt(precision):
         model = tf.keras.applications.mobilenet.MobileNet()
         model.save("saved_model")
 
-        input_model = Model(file="saved_model", spec=get_model_spec("saved_model"))
+        input_model = Model(path="saved_model", spec=get_model_spec("saved_model"))
         cfg = TFTRTConfig()
         cfg.precision_mode = precision
         run(input_model, cfg)

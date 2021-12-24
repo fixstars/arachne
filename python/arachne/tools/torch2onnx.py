@@ -45,7 +45,7 @@ def run(input: Model, cfg: Torch2ONNXConfig) -> Model:
 
     assert input.spec is not None
 
-    model = torch.load(input.file)
+    model = torch.load(input.path)
 
     args = []
     for inp in list(input.spec.inputs):
@@ -76,7 +76,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:

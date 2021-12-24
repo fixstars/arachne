@@ -60,19 +60,19 @@ def _load_as_tvmc_model(input: Model) -> TVMCModel:
     input_shape_dict = {}
     for ti in input.spec.inputs:
         input_shape_dict[ti.name] = ti.shape
-    if input.file.endswith(".pb"):
+    if input.path.endswith(".pb"):
         outputs = [out.name for out in input.spec.outputs]
         model = load_model(
-            path=input.file,
+            path=input.path,
             shape_dict=input_shape_dict,
             outputs=outputs,
         )
-    elif input.file.endswith(".onnx"):
-        model = load_model(path=input.file, shape_dict=input_shape_dict, freeze_params=True)
-    elif input.file.endswith(".tar"):
-        model = TVMCModel(model_path=input.file)
+    elif input.path.endswith(".onnx"):
+        model = load_model(path=input.path, shape_dict=input_shape_dict, freeze_params=True)
+    elif input.path.endswith(".tar"):
+        model = TVMCModel(model_path=input.path)
     else:
-        model = load_model(path=input.file, shape_dict=input_shape_dict)
+        model = load_model(path=input.path, shape_dict=input_shape_dict)
 
     return model
 
@@ -221,7 +221,7 @@ def run(input: Model, cfg: TVMConfig) -> Model:
 
     _save_relay(graph_module=graph_module, module=module, module_path=package_path)
 
-    return Model(file=package_path, spec=input.spec)
+    return Model(path=package_path, spec=input.spec)
 
 
 @hydra.main(config_path=None, config_name="config")
@@ -231,7 +231,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:

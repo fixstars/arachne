@@ -35,10 +35,10 @@ def get_torch_dtype_from_string(dtype_str: str) -> torch.dtype:
     return dtype_str_to_torch_dtype_dict[dtype_str]
 
 
-def get_tflite_model_spec(model_file: str) -> ModelSpec:
+def get_tflite_model_spec(model_path: str) -> ModelSpec:
     inputs = []
     outputs = []
-    interpreter = tf.lite.Interpreter(model_path=model_file)
+    interpreter = tf.lite.Interpreter(model_path=model_path)
     interpreter.allocate_tensors()
 
     # Get input and output tensors.
@@ -56,10 +56,10 @@ def get_tflite_model_spec(model_file: str) -> ModelSpec:
     return ModelSpec(inputs=inputs, outputs=outputs)
 
 
-def get_keras_model_spec(model_file: str) -> ModelSpec:
+def get_keras_model_spec(model_path: str) -> ModelSpec:
     inputs = []
     outputs = []
-    model = tf.keras.models.load_model(model_file)
+    model = tf.keras.models.load_model(model_path)
     for inp in model.inputs:  # type: ignore
         shape = [-1 if x is None else x for x in inp.shape]
         inputs.append(TensorSpec(name=inp.name, shape=shape, dtype=inp.dtype.name))
@@ -69,10 +69,10 @@ def get_keras_model_spec(model_file: str) -> ModelSpec:
     return ModelSpec(inputs=inputs, outputs=outputs)
 
 
-def get_saved_model_spec(model_file: str) -> ModelSpec:
+def get_saved_model_spec(model_path: str) -> ModelSpec:
     inputs = []
     outputs = []
-    model = tf.saved_model.load(model_file)
+    model = tf.saved_model.load(model_path)
     model_inputs = [
         inp for inp in model.signatures["serving_default"].inputs if "unknown" not in inp.name  # type: ignore
     ]
@@ -88,11 +88,11 @@ def get_saved_model_spec(model_file: str) -> ModelSpec:
     return ModelSpec(inputs=inputs, outputs=outputs)
 
 
-def get_onnx_model_spec(model_file: str) -> ModelSpec:
+def get_onnx_model_spec(model_path: str) -> ModelSpec:
     inputs = []
     outputs = []
 
-    session = onnxruntime.InferenceSession(model_file)
+    session = onnxruntime.InferenceSession(model_path)
     for inp in session.get_inputs():
         dtype = inp.type.replace("tensor(", "").replace(")", "")
         if dtype == "float":
@@ -110,18 +110,18 @@ def get_onnx_model_spec(model_file: str) -> ModelSpec:
     return ModelSpec(inputs=inputs, outputs=outputs)
 
 
-def get_model_spec(model_file: str) -> Optional[ModelSpec]:
-    if model_file.endswith(".tflite"):
-        return get_tflite_model_spec(model_file)
-    elif model_file.endswith(".h5"):
-        return get_keras_model_spec(model_file)
-    elif model_file.endswith("saved_model"):
-        return get_saved_model_spec(model_file)
-    elif model_file.endswith(".onnx"):
-        return get_onnx_model_spec(model_file)
-    elif model_file.endswith(".pb"):
+def get_model_spec(model_path: str) -> Optional[ModelSpec]:
+    if model_path.endswith(".tflite"):
+        return get_tflite_model_spec(model_path)
+    elif model_path.endswith(".h5"):
+        return get_keras_model_spec(model_path)
+    elif model_path.endswith("saved_model"):
+        return get_saved_model_spec(model_path)
+    elif model_path.endswith(".onnx"):
+        return get_onnx_model_spec(model_path)
+    elif model_path.endswith(".pb"):
         return None
-    elif model_file.endswith(".pth") or model_file.endswith(".pt"):
+    elif model_path.endswith(".pth") or model_path.endswith(".pt"):
         return None
     return None
 
@@ -170,16 +170,16 @@ def save_model(model: Model, output_path: str, cfg: DictConfig):
             env["tvm_device"] = "cuda"
 
     pip_deps = []
-    if model.file.endswith(".tflite"):
+    if model.path.endswith(".tflite"):
         pip_deps.append({"tensorflow": tf.__version__})
-    if model.file.endswith("saved_model"):
+    if model.path.endswith("saved_model"):
         pip_deps.append({"tensorflow": tf.__version__})
-    if model.file.endswith(".onnx"):
+    if model.path.endswith(".onnx"):
         pip_deps.append({"onnx": onnx.__version__})
         pip_deps.append({"onnxruntime": onnxruntime.__version__})
     env["dependencies"].append({"pip": pip_deps})
     with tarfile.open(output_path, "w:gz") as tar:
-        tar.add(model.file, arcname=model.file.split("/")[-1])
+        tar.add(model.path, arcname=model.path.split("/")[-1])
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             with open(tmp_dir + "/env.yaml", "w") as file:

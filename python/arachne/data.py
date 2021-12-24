@@ -17,5 +17,5 @@ class ModelSpec:
 
 @dataclass
 class Model:
-    file: str
+    path: str
     spec: Optional[ModelSpec] = None

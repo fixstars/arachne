@@ -41,13 +41,13 @@ def register_tflite_converter_config() -> None:
 
 
 def _init_tflite_converter(input: Model):
-    input_file = input.file
+    input_path = input.path
     converter = None
-    if input_file.endswith(".h5"):
+    if input_path.endswith(".h5"):
         # keras
-        model = tf.keras.models.load_model(input_file)
+        model = tf.keras.models.load_model(input_path)
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
-    elif input_file.endswith(".pb"):
+    elif input_path.endswith(".pb"):
         assert (
             input.spec is not None
         ), "To convert *.pb file, you should specify model spec by model_spec=</path/to/spec.yaml>"
@@ -58,13 +58,13 @@ def _init_tflite_converter(input: Model):
             input_shapes[inp.name] = inp.shape
 
         converter = tf.compat.v1.lite.TFLiteConverter.from_frozen_graph(
-            graph_def_file=input_file,
+            graph_def_file=input_path,
             input_arrays=inputs,
             output_arrays=outputs,
             input_shapes=input_shapes,
         )
-    elif input_file.endswith("saved_model"):
-        converter = tf.lite.TFLiteConverter.from_saved_model(input_file)
+    elif input_path.endswith("saved_model"):
+        converter = tf.lite.TFLiteConverter.from_saved_model(input_path)
     else:
         assert False
 
@@ -113,7 +113,7 @@ def run(input: Model, cfg: TFLiteConverterConfig) -> Model:
     with open(output_path, "wb") as w:
         w.write(tflite_model)
 
-    return Model(file=output_path, spec=get_model_spec(output_path))
+    return Model(path=output_path, spec=get_model_spec(output_path))
 
 
 @hydra.main(config_path=None, config_name="config")
@@ -123,7 +123,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:

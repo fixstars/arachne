@@ -45,7 +45,7 @@ def run(input: Model, cfg: Torch2TRTConfig) -> Model:
     idx = itertools.count().__next__()
     filename = f"model_trt_{idx}.pth"
 
-    model = torch.load(input.file).eval().cuda()
+    model = torch.load(input.path).eval().cuda()
 
     assert input.spec is not None
     args = []
@@ -81,7 +81,9 @@ def run(input: Model, cfg: Torch2TRTConfig) -> Model:
         elif cfg.int8_calib_algorithm == "ENTROPY_CALIBRATION":
             algo = trt.CalibrationAlgoType.ENTROPY_CALIBRATION  # type: ignore
         elif cfg.int8_calib_algorithm == "LEGACY_CALIBRATION":
-            assert False, "LEGACY_CALIBRATION caused a SEGV for resnet-18, so we restricted this algo"
+            assert (
+                False
+            ), "LEGACY_CALIBRATION caused a SEGV for resnet-18, so we restricted this algo"
         elif cfg.int8_calib_algorithm == "MINMAX_CALIBRATION":
             algo = trt.CalibrationAlgoType.MINMAX_CALIBRATION  # type: ignore
         else:
@@ -113,7 +115,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:
