@@ -59,7 +59,7 @@ def _load_as_tvmc_model(input: Model) -> TVMCModel:
 
     input_shape_dict = {}
     for ti in input.spec.inputs:
-        input_shape_dict[ti.name] = ti.shape
+        input_shape_dict[ti.name] = list(ti.shape)
     if input.path.endswith(".pb"):
         outputs = [out.name for out in input.spec.outputs]
         model = load_model(
