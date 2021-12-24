@@ -50,7 +50,7 @@ def run(input: Model, cfg: TFTRTConfig) -> Model:
     params = params._replace(max_batch_size=cfg.max_batch_size)
     params = params._replace(allow_build_at_runtime=cfg.allow_build_at_runtime)
 
-    converter = trt.TrtGraphConverterV2(input_saved_model_dir=input.file, conversion_params=params)
+    converter = trt.TrtGraphConverterV2(input_saved_model_dir=input.path, conversion_params=params)
 
     calibration_input_fn = None
     if cfg.precision_mode == "INT8":
@@ -76,7 +76,7 @@ def run(input: Model, cfg: TFTRTConfig) -> Model:
     converter.convert(calibration_input_fn=calibration_input_fn)
     output_saved_model_dir = f"tftrt-{idx}-saved_model"
     converter.save(output_saved_model_dir)
-    return Model(file=output_saved_model_dir, spec=input.spec)
+    return Model(path=output_saved_model_dir, spec=input.spec)
 
 
 @hydra.main(config_path=None, config_name="config")
@@ -86,7 +86,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:

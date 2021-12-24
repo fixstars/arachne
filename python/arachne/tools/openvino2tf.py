@@ -46,10 +46,10 @@ def run(input: Model, cfg: OpenVINO2TFConfig) -> Model:
 
     output_dir = f"openvino2tf-{idx}-saved_model"
 
-    if input.file.endswith(".xml"):
-        model_path = input.file
+    if input.path.endswith(".xml"):
+        model_path = input.path
     else:
-        model_path = _find_openvino_xml_file(input.file)
+        model_path = _find_openvino_xml_file(input.path)
     assert model_path is not None
     cmd = [
         "openvino2tensorflow",
@@ -65,7 +65,7 @@ def run(input: Model, cfg: OpenVINO2TFConfig) -> Model:
 
     ret = subprocess.run(cmd)
     assert ret.returncode == 0
-    return Model(file=output_dir, spec=get_model_spec(output_dir))
+    return Model(path=output_dir, spec=get_model_spec(output_dir))
 
 
 @hydra.main(config_path=None, config_name="config")
@@ -75,7 +75,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:

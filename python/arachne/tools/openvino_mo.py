@@ -40,7 +40,7 @@ def run(input: Model, cfg: OpenVINOModelOptConfig) -> Model:
     cmd = [
         "mo",
         "--input_model",
-        input.file,
+        input.path,
         "--input_shape",
         ",".join(input_shapes),
         "--output_dir",
@@ -52,7 +52,7 @@ def run(input: Model, cfg: OpenVINOModelOptConfig) -> Model:
 
     ret = subprocess.run(cmd)
     assert ret.returncode == 0
-    return Model(file=output_dir, spec=input.spec)
+    return Model(path=output_dir, spec=input.spec)
 
 
 @hydra.main(config_path=None, config_name="config")
@@ -62,7 +62,7 @@ def main(cfg: DictConfig) -> None:
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
 
-    input_model = Model(file=input_model_path, spec=get_model_spec(input_model_path))
+    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:

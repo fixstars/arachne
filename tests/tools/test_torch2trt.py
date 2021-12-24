@@ -20,7 +20,7 @@ def test_torch2trt(precision):
             inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
             outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
         )
-        input_model = Model(file="resnet18.pt", spec=spec)
+        input_model = Model(path="resnet18.pt", spec=spec)
         cfg = Torch2TRTConfig()
         if precision == "FP16":
             cfg.fp16_mode = True
@@ -39,7 +39,7 @@ def test_torch2trt_int8(calib_algo):
             inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
             outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
         )
-        input_model = Model(file="resnet18.pt", spec=spec)
+        input_model = Model(path="resnet18.pt", spec=spec)
         cfg = Torch2TRTConfig()
         cfg.int8_mode = True
         cfg.int8_calib_algorithm = calib_algo

@@ -25,13 +25,13 @@ def test_torch2onnx():
             inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
             outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
         )
-        input_model = Model(file="resnet18.pt", spec=spec)
+        input_model = Model(path="resnet18.pt", spec=spec)
         cfg = Torch2ONNXConfig()
         m = run_torch2onnx(input_model, cfg)
         m = run_openvino_mo(m, OpenVINOModelOptConfig())
         m = run_openvino2tf(m, OpenVINO2TFConfig())
 
-        tf_loaded = tf.saved_model.load(m.file)
+        tf_loaded = tf.saved_model.load(m.path)
         resnet18_tf = tf_loaded.signatures["serving_default"]  # type: ignore
 
         input = np.random.rand(1, 3, 224, 224).astype(np.float32)  # type: ignore
