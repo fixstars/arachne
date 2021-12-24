@@ -18,6 +18,8 @@ hydra-core = "^1.1.1"
 tflite = "^2.4.0"
 nvidia-tensorrt = "7.2.3.4"
 packaging = "^21.3"
+openvino-dev = "^2021.4.2"
+rawpy = "0.16.0"
 
 [[tool.poetry.source]]
 name = 'nvidia'
@@ -61,4 +63,4 @@ filter_files = true
 skip_glob = "*/3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*"
 
 [tool.pyright]
-ignore = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*"]
+ignore = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]

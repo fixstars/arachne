@@ -81,7 +81,9 @@ def run(input: Model, cfg: Torch2TRTConfig) -> Model:
         elif cfg.int8_calib_algorithm == "ENTROPY_CALIBRATION":
             algo = trt.CalibrationAlgoType.ENTROPY_CALIBRATION  # type: ignore
         elif cfg.int8_calib_algorithm == "LEGACY_CALIBRATION":
-            assert False, "LEGACY_CALIBRATION caused a SEGV for resnet-18, so we restricted this algo"
+            assert (
+                False
+            ), "LEGACY_CALIBRATION caused a SEGV for resnet-18, so we restricted this algo"
         elif cfg.int8_calib_algorithm == "MINMAX_CALIBRATION":
             algo = trt.CalibrationAlgoType.MINMAX_CALIBRATION  # type: ignore
         else:
