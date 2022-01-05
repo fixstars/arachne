@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any
+from typing import Any, Dict
+
+import numpy as np
 
 
 class RuntimeModule(metaclass=ABCMeta):
@@ -19,7 +21,7 @@ class RuntimeModule(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_output(self, idx):
+    def get_output(self, idx) -> np.ndarray:
         pass
 
     @abstractmethod
@@ -31,5 +33,5 @@ class RuntimeModule(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1):
+    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1) -> Dict:
         pass
