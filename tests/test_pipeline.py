@@ -24,7 +24,6 @@ def test_pipeline_from_keras(pipeline):
         cfg = PipelineConfig()
         cfg.pipeline = pipeline
         cfg.tools = get_default_tool_configs(pipeline)
-        cfg = OmegaConf.structured(cfg)
         run(input, cfg)
 
 

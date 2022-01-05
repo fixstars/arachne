@@ -38,7 +38,7 @@ def get_default_tool_configs(tools: List[str]) -> Dict:
     return config
 
 
-def run(input: Model, cfg: DictConfig) -> Model:
+def run(input: Model, cfg: PipelineConfig) -> Model:
 
     # Preprare DataCatalog
     data_catalog = DataCatalog()
@@ -90,7 +90,7 @@ def main(cfg: DictConfig) -> None:
 
     assert input_model.spec is not None
 
-    output_model = run(input_model, cfg)
+    output_model = run(input_model, cfg)  # type: ignore
 
     save_model(model=output_model, output_path=output_path, cfg=cfg)
 
@@ -101,10 +101,8 @@ if __name__ == "__main__":
     defaults = [{"tools": get_all_tools()}, "_self_"]
 
     @dataclass
-    class PipelineCLIConfig(BaseConfig):
+    class PipelineCLIConfig(PipelineConfig):
         defaults: List[Any] = field(default_factory=lambda: defaults)
-        tools: Any = MISSING
-        pipeline: List[str] = MISSING
 
     cs = ConfigStore.instance()
     cs.store(name="config", node=PipelineCLIConfig)
