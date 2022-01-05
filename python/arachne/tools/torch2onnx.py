@@ -15,6 +15,7 @@ from arachne.utils import (
     get_tool_config_objects,
     get_tool_run_objects,
     get_torch_dtype_from_string,
+    load_model_spec,
     save_model,
 )
 
@@ -86,7 +87,7 @@ def main(cfg: DictConfig) -> None:
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:
-        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))  # type: ignore
+        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.torch2onnx)

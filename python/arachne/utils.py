@@ -127,6 +127,19 @@ def get_model_spec(model_path: str) -> Optional[ModelSpec]:
     return None
 
 
+def load_model_spec(spec_file_path: str) -> ModelSpec:
+    tmp = OmegaConf.load(spec_file_path)
+    tmp = OmegaConf.to_container(tmp)
+    assert isinstance(tmp, dict)
+    inputs = []
+    outputs = []
+    for inp in tmp["inputs"]:
+        inputs.append(TensorSpec(name=inp["name"], shape=inp["shape"], dtype=inp["dtype"]))
+    for out in tmp["outputs"]:
+        outputs.append(TensorSpec(name=out["name"], shape=out["shape"], dtype=out["dtype"]))
+    return ModelSpec(inputs=inputs, outputs=outputs)
+
+
 def get_tensorrt_version():
     dist = platform.linux_distribution()[0]
     if dist == "Ubuntu" or dist == "Debian":
@@ -153,9 +166,7 @@ def get_cudnn_version():
 
 
 def save_model(model: Model, output_path: str, cfg: DictConfig):
-    if isinstance(model.spec, DictConfig):
-        spec = OmegaConf.to_object(model.spec)
-    elif dataclasses.is_dataclass(model.spec):
+    if dataclasses.is_dataclass(model.spec):
         spec = asdict(model.spec)
     else:
         assert False, f"model.spec is unknown object or None: {model.spec}"
