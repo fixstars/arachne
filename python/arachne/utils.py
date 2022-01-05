@@ -4,7 +4,7 @@ import subprocess
 import tarfile
 import tempfile
 from dataclasses import asdict
-from typing import Optional
+from typing import Callable, Dict, Optional
 
 import onnx
 import onnxruntime
@@ -12,6 +12,7 @@ import tensorflow as tf
 import torch
 import yaml
 from omegaconf import DictConfig, OmegaConf
+from tvm.relay import Any
 
 from .data import Model, ModelSpec, TensorSpec
 
@@ -126,6 +127,19 @@ def get_model_spec(model_path: str) -> Optional[ModelSpec]:
     return None
 
 
+def load_model_spec(spec_file_path: str) -> ModelSpec:
+    tmp = OmegaConf.load(spec_file_path)
+    tmp = OmegaConf.to_container(tmp)
+    assert isinstance(tmp, dict)
+    inputs = []
+    outputs = []
+    for inp in tmp["inputs"]:
+        inputs.append(TensorSpec(name=inp["name"], shape=inp["shape"], dtype=inp["dtype"]))
+    for out in tmp["outputs"]:
+        outputs.append(TensorSpec(name=out["name"], shape=out["shape"], dtype=out["dtype"]))
+    return ModelSpec(inputs=inputs, outputs=outputs)
+
+
 def get_tensorrt_version():
     dist = platform.linux_distribution()[0]
     if dist == "Ubuntu" or dist == "Debian":
@@ -152,16 +166,15 @@ def get_cudnn_version():
 
 
 def save_model(model: Model, output_path: str, cfg: DictConfig):
-    if isinstance(model.spec, DictConfig):
-        spec = OmegaConf.to_object(model.spec)
-    elif dataclasses.is_dataclass(model.spec):
+    if dataclasses.is_dataclass(model.spec):
         spec = asdict(model.spec)
     else:
         assert False, f"model.spec is unknown object or None: {model.spec}"
     env = {"model_spec": spec, "dependencies": []}
     if "tvm" in cfg.tools.keys():
-        env["tvm_device"] = "cpu"
         targets = list(cfg.tools.tvm.composite_target)
+        if len(targets) > 0:
+            env["tvm_device"] = "cpu"
         if "tensorrt" in targets:
             env["dependencies"].append({"tensorrt": get_tensorrt_version()})
         if "cuda" in targets:
@@ -185,3 +198,17 @@ def save_model(model: Model, output_path: str, cfg: DictConfig):
             with open(tmp_dir + "/env.yaml", "w") as file:
                 yaml.dump(env, file)
                 tar.add(tmp_dir + "/env.yaml", arcname="env.yaml")
+
+
+_TOOL_CONFIG_GLOBAL_OBJECTS: Dict[str, Any] = {}
+
+
+def get_tool_config_objects():
+    return _TOOL_CONFIG_GLOBAL_OBJECTS
+
+
+_TOOL_RUN_GLOBAL_OBJECTS: Dict[str, Callable] = {}
+
+
+def get_tool_run_objects():
+    return _TOOL_RUN_GLOBAL_OBJECTS

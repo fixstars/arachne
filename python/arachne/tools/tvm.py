@@ -18,7 +18,13 @@ from tvm.driver.tvmc.frontends import load_model
 from tvm.driver.tvmc.model import TVMCModel
 from tvm.relay.backend.executor_factory import GraphExecutorFactoryModule
 
-from arachne.utils import get_model_spec, save_model
+from arachne.utils import (
+    get_model_spec,
+    get_tool_config_objects,
+    get_tool_run_objects,
+    load_model_spec,
+    save_model,
+)
 
 from ..data import Model
 
@@ -29,7 +35,7 @@ class TVMConfig:
     cpu_attr: List[str] = field(default_factory=list)
     cpu_name: Optional[str] = None
     cuda_target_device: str = "cuda"
-    composite_target: List[str] = field(default_factory=list)
+    composite_target: List[str] = field(default_factory=lambda: ["cpu"])
 
     # these two configs will be updated by above configurations
     target: Optional[str] = None
@@ -59,7 +65,7 @@ def _load_as_tvmc_model(input: Model) -> TVMCModel:
 
     input_shape_dict = {}
     for ti in input.spec.inputs:
-        input_shape_dict[ti.name] = ti.shape
+        input_shape_dict[ti.name] = list(ti.shape)
     if input.path.endswith(".pb"):
         outputs = [out.name for out in input.spec.outputs]
         model = load_model(
@@ -235,7 +241,7 @@ def main(cfg: DictConfig) -> None:
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:
-        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))  # type: ignore
+        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.tvm)
@@ -257,3 +263,7 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
+
+
+get_tool_config_objects()["tvm"] = TVMConfig
+get_tool_run_objects()["tvm"] = run
