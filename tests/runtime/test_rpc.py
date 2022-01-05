@@ -10,7 +10,7 @@ from omegaconf.dictconfig import DictConfig
 import arachne.runtime
 import arachne.tools.tvm
 from arachne.data import Model
-from arachne.runtime.rpc import TVMRuntimeClient, create_channel
+from arachne.runtime.rpc import TfliteRuntimeClient, TVMRuntimeClient, create_channel
 from arachne.server import create_server
 from arachne.tools.tvm import TVMConfig
 from arachne.utils import get_model_spec, save_model
@@ -58,3 +58,41 @@ def test_tvm_runtime_rpc(rpc_port=5051):
             server.stop(0)
         # compare
         np.testing.assert_equal(local_output, rpc_output)
+
+
+def test_tflite_runtime_rpc(rpc_port=5051):
+    import tensorflow as tf
+
+    def save_tflite_model(model_path):
+        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        tflite_model = converter.convert()
+        with open(model_path, "wb") as w:
+            w.write(tflite_model)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        model_path = tmp_dir + "/model.tflite"
+        save_tflite_model(model_path)
+        rtmodule = arachne.runtime.init(model=model_path)
+        assert rtmodule
+
+        # local
+        dummy_input = np.random.rand(1, 224, 224, 3).astype(np.float32)
+        rtmodule.set_input(0, dummy_input)
+        rtmodule.run()
+        local_output = rtmodule.get_output(0)
+
+        # rpc
+        server = create_server(rpc_port)
+        server.start()
+        try:
+            channel = create_channel(port=rpc_port)
+            client = TfliteRuntimeClient(channel, model_path)
+            client.set_input(0, dummy_input)
+            client.invoke()
+            rpc_output = client.get_output(0)
+        finally:
+            server.stop(0)
+
+        # compare
+        np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)

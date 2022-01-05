@@ -1,5 +1,6 @@
 import tempfile
 
+import numpy as np
 import torch
 import torch.onnx
 import torchvision
@@ -34,3 +35,36 @@ def test_tvm_runtime():
         rtmodule = arachne.runtime.init(package=package_path)
         assert rtmodule
         rtmodule.benchmark()
+
+
+def test_tflite_runtime():
+    import tensorflow as tf
+
+    def save_tflite_model(model_path):
+        @tf.function(
+            input_signature=[
+                tf.TensorSpec(shape=[], dtype=tf.float32),
+                tf.TensorSpec(shape=[], dtype=tf.float32),
+            ]
+        )
+        def add(x, y):
+            return x + y
+
+        concrete_func = add.get_concrete_function()
+        converter = tf.lite.TFLiteConverter.from_concrete_functions([concrete_func])
+        tflite_model = converter.convert()
+        with open(model_path, "wb") as w:
+            w.write(tflite_model)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        model_path = tmp_dir + "/model.tflite"
+        save_tflite_model(model_path)
+        rtmodule = arachne.runtime.init(model=model_path)
+        assert rtmodule
+        input_data = np.array(1.0, dtype=np.float32)
+        rtmodule.set_input(0, input_data)
+        rtmodule.set_input(1, input_data)
+        rtmodule.run()
+        local_output = rtmodule.get_output(0)
+        desire_output = np.array(2.0, dtype=np.float32)
+        np.testing.assert_equal(local_output, desire_output)
