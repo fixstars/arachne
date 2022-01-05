@@ -10,7 +10,13 @@ from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 
-from arachne.utils import get_model_spec, get_torch_dtype_from_string, save_model
+from arachne.utils import (
+    get_model_spec,
+    get_tool_config_objects,
+    get_tool_run_objects,
+    get_torch_dtype_from_string,
+    save_model,
+)
 
 from ..data import Model
 
@@ -102,3 +108,7 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
+
+
+get_tool_config_objects()["torch2onnx"] = Torch2ONNXConfig
+get_tool_run_objects()["torch2onnx"] = run

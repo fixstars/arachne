@@ -9,7 +9,12 @@ from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
-from arachne.utils import get_model_spec, save_model
+from arachne.utils import (
+    get_model_spec,
+    get_tool_config_objects,
+    get_tool_run_objects,
+    save_model,
+)
 
 from ..data import Model, TensorSpec
 
@@ -112,3 +117,7 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
+
+
+get_tool_config_objects()["tftrt"] = TFTRTConfig
+get_tool_run_objects()["tftrt"] = run

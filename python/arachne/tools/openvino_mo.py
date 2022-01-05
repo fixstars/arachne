@@ -8,7 +8,12 @@ from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 
-from arachne.utils import get_model_spec, save_model
+from arachne.utils import (
+    get_model_spec,
+    get_tool_config_objects,
+    get_tool_run_objects,
+    save_model,
+)
 
 from ..data import Model
 
@@ -88,3 +93,7 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
+
+
+get_tool_config_objects()["openvino_mo"] = OpenVINOModelOptConfig
+get_tool_run_objects()["openvino_mo"] = run
