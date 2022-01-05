@@ -245,7 +245,7 @@ def main(cfg: DictConfig) -> None:
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.tvm)
-    save_model(model=output_model, output_path=output_path, cfg=cfg)
+    save_model(model=output_model, output_path=output_path, tvm_cfg=cfg.tools.tvm)
 
 
 if __name__ == "__main__":

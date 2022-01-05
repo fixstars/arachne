@@ -51,7 +51,7 @@ def register_torch2trt_config() -> None:
 
 def run(input: Model, cfg: Torch2TRTConfig) -> Model:
     idx = itertools.count().__next__()
-    filename = f"model_trt_{idx}.pth"
+    filename = f"model_{idx}_trt.pth"
 
     model = torch.load(input.path).eval().cuda()
 
@@ -131,7 +131,7 @@ def main(cfg: DictConfig) -> None:
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.torch2trt)
-    save_model(model=output_model, output_path=output_path, cfg=cfg)
+    save_model(model=output_model, output_path=output_path)
 
 
 if __name__ == "__main__":

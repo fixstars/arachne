@@ -76,7 +76,7 @@ def main(cfg: DictConfig) -> None:
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.openvino_mo)
-    save_model(model=output_model, output_path=output_path, cfg=cfg)
+    save_model(model=output_model, output_path=output_path)
 
 
 if __name__ == "__main__":

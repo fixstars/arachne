@@ -4,15 +4,15 @@ import subprocess
 import tarfile
 import tempfile
 from dataclasses import asdict
-from typing import Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import onnx
 import onnxruntime
 import tensorflow as tf
 import torch
+import tvm
 import yaml
 from omegaconf import DictConfig, OmegaConf
-from tvm.relay import Any
 
 from .data import Model, ModelSpec, TensorSpec
 
@@ -165,16 +165,26 @@ def get_cudnn_version():
         assert False, "Unsupported OS distribution"
 
 
-def save_model(model: Model, output_path: str, cfg: DictConfig):
+def get_torch2trt_version():
+    result = subprocess.check_output("pip show torch2trt", shell=True)
+    return result.decode().strip().split("\n")[1].split()[1]
+
+
+def save_model(model: Model, output_path: str, tvm_cfg: Optional[DictConfig] = None):
     if dataclasses.is_dataclass(model.spec):
         spec = asdict(model.spec)
     else:
-        assert False, f"model.spec is unknown object or None: {model.spec}"
+        assert False, f"model.spec should be arachne.data.ModelSpec: {model.spec}"
     env = {"model_spec": spec, "dependencies": []}
-    if "tvm" in cfg.tools.keys():
-        targets = list(cfg.tools.tvm.composite_target)
-        if len(targets) > 0:
-            env["tvm_device"] = "cpu"
+
+    pip_deps = []
+    if model.path.endswith(".tar"):
+        pip_deps.append({"tvm": tvm.__version__})
+
+        assert tvm_cfg is not None, "when save a tvm_package.tar, tvm_cfg must be avaiable"
+        env["tvm_device"] = "cpu"
+
+        targets = list(tvm_cfg.composite_target)
         if "tensorrt" in targets:
             env["dependencies"].append({"tensorrt": get_tensorrt_version()})
         if "cuda" in targets:
@@ -182,7 +192,6 @@ def save_model(model: Model, output_path: str, cfg: DictConfig):
             env["dependencies"].append({"cudnn": get_cudnn_version()})
             env["tvm_device"] = "cuda"
 
-    pip_deps = []
     if model.path.endswith(".tflite"):
         pip_deps.append({"tensorflow": tf.__version__})
     if model.path.endswith("saved_model"):
@@ -190,6 +199,10 @@ def save_model(model: Model, output_path: str, cfg: DictConfig):
     if model.path.endswith(".onnx"):
         pip_deps.append({"onnx": onnx.__version__})
         pip_deps.append({"onnxruntime": onnxruntime.__version__})
+    if model.path.endswith(".pth"):
+        pip_deps.append({"torch": torch.__version__})  # type: ignore
+    if model.path.endswith("_trt.pth"):
+        pip_deps.append({"torch2trt": get_torch2trt_version()})
     env["dependencies"].append({"pip": pip_deps})
     with tarfile.open(output_path, "w:gz") as tar:
         tar.add(model.path, arcname=model.path.split("/")[-1])
