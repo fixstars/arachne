@@ -40,9 +40,10 @@ class TVMRuntimeClient:
     def set_input(self, idx: Union[int, str], value: np.ndarray):
         def request_generator(idx, value):
             if isinstance(idx, int):
-                yield tvmruntime_pb2.SetInputRequest(index_i=idx)
+                idx = tvmruntime_pb2.Index(index_i=idx)
             elif isinstance(idx, str):
-                yield tvmruntime_pb2.SetInputRequest(index_s=idx)
+                idx = tvmruntime_pb2.Index(index_s=idx)
+            yield tvmruntime_pb2.SetInputRequest(index=idx)
 
             for piece in nparray_piece_generator(value):
                 chunk = stream_data_pb2.Chunk(buffer=piece)

@@ -21,7 +21,7 @@ def validate_environment(env: dict) -> bool:
             cudnn_version = sys_details["cudnn_version"]
             if cudnn_version != dep["cudnn"]:
                 return False
-        if 'pip' in dep:
+        if "pip" in dep:
             for pkg in dep["pip"]:
                 for name in pkg.keys():
                     mod = importlib.import_module(name)
@@ -52,9 +52,10 @@ def init(
             env = yaml.safe_load(file)
 
         assert validate_environment(env), "invalid runtime environment"
-
     if model.endswith(".tar"):
-        return TVMRuntimeModule(model=model, device_type=env['tvm_device'], model_spec=env['model_spec'])
+        return TVMRuntimeModule(
+            model=model, device_type=env["tvm_device"], model_spec=env["model_spec"]
+        )
     elif model.endswith(".tflite"):
         return TFLiteRuntimeModule(model=model)
     else:

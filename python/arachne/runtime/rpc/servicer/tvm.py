@@ -50,6 +50,6 @@ class TVMRuntimeServicer(tvmruntime_pb2_grpc.TVMRuntimeServerServicer):
     def GetOutput(self, request, context):
         index = request.index
         assert self.module
-        np_array = self.module.get_output(index).asnumpy()
+        np_array = self.module.get_output(index).numpy()
         for piece in nparray_piece_generator(np_array):
             yield tvmruntime_pb2.GetOutputResponse(np_data=piece)

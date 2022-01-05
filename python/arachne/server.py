@@ -15,7 +15,7 @@ from arachne.runtime.rpc.servicer import (
 )
 
 
-def start_server(port: int):
+def create_server(port: int):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     tfliteruntime_pb2_grpc.add_TfliteRuntimeServerServicer_to_server(
         TfLiteRuntimeServicer(), server
@@ -24,15 +24,17 @@ def start_server(port: int):
     tvmruntime_pb2_grpc.add_TVMRuntimeServerServicer_to_server(TVMRuntimeServicer(), server)
 
     server.add_insecure_port("[::]:" + str(port))
+    return server
+
+
+def start_server(server: grpc.Server, port: int):
     server.start()
     print("run server on port", port)
 
-    # wait
     try:
         while True:
-            time.sleep(3600)
+            pass
     except KeyboardInterrupt:
-        # stop server
         server.stop(0)
 
 
@@ -40,4 +42,5 @@ import sys
 
 if __name__ == "__main__":
     port = int(sys.argv[1])
-    start_server(port)
+    server = create_server(port)
+    start_server(server, port)

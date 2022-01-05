@@ -2,7 +2,7 @@ import os
 import tarfile
 import tempfile
 import time
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import tvm
@@ -36,8 +36,10 @@ class TVMRuntimeModule(RuntimeModule):
     def __init__(self, model: str, device_type: str, model_spec: dict, **kwargs):
         tvm_device = tvm.runtime.device(device_type, 0)
         graph, params, lib = _open_module_file(model)
-        if 'TVM_DEBUG_EXECUTOR' in os.environ:
-            module: GraphModule = debug_executor.create(graph, lib, tvm_device, dump_root="./tvm_dbg")
+        if "TVM_DEBUG_EXECUTOR" in os.environ:
+            module: GraphModule = debug_executor.create(
+                graph, lib, tvm_device, dump_root="./tvm_dbg"
+            )
         else:
             module: GraphModule = graph_executor.create(graph, lib, tvm_device)
         module.load_params(params)
@@ -68,7 +70,7 @@ class TVMRuntimeModule(RuntimeModule):
     def get_output_details(self):
         return self.output_details
 
-    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1):
+    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1) -> Dict:
         for idx, inp in enumerate(self.input_details):
             input_data = np.random.uniform(0, 1, size=inp["shape"]).astype(inp["dtype"])
             self.set_input(idx, input_data)
