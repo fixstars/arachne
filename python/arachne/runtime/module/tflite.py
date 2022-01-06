@@ -1,4 +1,3 @@
-
 import time
 
 import numpy as np
@@ -18,10 +17,10 @@ class TFLiteRuntimeModule(RuntimeModule):
         self.module.invoke()
 
     def set_input(self, idx, value, **kwargs):
-        self.module.set_tensor(self.input_details[idx]['index'], value)
+        self.module.set_tensor(self.input_details[idx]["index"], value)
 
     def get_output(self, idx):
-        return self.module.get_tensor(self.output_details[idx]['index'])
+        return self.module.get_tensor(self.output_details[idx]["index"])
 
     def get_input_details(self):
         return self.input_details
