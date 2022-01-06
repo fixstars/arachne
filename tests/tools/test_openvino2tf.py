@@ -38,8 +38,8 @@ def test_torch2onnx():
         torch_input = torch.from_numpy(input).clone()
         tf_input = tf.convert_to_tensor(np.transpose(input, (0, 2, 3, 1)))
 
-        torch_result = resnet18(torch_input).to('cpu').detach().numpy().copy()
+        torch_result = resnet18(torch_input).to("cpu").detach().numpy().copy()
         tf_result = resnet18_tf(tf_input)
-        tf_result = tf_result['tf.identity'].numpy()
+        tf_result = tf_result["tf.identity"].numpy()
 
         np.testing.assert_allclose(torch_result, tf_result, atol=1e-5, rtol=1e-5)

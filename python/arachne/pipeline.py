@@ -92,7 +92,7 @@ def main(cfg: DictConfig) -> None:
 
     output_model = run(input_model, cfg)  # type: ignore
 
-    save_model(model=output_model, output_path=output_path, cfg=cfg)
+    save_model(model=output_model, output_path=output_path, tvm_cfg=cfg.tools.tvm)
 
 
 if __name__ == "__main__":
