@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -25,11 +25,11 @@ class RuntimeModule(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_input_details(self):
+    def get_input_details(self) -> List[dict]:
         pass
 
     @abstractmethod
-    def get_output_details(self):
+    def get_output_details(self) -> List[dict]:
         pass
 
     @abstractmethod

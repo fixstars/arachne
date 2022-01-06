@@ -28,7 +28,9 @@ def test_torch2trt(precision):
 
 
 # @pytest.mark.parametrize("calib_algo", ["ENTROPY_CALIBRATION_2", "ENTROPY_CALIBRATION", "LEGACY_CALIBRATION", "MINMAX_CALIBRATION"])
-@pytest.mark.parametrize("calib_algo", ["ENTROPY_CALIBRATION_2", "ENTROPY_CALIBRATION", "MINMAX_CALIBRATION"])
+@pytest.mark.parametrize(
+    "calib_algo", ["ENTROPY_CALIBRATION_2", "ENTROPY_CALIBRATION", "MINMAX_CALIBRATION"]
+)
 def test_torch2trt_int8(calib_algo):
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)

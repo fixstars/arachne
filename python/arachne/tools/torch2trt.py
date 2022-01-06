@@ -9,9 +9,17 @@ import torch
 from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
-from torch2trt import DEFAULT_CALIBRATION_ALGORITHM, torch2trt
+from torch2trt import DEFAULT_CALIBRATION_ALGORITHM
+from torch2trt import torch2trt as run_torch2trt
 
-from arachne.utils import get_model_spec, get_torch_dtype_from_string, save_model
+from arachne.utils import (
+    get_model_spec,
+    get_tool_config_objects,
+    get_tool_run_objects,
+    get_torch_dtype_from_string,
+    load_model_spec,
+    save_model,
+)
 
 from ..data import Model
 
@@ -43,7 +51,7 @@ def register_torch2trt_config() -> None:
 
 def run(input: Model, cfg: Torch2TRTConfig) -> Model:
     idx = itertools.count().__next__()
-    filename = f"model_trt_{idx}.pth"
+    filename = f"model_{idx}_trt.pth"
 
     model = torch.load(input.path).eval().cuda()
 
@@ -89,7 +97,7 @@ def run(input: Model, cfg: Torch2TRTConfig) -> Model:
         else:
             algo = DEFAULT_CALIBRATION_ALGORITHM
 
-    model_trt = torch2trt(
+    model_trt = run_torch2trt(
         model,
         args,
         max_batch_size=cfg.max_batch_size,
@@ -119,11 +127,11 @@ def main(cfg: DictConfig) -> None:
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:
-        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))  # type: ignore
+        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.torch2trt)
-    save_model(model=output_model, output_path=output_path, cfg=cfg)
+    save_model(model=output_model, output_path=output_path)
 
 
 if __name__ == "__main__":
@@ -141,3 +149,7 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
+
+
+get_tool_config_objects()["torch2trt"] = Torch2TRTConfig
+get_tool_run_objects()["torch2trt"] = run

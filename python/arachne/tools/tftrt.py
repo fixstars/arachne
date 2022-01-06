@@ -9,7 +9,13 @@ from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
-from arachne.utils import get_model_spec, save_model
+from arachne.utils import (
+    get_model_spec,
+    get_tool_config_objects,
+    get_tool_run_objects,
+    load_model_spec,
+    save_model,
+)
 
 from ..data import Model, TensorSpec
 
@@ -90,11 +96,11 @@ def main(cfg: DictConfig) -> None:
 
     # overwrite model spec if input_spec is specified
     if cfg.input_spec:
-        input_model.spec = OmegaConf.load(to_absolute_path(cfg.input_spec))  # type: ignore
+        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
 
     assert input_model.spec is not None
     output_model = run(input=input_model, cfg=cfg.tools.tftrt)
-    save_model(model=output_model, output_path=output_path, cfg=cfg)
+    save_model(model=output_model, output_path=output_path)
 
 
 if __name__ == "__main__":
@@ -112,3 +118,7 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
+
+
+get_tool_config_objects()["tftrt"] = TFTRTConfig
+get_tool_run_objects()["tftrt"] = run

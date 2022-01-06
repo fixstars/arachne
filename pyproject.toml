@@ -6,32 +6,30 @@ authors = ["Takafumi Kubota <takafumi.kubota@fixstars.com>"]
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.6.3"
+python = ">=3.6.3,<3.9"
 tensorflow = "2.4.1"
 numpy = "1.19.4"
 torch = "1.8.0"
 torchvision = "0.9.0"
 tensorflow-datasets = "^4.4.0"
-onnx = "1.8.0"
-onnxruntime = "1.8.0"
 hydra-core = "^1.1.1"
 tflite = "^2.4.0"
-nvidia-tensorrt = "7.2.3.4"
 packaging = "^21.3"
 openvino-dev = "^2021.4.2"
 rawpy = "0.16.0"
-
-[[tool.poetry.source]]
-name = 'nvidia'
-url = 'https://pypi.ngc.nvidia.com'
+kedro = "^0.17.6"
+openvino2tensorflow = "^1.27.1"
+onnxruntime-gpu = "1.6.0"
+onnx = "1.6.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.0"
+pytest = ">=6.2.0"
 flake8 = "^3.9.2"
 black = "~20.8b1"
 isort = "^5.10.1"
 cmake = "^3.22.1"
 ninja = "^1.10.2"
+pytest-xdist = "^2.5.0"
 
 
 [build-system]

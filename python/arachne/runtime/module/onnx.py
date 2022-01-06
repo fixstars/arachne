@@ -1,26 +1,37 @@
 import time
 
 import numpy as np
-import tensorflow as tf
+import onnxruntime as ort
 
 from . import RuntimeModule
 
 
-class TFLiteRuntimeModule(RuntimeModule):
+def onnx_tensor_type_to_np_dtype(ottype: str):
+    dtype = ottype.replace("tensor(", "").replace(")", "")
+    if dtype == "float":
+        dtype = "float32"
+    elif dtype == "double":
+        dtype = "float64"
+    return dtype
+
+
+class ONNXRuntimeModule(RuntimeModule):
     def __init__(self, model: str, **kwargs):
-        self.module: tf.lite.Interpreter = tf.lite.Interpreter(model_path=model, **kwargs)
-        self.module.allocate_tensors()
-        self.input_details = self.module.get_input_details()
-        self.output_details = self.module.get_output_details()
+        self.module: ort.InferenceSession = ort.InferenceSession(model, **kwargs)
+        self._inputs = {}
+        self._outputs = {}
+        self.input_details = self.module.get_inputs()
+        self.output_details = self.module.get_outputs()
 
     def run(self):
-        self.module.invoke()
+        # NOTE: should we support run_options?
+        self._outputs = self.module.run(output_names=None, input_feed=self._inputs)
 
     def set_input(self, idx, value, **kwargs):
-        self.module.set_tensor(self.input_details[idx]["index"], value)
+        self._inputs[self.input_details[idx].name] = value
 
     def get_output(self, idx):
-        return self.module.get_tensor(self.output_details[idx]["index"])
+        return self._outputs[idx]
 
     def get_input_details(self):
         return self.input_details
@@ -30,7 +41,9 @@ class TFLiteRuntimeModule(RuntimeModule):
 
     def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1):
         for idx, inp in enumerate(self.input_details):
-            input_data = np.random.uniform(0, 1, size=inp["shape"]).astype(inp["dtype"])
+            input_data = np.random.uniform(0, 1, size=inp.shape).astype(
+                onnx_tensor_type_to_np_dtype(inp.type)
+            )
             self.set_input(idx, input_data)
 
         for _ in range(warmup):

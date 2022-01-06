@@ -2,7 +2,7 @@ import os
 import tarfile
 import tempfile
 import time
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import tvm
@@ -44,7 +44,8 @@ class TVMRuntimeModule(RuntimeModule):
             module: GraphModule = graph_executor.create(graph, lib, tvm_device)
         module.load_params(params)
 
-        self.input_details = self.output_details = {}
+        self.input_details = []
+        self.output_details = []
         if "inputs" in model_spec and "outputs" in model_spec:
             self.input_details = model_spec["inputs"]
             self.output_details = model_spec["outputs"]
@@ -62,7 +63,7 @@ class TVMRuntimeModule(RuntimeModule):
         self.module.set_input(idx, value, **kwargs)
 
     def get_output(self, idx):
-        return self.module.get_output(idx)
+        return self.module.get_output(idx).numpy()
 
     def get_input_details(self):
         return self.input_details
@@ -70,7 +71,8 @@ class TVMRuntimeModule(RuntimeModule):
     def get_output_details(self):
         return self.output_details
 
-    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1) -> Dict:
+    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1):
+        assert len(self.input_details) > 0, "No input tensor information"
         for idx, inp in enumerate(self.input_details):
             input_data = np.random.uniform(0, 1, size=inp["shape"]).astype(inp["dtype"])
             self.set_input(idx, input_data)
