@@ -5,12 +5,17 @@ import numpy as np
 import torch
 import torch.onnx
 import torchvision
-from omegaconf.dictconfig import DictConfig
+from omegaconf import OmegaConf
 
 import arachne.runtime
 import arachne.tools.tvm
 from arachne.data import Model
-from arachne.runtime.rpc import TfliteRuntimeClient, TVMRuntimeClient, create_channel
+from arachne.runtime.rpc import (
+    ONNXRuntimeClient,
+    TfliteRuntimeClient,
+    TVMRuntimeClient,
+    create_channel,
+)
 from arachne.server import create_server
 from arachne.tools.tvm import TVMConfig
 from arachne.utils import get_model_spec, save_model
@@ -32,18 +37,17 @@ def test_tvm_runtime_rpc(rpc_port=5051):
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         package_path = tmp_dir + "/package.tar"
-        model, tvmcfg = compile()
-        cfg = DictConfig({"tools": {"tvm": tvmcfg}})
-        save_model(model, package_path, cfg)
+        model, cfg = compile()
+        save_model(model, package_path, tvm_cfg=OmegaConf.structured(cfg))
 
         dummy_input = np.random.rand(1, 3, 224, 224)
 
         # local run
-        rtmodule = arachne.runtime.init(package=package_path)
+        rtmodule = arachne.runtime.init(package_tar=package_path)
         assert rtmodule
         rtmodule.set_input(0, dummy_input)
         rtmodule.run()
-        local_output = rtmodule.get_output(0).numpy()
+        local_output = rtmodule.get_output(0)
 
         # rpc run
         server = create_server(rpc_port)
@@ -73,7 +77,7 @@ def test_tflite_runtime_rpc(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
         model_path = tmp_dir + "/model.tflite"
         save_tflite_model(model_path)
-        rtmodule = arachne.runtime.init(model=model_path)
+        rtmodule = arachne.runtime.init(model_file=model_path)
         assert rtmodule
 
         # local
@@ -94,5 +98,41 @@ def test_tflite_runtime_rpc(rpc_port=5051):
         finally:
             server.stop(0)
 
+        # compare
+        np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)
+
+
+def test_onnx_runtime_rpc(rpc_port=5051):
+    def save_onnx_model(model_path):
+        resnet18 = torchvision.models.resnet18(pretrained=True)
+        dummy_input = torch.randn(1, 3, 224, 224)
+        torch.onnx.export(resnet18, dummy_input, model_path)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        model_path = "./resnet18.onnx"
+        save_onnx_model(model_path)
+
+        # dummy_input = np.random.rand(1, 3, 224, 224)
+        dummy_input = np.array(np.random.random_sample([1, 3, 224, 224]), dtype=np.float32)  # type: ignore
+
+        # local run
+        rtmodule = arachne.runtime.init(model_file=model_path)
+        assert rtmodule
+        rtmodule.set_input(0, dummy_input)
+        rtmodule.run()
+        local_output = rtmodule.get_output(0)
+
+        # rpc run
+        server = create_server(rpc_port)
+        server.start()
+        try:
+            channel = create_channel(port=rpc_port)
+            ort_opts = {"providers": ["CPUExecutionProvider"]}
+            client = ONNXRuntimeClient(channel, model_path, **ort_opts)
+            client.set_input(0, dummy_input)
+            client.run()
+            rpc_output = client.get_output(0)
+        finally:
+            server.stop(0)
         # compare
         np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)

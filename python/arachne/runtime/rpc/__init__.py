@@ -1,7 +1,7 @@
 import grpc
 
-from .client import TfliteRuntimeClient, TVMRuntimeClient
-from .servicer import TfLiteRuntimeServicer, TVMRuntimeServicer
+from .client import ONNXRuntimeClient, TfliteRuntimeClient, TVMRuntimeClient
+from .servicer import ONNXRuntimeServicer, TfLiteRuntimeServicer, TVMRuntimeServicer
 
 
 def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:
