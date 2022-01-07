@@ -1,26 +1,22 @@
-import os
+# import os
 import tempfile
 
 import numpy as np
 import tensorflow as tf
+from tvm.contrib.download import download
 
 import arachne.runtime
 
 
 def test_tflite_runtime():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        os.chdir(tmp_dir)
-        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
-        converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
 
-        tflite_model = converter.convert()
-
-        filename = "model.tflite"
-        with open(filename, "wb") as w:
-            w.write(tflite_model)
+        model_path = tmp_dir + "/mobilenet.tflite"
+        download(url, model_path)
 
         # TFLite Interpreter
-        interpreter = tf.lite.Interpreter(model_path="model.tflite", num_threads=4)
+        interpreter = tf.lite.Interpreter(model_path=model_path, num_threads=4)
         interpreter.allocate_tensors()
 
         input_details = interpreter.get_input_details()
@@ -36,7 +32,7 @@ def test_tflite_runtime():
 
         # Arachne Runtime
         tflite_interpreter_opts = {"num_threads": 4}
-        runtime_module = arachne.runtime.init(model_file="model.tflite", **tflite_interpreter_opts)
+        runtime_module = arachne.runtime.init(model_file=model_path, **tflite_interpreter_opts)
         runtime_module.set_input(0, input_data)
         runtime_module.run()
         aout = runtime_module.get_output(0)
