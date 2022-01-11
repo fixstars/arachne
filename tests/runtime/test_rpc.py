@@ -1,7 +1,6 @@
 import tempfile
 
 import numpy as np
-import torch.onnx
 from tvm.contrib.download import download
 
 import arachne.runtime
@@ -33,13 +32,14 @@ def test_tvm_runtime_rpc(rpc_port=5051):
         # rpc run
         server = create_server(rpc_port)
         server.start()
+        channel = create_channel(port=rpc_port)
         try:
-            channel = create_channel(port=rpc_port)
             client = TVMRuntimeClient(channel, tvm_package_path)
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
         finally:
+            channel.close()
             server.stop(0)
         # compare
         np.testing.assert_equal(local_output, rpc_output)
@@ -63,13 +63,14 @@ def test_tflite_runtime_rpc(rpc_port=5051):
         # rpc
         server = create_server(rpc_port)
         server.start()
+        channel = create_channel(port=rpc_port)
         try:
-            channel = create_channel(port=rpc_port)
             client = TfliteRuntimeClient(channel, model_path)
             client.set_input(0, dummy_input)
             client.invoke()
             rpc_output = client.get_output(0)
         finally:
+            channel.close()
             server.stop(0)
 
         # compare
@@ -96,14 +97,15 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         # rpc run
         server = create_server(rpc_port)
         server.start()
+        channel = create_channel(port=rpc_port)
         try:
-            channel = create_channel(port=rpc_port)
             ort_opts = {"providers": ["CPUExecutionProvider"]}
             client = ONNXRuntimeClient(channel, model_path, **ort_opts)
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
         finally:
+            channel.close()
             server.stop(0)
         # compare
         np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)

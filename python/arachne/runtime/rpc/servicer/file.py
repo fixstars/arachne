@@ -12,13 +12,13 @@ class FileServicer(fileserver_pb2_grpc.FileServerServicer):
 
     def make_tmpdir(self, request, context):
         dirname = tempfile.mkdtemp()
-        print('create dirname:', dirname)
+        print("create dirname:", dirname)
         return fileserver_pb2.MakeTmpDirResponse(dirname=dirname)
 
     def delete_tmpdir(self, request, context):
         dirname = request.dirname
         if os.path.exists(dirname):
-            print('delete dirname:', dirname)
+            print("delete dirname:", dirname)
             shutil.rmtree(dirname)
         return fileserver_pb2.DeleteTmpDirResponse()
 

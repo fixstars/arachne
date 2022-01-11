@@ -1,7 +1,19 @@
 import grpc
 
-from .client import ONNXRuntimeClient, TfliteRuntimeClient, TVMRuntimeClient
-from .servicer import ONNXRuntimeServicer, TfLiteRuntimeServicer, TVMRuntimeServicer
+from .client import (
+    FileClient,
+    ONNXRuntimeClient,
+    ServerStatusClient,
+    TfliteRuntimeClient,
+    TVMRuntimeClient,
+)
+from .servicer import (
+    FileServicer,
+    ONNXRuntimeServicer,
+    ServerStatusServicer,
+    TfLiteRuntimeServicer,
+    TVMRuntimeServicer,
+)
 
 
 def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:

@@ -11,6 +11,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+import msg_response_pb2 as msg__response__pb2
 import stream_data_pb2 as stream__data__pb2
 
 
@@ -20,50 +21,11 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13tfliteruntime.proto\x12\rtfliteruntime\x1a\x11stream_data.proto\"-\n\x0bMsgResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"6\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x13\n\x0bnum_threads\x18\x02 \x01(\x05\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0f\n\rInvokeRequest\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xbd\x02\n\x13TfliteRuntimeServer\x12@\n\x04Init\x12\x1a.tfliteruntime.InitRequest\x1a\x1a.tfliteruntime.MsgResponse\"\x00\x12J\n\x08SetInput\x12\x1e.tfliteruntime.SetInputRequest\x1a\x1a.tfliteruntime.MsgResponse\"\x00(\x01\x12\x44\n\x06Invoke\x12\x1c.tfliteruntime.InvokeRequest\x1a\x1a.tfliteruntime.MsgResponse\"\x00\x12R\n\tGetOutput\x12\x1f.tfliteruntime.GetOutputRequest\x1a .tfliteruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13tfliteruntime.proto\x12\rtfliteruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"6\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x13\n\x0bnum_threads\x18\x02 \x01(\x05\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0f\n\rInvokeRequest\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\x93\x02\n\x13TfliteRuntimeServer\x12\x32\n\x04Init\x12\x1a.tfliteruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12<\n\x08SetInput\x12\x1e.tfliteruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\x36\n\x06Invoke\x12\x1c.tfliteruntime.InvokeRequest\x1a\x0c.MsgResponse\"\x00\x12R\n\tGetOutput\x12\x1f.tfliteruntime.GetOutputRequest\x1a .tfliteruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
   ,
-  dependencies=[stream__data__pb2.DESCRIPTOR,])
+  dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
 
 
-
-
-_MSGRESPONSE = _descriptor.Descriptor(
-  name='MsgResponse',
-  full_name='tfliteruntime.MsgResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='error', full_name='tfliteruntime.MsgResponse.error', index=0,
-      number=1, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='message', full_name='tfliteruntime.MsgResponse.message', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=57,
-  serialized_end=102,
-)
 
 
 _INITREQUEST = _descriptor.Descriptor(
@@ -100,8 +62,8 @@ _INITREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=104,
-  serialized_end=158,
+  serialized_start=77,
+  serialized_end=131,
 )
 
 
@@ -144,8 +106,8 @@ _SETINPUTREQUEST = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=160,
-  serialized_end=234,
+  serialized_start=133,
+  serialized_end=207,
 )
 
 
@@ -169,8 +131,8 @@ _INVOKEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=236,
-  serialized_end=251,
+  serialized_start=209,
+  serialized_end=224,
 )
 
 
@@ -201,8 +163,8 @@ _GETOUTPUTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=253,
-  serialized_end=286,
+  serialized_start=226,
+  serialized_end=259,
 )
 
 
@@ -233,8 +195,8 @@ _GETOUTPUTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=288,
-  serialized_end=324,
+  serialized_start=261,
+  serialized_end=297,
 )
 
 _SETINPUTREQUEST.fields_by_name['np_arr_chunk'].message_type = stream__data__pb2._CHUNK
@@ -244,20 +206,12 @@ _SETINPUTREQUEST.fields_by_name['index'].containing_oneof = _SETINPUTREQUEST.one
 _SETINPUTREQUEST.oneofs_by_name['data'].fields.append(
   _SETINPUTREQUEST.fields_by_name['np_arr_chunk'])
 _SETINPUTREQUEST.fields_by_name['np_arr_chunk'].containing_oneof = _SETINPUTREQUEST.oneofs_by_name['data']
-DESCRIPTOR.message_types_by_name['MsgResponse'] = _MSGRESPONSE
 DESCRIPTOR.message_types_by_name['InitRequest'] = _INITREQUEST
 DESCRIPTOR.message_types_by_name['SetInputRequest'] = _SETINPUTREQUEST
 DESCRIPTOR.message_types_by_name['InvokeRequest'] = _INVOKEREQUEST
 DESCRIPTOR.message_types_by_name['GetOutputRequest'] = _GETOUTPUTREQUEST
 DESCRIPTOR.message_types_by_name['GetOutputResponse'] = _GETOUTPUTRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-MsgResponse = _reflection.GeneratedProtocolMessageType('MsgResponse', (_message.Message,), {
-  'DESCRIPTOR' : _MSGRESPONSE,
-  '__module__' : 'tfliteruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tfliteruntime.MsgResponse)
-  })
-_sym_db.RegisterMessage(MsgResponse)
 
 InitRequest = _reflection.GeneratedProtocolMessageType('InitRequest', (_message.Message,), {
   'DESCRIPTOR' : _INITREQUEST,
@@ -303,8 +257,8 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=327,
-  serialized_end=644,
+  serialized_start=300,
+  serialized_end=575,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
@@ -312,7 +266,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
     index=0,
     containing_service=None,
     input_type=_INITREQUEST,
-    output_type=_MSGRESPONSE,
+    output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
@@ -322,7 +276,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
     index=1,
     containing_service=None,
     input_type=_SETINPUTREQUEST,
-    output_type=_MSGRESPONSE,
+    output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
@@ -332,7 +286,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
     index=2,
     containing_service=None,
     input_type=_INVOKEREQUEST,
-    output_type=_MSGRESPONSE,
+    output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
