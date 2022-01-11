@@ -16,21 +16,28 @@ from arachne.runtime.rpc.util.nparray import (
 )
 
 from .file import FileClient
+from .runtimebase import RuntimeClientBase
 
 
-class TVMRuntimeClient:
+class TVMRuntimeClient(RuntimeClientBase):
     def __init__(
         self,
         channel: grpc.Channel,
         package_path: str,
         **kwargs,
     ):
+        super().__init__(channel)
+        self.init_success = False
         self.fileclient = FileClient(channel)
         self.stub = tvmruntime_pb2_grpc.TVMRuntimeServerStub(channel)
 
         upload_response = self.fileclient.upload(Path(package_path))
         req = tvmruntime_pb2.InitRequest(package_path=upload_response.filepath)
-        self.stub.Init(req)
+        response = self.stub.Init(req)
+        if response.error:
+            raise Exception(response.message)
+        else:
+            self.init_success = True
 
     def run(self):
         # TODO: how to handle timeout?

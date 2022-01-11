@@ -14,10 +14,12 @@ from arachne.runtime.rpc.util.nparray import (
 )
 
 from .file import FileClient
+from .runtimebase import RuntimeClientBase
 
 
-class TfliteRuntimeClient:
+class TfliteRuntimeClient(RuntimeClientBase):
     def __init__(self, channel: grpc.Channel, model_path: str, num_threads=1):
+        super().__init__(channel)
         self.fileclient = FileClient(channel)
         self.stub = tfliteruntime_pb2_grpc.TfliteRuntimeServerStub(channel)
         response = self.fileclient.upload(Path(model_path))

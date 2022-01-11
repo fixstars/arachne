@@ -2,6 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+import msg_response_pb2 as msg__response__pb2
 import tfliteruntime_pb2 as tfliteruntime__pb2
 
 
@@ -18,17 +19,17 @@ class TfliteRuntimeServerStub(object):
         self.Init = channel.unary_unary(
                 '/tfliteruntime.TfliteRuntimeServer/Init',
                 request_serializer=tfliteruntime__pb2.InitRequest.SerializeToString,
-                response_deserializer=tfliteruntime__pb2.MsgResponse.FromString,
+                response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
                 '/tfliteruntime.TfliteRuntimeServer/SetInput',
                 request_serializer=tfliteruntime__pb2.SetInputRequest.SerializeToString,
-                response_deserializer=tfliteruntime__pb2.MsgResponse.FromString,
+                response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Invoke = channel.unary_unary(
                 '/tfliteruntime.TfliteRuntimeServer/Invoke',
                 request_serializer=tfliteruntime__pb2.InvokeRequest.SerializeToString,
-                response_deserializer=tfliteruntime__pb2.MsgResponse.FromString,
+                response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.GetOutput = channel.unary_stream(
                 '/tfliteruntime.TfliteRuntimeServer/GetOutput',
@@ -71,17 +72,17 @@ def add_TfliteRuntimeServerServicer_to_server(servicer, server):
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
                     request_deserializer=tfliteruntime__pb2.InitRequest.FromString,
-                    response_serializer=tfliteruntime__pb2.MsgResponse.SerializeToString,
+                    response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'SetInput': grpc.stream_unary_rpc_method_handler(
                     servicer.SetInput,
                     request_deserializer=tfliteruntime__pb2.SetInputRequest.FromString,
-                    response_serializer=tfliteruntime__pb2.MsgResponse.SerializeToString,
+                    response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'Invoke': grpc.unary_unary_rpc_method_handler(
                     servicer.Invoke,
                     request_deserializer=tfliteruntime__pb2.InvokeRequest.FromString,
-                    response_serializer=tfliteruntime__pb2.MsgResponse.SerializeToString,
+                    response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'GetOutput': grpc.unary_stream_rpc_method_handler(
                     servicer.GetOutput,
@@ -112,7 +113,7 @@ class TfliteRuntimeServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfliteRuntimeServer/Init',
             tfliteruntime__pb2.InitRequest.SerializeToString,
-            tfliteruntime__pb2.MsgResponse.FromString,
+            msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -129,7 +130,7 @@ class TfliteRuntimeServer(object):
             metadata=None):
         return grpc.experimental.stream_unary(request_iterator, target, '/tfliteruntime.TfliteRuntimeServer/SetInput',
             tfliteruntime__pb2.SetInputRequest.SerializeToString,
-            tfliteruntime__pb2.MsgResponse.FromString,
+            msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -146,7 +147,7 @@ class TfliteRuntimeServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfliteRuntimeServer/Invoke',
             tfliteruntime__pb2.InvokeRequest.SerializeToString,
-            tfliteruntime__pb2.MsgResponse.FromString,
+            msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

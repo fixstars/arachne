@@ -2,6 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+import msg_response_pb2 as msg__response__pb2
 import tvmruntime_pb2 as tvmruntime__pb2
 
 
@@ -18,17 +19,17 @@ class TVMRuntimeServerStub(object):
         self.Init = channel.unary_unary(
                 '/tvmruntime.TVMRuntimeServer/Init',
                 request_serializer=tvmruntime__pb2.InitRequest.SerializeToString,
-                response_deserializer=tvmruntime__pb2.MsgResponse.FromString,
+                response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
                 '/tvmruntime.TVMRuntimeServer/SetInput',
                 request_serializer=tvmruntime__pb2.SetInputRequest.SerializeToString,
-                response_deserializer=tvmruntime__pb2.MsgResponse.FromString,
+                response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Run = channel.unary_unary(
                 '/tvmruntime.TVMRuntimeServer/Run',
                 request_serializer=tvmruntime__pb2.RunRequest.SerializeToString,
-                response_deserializer=tvmruntime__pb2.MsgResponse.FromString,
+                response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Benchmark = channel.unary_unary(
                 '/tvmruntime.TVMRuntimeServer/Benchmark',
@@ -82,17 +83,17 @@ def add_TVMRuntimeServerServicer_to_server(servicer, server):
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
                     request_deserializer=tvmruntime__pb2.InitRequest.FromString,
-                    response_serializer=tvmruntime__pb2.MsgResponse.SerializeToString,
+                    response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'SetInput': grpc.stream_unary_rpc_method_handler(
                     servicer.SetInput,
                     request_deserializer=tvmruntime__pb2.SetInputRequest.FromString,
-                    response_serializer=tvmruntime__pb2.MsgResponse.SerializeToString,
+                    response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'Run': grpc.unary_unary_rpc_method_handler(
                     servicer.Run,
                     request_deserializer=tvmruntime__pb2.RunRequest.FromString,
-                    response_serializer=tvmruntime__pb2.MsgResponse.SerializeToString,
+                    response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'Benchmark': grpc.unary_unary_rpc_method_handler(
                     servicer.Benchmark,
@@ -128,7 +129,7 @@ class TVMRuntimeServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntimeServer/Init',
             tvmruntime__pb2.InitRequest.SerializeToString,
-            tvmruntime__pb2.MsgResponse.FromString,
+            msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -145,7 +146,7 @@ class TVMRuntimeServer(object):
             metadata=None):
         return grpc.experimental.stream_unary(request_iterator, target, '/tvmruntime.TVMRuntimeServer/SetInput',
             tvmruntime__pb2.SetInputRequest.SerializeToString,
-            tvmruntime__pb2.MsgResponse.FromString,
+            msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -162,7 +163,7 @@ class TVMRuntimeServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntimeServer/Run',
             tvmruntime__pb2.RunRequest.SerializeToString,
-            tvmruntime__pb2.MsgResponse.FromString,
+            msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
