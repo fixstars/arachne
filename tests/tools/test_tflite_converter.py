@@ -42,7 +42,7 @@ def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
     elif ptq_method == "fp16":
         np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
     elif ptq_method == "dynamic_range":
-        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.2, rtol=0)
     else:
         # skip dummy int8
         pass

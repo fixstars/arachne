@@ -11,6 +11,7 @@ class TensorSpec:
         shape (List[int]): tensor shape.
         dtype (str): tensor data type.
     """
+
     name: str
     shape: List[int]
     dtype: str
@@ -24,6 +25,7 @@ class ModelSpec:
         inputs (List[arachne.data.TensorSpec]): input tensors
         outputs (List[arachne.data.TensorSpec]): output tensors
     """
+
     inputs: List[TensorSpec]
     outputs: List[TensorSpec]
 
@@ -36,5 +38,6 @@ class Model:
         path (str): The path to model file or directory.
         spec (arachne.data.ModelSpec, optional): the tensor specification  for this model.
     """
+
     path: str
     spec: Optional[ModelSpec] = None

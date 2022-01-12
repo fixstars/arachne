@@ -17,7 +17,7 @@ def check_tftrt_output(tf_model, input_shape, precision, tftrt_model_path):
     loaded = tf.saved_model.load(tftrt_model_path)
 
     infer = loaded.signatures["serving_default"]  # type: ignore
-    aout = infer(tf.constant(input_data))['predictions'].numpy()
+    aout = infer(tf.constant(input_data))["predictions"].numpy()
 
     if precision == "FP32":
         np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)

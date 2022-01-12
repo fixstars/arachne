@@ -43,7 +43,9 @@ params = {
 }
 
 
-def check_tvm_output(input_model: str, input_fmt: str, input_shape: List[int], tvm_model: str, tvm_device_type: str):
+def check_tvm_output(
+    input_model: str, input_fmt: str, input_shape: List[int], tvm_model: str, tvm_device_type: str
+):
     input_data = np.array(np.random.random_sample(input_shape), dtype=np.float32)  # type: ignore
     if input_fmt == "h5" or input_fmt == "pb":
         model = tf.keras.models.load_model(input_model)
@@ -112,7 +114,9 @@ def test_tvm(model_format, composite_target):
             input = Model("model.tflite", spec=get_model_spec("model.tflite"))
             output = run(input=input, cfg=cfg)
 
-            check_tvm_output("model.tflite", model_format, [1, 224, 224, 3], output.path, device_type)
+            check_tvm_output(
+                "model.tflite", model_format, [1, 224, 224, 3], output.path, device_type
+            )
 
         elif model_format == "pb":
             model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
@@ -162,7 +166,9 @@ def test_tvm(model_format, composite_target):
             input = Model("./resnet18.onnx", spec=get_model_spec("resnet18.onnx"))
             output = run(input=input, cfg=cfg)
 
-            check_tvm_output("resnet18.onnx", model_format, [1, 3, 224, 224], output.path, device_type)
+            check_tvm_output(
+                "resnet18.onnx", model_format, [1, 3, 224, 224], output.path, device_type
+            )
 
         elif model_format == "pth":
             resnet18 = torchvision.models.resnet18(pretrained=True)
