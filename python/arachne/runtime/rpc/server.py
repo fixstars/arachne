@@ -3,6 +3,8 @@ from concurrent import futures
 
 import grpc
 
+from arachne.logger import Logger
+
 from .protobuf import fileserver_pb2_grpc, server_status_pb2_grpc
 from .servicer import (
     FileServicer,
@@ -10,6 +12,8 @@ from .servicer import (
     get_runtime_servicer,
     runtime_servicer_list,
 )
+
+logger = Logger.logger()
 
 
 def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:
@@ -34,7 +38,7 @@ def create_server(runtime_name: str, port: int):
 
 def start_server(server: grpc.Server, port: int):
     server.start()
-    print("run server on port", port)
+    logger.info(f"server is running on port: {port}")
 
     try:
         while True:

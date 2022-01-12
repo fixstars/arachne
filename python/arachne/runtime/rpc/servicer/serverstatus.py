@@ -1,5 +1,10 @@
+import grpc
+
+from arachne.logger import Logger
 from arachne.runtime.rpc.protobuf import server_status_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
+
+logger = Logger.logger()
 
 
 class ServerStatusServicer(server_status_pb2_grpc.ServerStatusServicer):
@@ -8,14 +13,18 @@ class ServerStatusServicer(server_status_pb2_grpc.ServerStatusServicer):
 
     def Lock(self, request, context):
         if self.is_busy:
-            return MsgResponse(error=True, message="server is busy")
+            context.set_code(grpc.StatusCode.PERMISSION_DENIED)
+            context.set_details("server is being used by other client")
+            return MsgResponse()
         else:
-            print("lock!")
+            logger.info("server is locked from client")
             self.is_busy = True
-            return MsgResponse(error=False, message="OK")
+            return MsgResponse(msg="locked")
 
     def Unlock(self, request, context):
         if self.is_busy:
-            print("server is unlocked.")
+            logger.info("server is unlocked from client")
             self.is_busy = False
-        return MsgResponse(error=False, message="OK")
+            return MsgResponse(msg="unlocked")
+        else:
+            return MsgResponse(msg="already unlocked")

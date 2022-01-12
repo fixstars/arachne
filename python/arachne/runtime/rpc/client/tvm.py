@@ -27,20 +27,14 @@ class TVMRuntimeClient(RuntimeClientBase):
         **kwargs,
     ):
         super().__init__(channel)
-        self.init_success = False
         self.fileclient = FileClient(channel)
         self.stub = tvmruntime_pb2_grpc.TVMRuntimeServerStub(channel)
 
         upload_response = self.fileclient.upload(Path(package_path))
         req = tvmruntime_pb2.InitRequest(package_path=upload_response.filepath)
-        response = self.stub.Init(req)
-        if response.error:
-            raise Exception(response.message)
-        else:
-            self.init_success = True
+        self.stub.Init(req)
 
     def run(self):
-        # TODO: how to handle timeout?
         req = tvmruntime_pb2.RunRequest()
         self.stub.Run(req)
 

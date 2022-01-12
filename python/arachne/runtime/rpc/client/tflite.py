@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict
 
 import grpc
 import numpy as np
@@ -46,3 +47,14 @@ class TfliteRuntimeClient(RuntimeClientBase):
         np_array = generator_to_np_array(response_generator, byte_extract_func)
         assert isinstance(np_array, np.ndarray)
         return np_array
+
+    def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1) -> Dict:
+        req = tfliteruntime_pb2.BenchmarkRequest(warmup=warmup, repeat=repeat, number=number)
+        response = self.stub.Benchmark(req)
+
+        return {
+            "mean": response.mean_ts,
+            "std": response.std_ts,
+            "max": response.max_ts,
+            "min": response.min_ts,
+        }

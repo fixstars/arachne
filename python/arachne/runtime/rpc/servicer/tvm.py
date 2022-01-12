@@ -1,5 +1,6 @@
 import grpc
 
+from arachne.logger import Logger
 from arachne.runtime import TVMRuntimeModule, init
 from arachne.runtime.rpc.protobuf import tvmruntime_pb2, tvmruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -9,6 +10,8 @@ from arachne.runtime.rpc.util.nparray import (
 )
 
 from .servicer import RuntimeServicerBase, register_runtime_servicer
+
+logger = Logger.logger()
 
 
 class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServerServicer):
@@ -24,25 +27,27 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         pass
 
     def Init(self, request, context):
-        self.module = init(request.package_path)
+        package_path = request.package_path
+        logger.info("loading " + package_path)
+        self.module = init(package_path)
         assert isinstance(self.module, TVMRuntimeModule)
-        return MsgResponse(error=False, message="OK")
+        return MsgResponse(msg="OK")
 
     def SetInput(self, request_iterator, context):
         assert self.module
         index = next(request_iterator).index
         # select index from 'oneof' structure
         index = index.index_i if index.index_i is not None else index.index_s
-        assert index is not None
+        assert index is not None, "index should not be None"
         byte_extract_func = lambda request: request.np_arr_chunk.buffer
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
-        return MsgResponse(error=False, message="OK")
+        return MsgResponse(msg="OK")
 
     def Run(self, request, context):
         assert self.module
         self.module.run()
-        return MsgResponse(error=False, message="OK")
+        return MsgResponse(msg="OK")
 
     def Benchmark(self, request, context):
         assert self.module

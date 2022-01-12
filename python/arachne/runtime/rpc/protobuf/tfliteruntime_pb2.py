@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13tfliteruntime.proto\x12\rtfliteruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"6\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x13\n\x0bnum_threads\x18\x02 \x01(\x05\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0f\n\rInvokeRequest\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\x93\x02\n\x13TfliteRuntimeServer\x12\x32\n\x04Init\x12\x1a.tfliteruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12<\n\x08SetInput\x12\x1e.tfliteruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\x36\n\x06Invoke\x12\x1c.tfliteruntime.InvokeRequest\x1a\x0c.MsgResponse\"\x00\x12R\n\tGetOutput\x12\x1f.tfliteruntime.GetOutputRequest\x1a .tfliteruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13tfliteruntime.proto\x12\rtfliteruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"6\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x13\n\x0bnum_threads\x18\x02 \x01(\x05\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0f\n\rInvokeRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xe5\x02\n\x13TfliteRuntimeServer\x12\x32\n\x04Init\x12\x1a.tfliteruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12<\n\x08SetInput\x12\x1e.tfliteruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\x36\n\x06Invoke\x12\x1c.tfliteruntime.InvokeRequest\x1a\x0c.MsgResponse\"\x00\x12R\n\tGetOutput\x12\x1f.tfliteruntime.GetOutputRequest\x1a .tfliteruntime.GetOutputResponse\"\x00\x30\x01\x12P\n\tBenchmark\x12\x1f.tfliteruntime.BenchmarkRequest\x1a .tfliteruntime.BenchmarkResponse\"\x00\x62\x06proto3'
   ,
   dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
 
@@ -136,6 +136,105 @@ _INVOKEREQUEST = _descriptor.Descriptor(
 )
 
 
+_BENCHMARKREQUEST = _descriptor.Descriptor(
+  name='BenchmarkRequest',
+  full_name='tfliteruntime.BenchmarkRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='warmup', full_name='tfliteruntime.BenchmarkRequest.warmup', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='repeat', full_name='tfliteruntime.BenchmarkRequest.repeat', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='number', full_name='tfliteruntime.BenchmarkRequest.number', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=226,
+  serialized_end=292,
+)
+
+
+_BENCHMARKRESPONSE = _descriptor.Descriptor(
+  name='BenchmarkResponse',
+  full_name='tfliteruntime.BenchmarkResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='mean_ts', full_name='tfliteruntime.BenchmarkResponse.mean_ts', index=0,
+      number=1, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='std_ts', full_name='tfliteruntime.BenchmarkResponse.std_ts', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='max_ts', full_name='tfliteruntime.BenchmarkResponse.max_ts', index=2,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='min_ts', full_name='tfliteruntime.BenchmarkResponse.min_ts', index=3,
+      number=4, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=294,
+  serialized_end=378,
+)
+
+
 _GETOUTPUTREQUEST = _descriptor.Descriptor(
   name='GetOutputRequest',
   full_name='tfliteruntime.GetOutputRequest',
@@ -163,8 +262,8 @@ _GETOUTPUTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=226,
-  serialized_end=259,
+  serialized_start=380,
+  serialized_end=413,
 )
 
 
@@ -195,8 +294,8 @@ _GETOUTPUTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=261,
-  serialized_end=297,
+  serialized_start=415,
+  serialized_end=451,
 )
 
 _SETINPUTREQUEST.fields_by_name['np_arr_chunk'].message_type = stream__data__pb2._CHUNK
@@ -209,6 +308,8 @@ _SETINPUTREQUEST.fields_by_name['np_arr_chunk'].containing_oneof = _SETINPUTREQU
 DESCRIPTOR.message_types_by_name['InitRequest'] = _INITREQUEST
 DESCRIPTOR.message_types_by_name['SetInputRequest'] = _SETINPUTREQUEST
 DESCRIPTOR.message_types_by_name['InvokeRequest'] = _INVOKEREQUEST
+DESCRIPTOR.message_types_by_name['BenchmarkRequest'] = _BENCHMARKREQUEST
+DESCRIPTOR.message_types_by_name['BenchmarkResponse'] = _BENCHMARKRESPONSE
 DESCRIPTOR.message_types_by_name['GetOutputRequest'] = _GETOUTPUTREQUEST
 DESCRIPTOR.message_types_by_name['GetOutputResponse'] = _GETOUTPUTRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -234,6 +335,20 @@ InvokeRequest = _reflection.GeneratedProtocolMessageType('InvokeRequest', (_mess
   })
 _sym_db.RegisterMessage(InvokeRequest)
 
+BenchmarkRequest = _reflection.GeneratedProtocolMessageType('BenchmarkRequest', (_message.Message,), {
+  'DESCRIPTOR' : _BENCHMARKREQUEST,
+  '__module__' : 'tfliteruntime_pb2'
+  # @@protoc_insertion_point(class_scope:tfliteruntime.BenchmarkRequest)
+  })
+_sym_db.RegisterMessage(BenchmarkRequest)
+
+BenchmarkResponse = _reflection.GeneratedProtocolMessageType('BenchmarkResponse', (_message.Message,), {
+  'DESCRIPTOR' : _BENCHMARKRESPONSE,
+  '__module__' : 'tfliteruntime_pb2'
+  # @@protoc_insertion_point(class_scope:tfliteruntime.BenchmarkResponse)
+  })
+_sym_db.RegisterMessage(BenchmarkResponse)
+
 GetOutputRequest = _reflection.GeneratedProtocolMessageType('GetOutputRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETOUTPUTREQUEST,
   '__module__' : 'tfliteruntime_pb2'
@@ -257,8 +372,8 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=300,
-  serialized_end=575,
+  serialized_start=454,
+  serialized_end=811,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
@@ -297,6 +412,16 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_GETOUTPUTREQUEST,
     output_type=_GETOUTPUTRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Benchmark',
+    full_name='tfliteruntime.TfliteRuntimeServer.Benchmark',
+    index=4,
+    containing_service=None,
+    input_type=_BENCHMARKREQUEST,
+    output_type=_BENCHMARKRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

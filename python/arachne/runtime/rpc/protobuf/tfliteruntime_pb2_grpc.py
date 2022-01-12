@@ -36,6 +36,11 @@ class TfliteRuntimeServerStub(object):
                 request_serializer=tfliteruntime__pb2.GetOutputRequest.SerializeToString,
                 response_deserializer=tfliteruntime__pb2.GetOutputResponse.FromString,
                 )
+        self.Benchmark = channel.unary_unary(
+                '/tfliteruntime.TfliteRuntimeServer/Benchmark',
+                request_serializer=tfliteruntime__pb2.BenchmarkRequest.SerializeToString,
+                response_deserializer=tfliteruntime__pb2.BenchmarkResponse.FromString,
+                )
 
 
 class TfliteRuntimeServerServicer(object):
@@ -66,6 +71,12 @@ class TfliteRuntimeServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Benchmark(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TfliteRuntimeServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -88,6 +99,11 @@ def add_TfliteRuntimeServerServicer_to_server(servicer, server):
                     servicer.GetOutput,
                     request_deserializer=tfliteruntime__pb2.GetOutputRequest.FromString,
                     response_serializer=tfliteruntime__pb2.GetOutputResponse.SerializeToString,
+            ),
+            'Benchmark': grpc.unary_unary_rpc_method_handler(
+                    servicer.Benchmark,
+                    request_deserializer=tfliteruntime__pb2.BenchmarkRequest.FromString,
+                    response_serializer=tfliteruntime__pb2.BenchmarkResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -165,5 +181,22 @@ class TfliteRuntimeServer(object):
         return grpc.experimental.unary_stream(request, target, '/tfliteruntime.TfliteRuntimeServer/GetOutput',
             tfliteruntime__pb2.GetOutputRequest.SerializeToString,
             tfliteruntime__pb2.GetOutputResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Benchmark(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfliteRuntimeServer/Benchmark',
+            tfliteruntime__pb2.BenchmarkRequest.SerializeToString,
+            tfliteruntime__pb2.BenchmarkResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

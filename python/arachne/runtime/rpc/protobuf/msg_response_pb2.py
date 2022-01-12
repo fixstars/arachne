@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12msg_response.proto\"-\n\x0bMsgResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\tb\x06proto3'
+  serialized_pb=b'\n\x12msg_response.proto\"\x1a\n\x0bMsgResponse\x12\x0b\n\x03msg\x18\x01 \x01(\tb\x06proto3'
 )
 
 
@@ -34,15 +34,8 @@ _MSGRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='error', full_name='MsgResponse.error', index=0,
-      number=1, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='message', full_name='MsgResponse.message', index=1,
-      number=2, type=9, cpp_type=9, label=1,
+      name='msg', full_name='MsgResponse.msg', index=0,
+      number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -60,7 +53,7 @@ _MSGRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=22,
-  serialized_end=67,
+  serialized_end=48,
 )
 
 DESCRIPTOR.message_types_by_name['MsgResponse'] = _MSGRESPONSE
