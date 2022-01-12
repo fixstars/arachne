@@ -40,11 +40,10 @@ test:
     - dgx1
   before_script:
     - poetry install
-    - poetry shell
-    - ./scripts/build_tvm.sh
-    - ./scripts/install_torch2trt.sh
+    - poetry run ./scripts/build_tvm.sh
+    - poetry run ./scripts/install_torch2trt.sh
   script:
-    - pytest tests --forked
+    - poetry run pytest tests --forked
 
 
 cleanup-image:
