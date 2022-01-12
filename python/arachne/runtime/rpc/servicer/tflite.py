@@ -1,4 +1,4 @@
-import os
+import grpc
 
 from arachne.runtime.rpc.protobuf import tfliteruntime_pb2, tfliteruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -7,8 +7,22 @@ from arachne.runtime.rpc.util.nparray import (
     nparray_piece_generator,
 )
 
+from .servicer import RuntimeServicerBase, register_runtime_servicer
 
-class TfLiteRuntimeServicer(tfliteruntime_pb2_grpc.TfliteRuntimeServerServicer):
+
+class TfLiteRuntimeServicer(
+    RuntimeServicerBase, tfliteruntime_pb2_grpc.TfliteRuntimeServerServicer
+):
+    @staticmethod
+    def register_servicer_to_server(server: grpc.Server):
+        tfliteruntime_pb2_grpc.add_TfliteRuntimeServerServicer_to_server(
+            TfLiteRuntimeServicer(), server
+        )
+
+    @staticmethod
+    def get_name():
+        return "tflite"
+
     def __init__(self):
         self.interpreter = None
 
@@ -48,3 +62,6 @@ class TfLiteRuntimeServicer(tfliteruntime_pb2_grpc.TfliteRuntimeServerServicer):
         np_array = self.interpreter.get_tensor(output_details[index]["index"])
         for piece in nparray_piece_generator(np_array):
             yield tfliteruntime_pb2.GetOutputResponse(np_data=piece)
+
+
+register_runtime_servicer(TfLiteRuntimeServicer)

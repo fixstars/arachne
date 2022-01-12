@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10\x66ileserver.proto\x1a\x11stream_data.proto\"\x1b\n\x07Request\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"\x19\n\x05Reply\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"?\n\x08\x46ileInfo\x12\x17\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x06.ChunkH\x00\x12\x12\n\x08\x66ilename\x18\x02 \x01(\tH\x00\x42\x06\n\x04info\"\x13\n\x11MakeTmpDirRequest\"%\n\x12MakeTmpDirResponse\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"&\n\x13\x44\x65leteTmpDirRequest\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"\x16\n\x14\x44\x65leteTmpDirResponse2\xcc\x01\n\nFileServer\x12\x38\n\x0bmake_tmpdir\x12\x12.MakeTmpDirRequest\x1a\x13.MakeTmpDirResponse\"\x00\x12>\n\rdelete_tmpdir\x12\x14.DeleteTmpDirRequest\x1a\x15.DeleteTmpDirResponse\"\x00\x12\x1f\n\x06upload\x12\t.FileInfo\x1a\x06.Reply\"\x00(\x01\x12#\n\x08\x64ownload\x12\x08.Request\x1a\t.FileInfo\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x10\x66ileserver.proto\x1a\x11stream_data.proto\"\x1b\n\x07Request\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"\x19\n\x05Reply\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"?\n\x08\x46ileInfo\x12\x17\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x06.ChunkH\x00\x12\x12\n\x08\x66ilename\x18\x02 \x01(\tH\x00\x42\x06\n\x04info\"\x13\n\x11MakeTmpDirRequest\"%\n\x12MakeTmpDirResponse\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"&\n\x13\x44\x65leteTmpDirRequest\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"\x16\n\x14\x44\x65leteTmpDirResponse2\xa7\x01\n\nFileServer\x12\x38\n\x0bmake_tmpdir\x12\x12.MakeTmpDirRequest\x1a\x13.MakeTmpDirResponse\"\x00\x12>\n\rdelete_tmpdir\x12\x14.DeleteTmpDirRequest\x1a\x15.DeleteTmpDirResponse\"\x00\x12\x1f\n\x06upload\x12\t.FileInfo\x1a\x06.Reply\"\x00(\x01\x62\x06proto3'
   ,
   dependencies=[stream__data__pb2.DESCRIPTOR,])
 
@@ -323,7 +323,7 @@ _FILESERVER = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=285,
-  serialized_end=489,
+  serialized_end=452,
   methods=[
   _descriptor.MethodDescriptor(
     name='make_tmpdir',
@@ -352,16 +352,6 @@ _FILESERVER = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_FILEINFO,
     output_type=_REPLY,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
-    name='download',
-    full_name='FileServer.download',
-    index=3,
-    containing_service=None,
-    input_type=_REQUEST,
-    output_type=_FILEINFO,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

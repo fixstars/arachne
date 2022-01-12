@@ -1,3 +1,5 @@
+import grpc
+
 from arachne.runtime import ONNXRuntimeModule, init
 from arachne.runtime.rpc.protobuf import onnxruntime_pb2, onnxruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -6,8 +8,18 @@ from arachne.runtime.rpc.util.nparray import (
     nparray_piece_generator,
 )
 
+from .servicer import RuntimeServicerBase, register_runtime_servicer
 
-class ONNXRuntimeServicer(onnxruntime_pb2_grpc.ONNXRuntimeServerServicer):
+
+class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeServerServicer):
+    @staticmethod
+    def register_servicer_to_server(server: grpc.Server):
+        onnxruntime_pb2_grpc.add_ONNXRuntimeServerServicer_to_server(ONNXRuntimeServicer(), server)
+
+    @staticmethod
+    def get_name():
+        return "onnx"
+
     def __init__(self):
         pass
 
@@ -52,3 +64,6 @@ class ONNXRuntimeServicer(onnxruntime_pb2_grpc.ONNXRuntimeServerServicer):
         np_array = self.module.get_output(index)
         for piece in nparray_piece_generator(np_array):
             yield onnxruntime_pb2.GetOutputResponse(np_data=piece)
+
+
+register_runtime_servicer(ONNXRuntimeServicer)

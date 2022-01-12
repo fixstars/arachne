@@ -25,7 +25,3 @@ class FileServicer(fileserver_pb2_grpc.FileServerServicer):
     def upload(self, request_iterator, context):
         filename = save_chunks_to_file(request_iterator)
         return fileserver_pb2.Reply(filepath=filename)
-
-    def download(self, request, context):
-        filepath = request.filepath
-        return get_file_chunks(filepath)

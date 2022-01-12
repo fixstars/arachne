@@ -1,3 +1,5 @@
+import grpc
+
 from arachne.runtime import TVMRuntimeModule, init
 from arachne.runtime.rpc.protobuf import tvmruntime_pb2, tvmruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -6,8 +8,18 @@ from arachne.runtime.rpc.util.nparray import (
     nparray_piece_generator,
 )
 
+from .servicer import RuntimeServicerBase, register_runtime_servicer
 
-class TVMRuntimeServicer(tvmruntime_pb2_grpc.TVMRuntimeServerServicer):
+
+class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServerServicer):
+    @staticmethod
+    def register_servicer_to_server(server: grpc.Server):
+        tvmruntime_pb2_grpc.add_TVMRuntimeServerServicer_to_server(TVMRuntimeServicer(), server)
+
+    @staticmethod
+    def get_name():
+        return "tvm"
+
     def __init__(self):
         pass
 
@@ -54,3 +66,6 @@ class TVMRuntimeServicer(tvmruntime_pb2_grpc.TVMRuntimeServerServicer):
         np_array = self.module.get_output(index)
         for piece in nparray_piece_generator(np_array):
             yield tvmruntime_pb2.GetOutputResponse(np_data=piece)
+
+
+register_runtime_servicer(TVMRuntimeServicer)

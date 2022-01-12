@@ -1,11 +1,12 @@
 import warnings
+from abc import ABCMeta
 
 import grpc
 
 from .serverstatus import ServerStatusClient
 
 
-class RuntimeClientBase:
+class RuntimeClientBase(metaclass=ABCMeta):
     def __init__(self, channel: grpc.Channel):
         self.finalized = False
         self.statusclient = ServerStatusClient(channel)
