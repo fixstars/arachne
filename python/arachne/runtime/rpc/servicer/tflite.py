@@ -45,7 +45,6 @@ class TfLiteRuntimeServicer(
         np_arr = None
         byte_extract_func = lambda request: request.np_arr_chunk.buffer
         index = next(request_iterator).index
-        index = None
         assert index is not None, "index should not be None"
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
