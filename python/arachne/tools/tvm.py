@@ -31,6 +31,25 @@ from ..data import Model
 
 @dataclass
 class TVMConfig:
+    """This is a class for configuring a build process of the tvm.
+
+    Attributes:
+        cpu_target (str): A LLVM Target (e.g., x86-64, aarch64, etc). Defaults to x86-64
+        cpu_attr (List[str]): List of attributes of the target (e.g., +fma, +avx2). Defaults to `[]`
+        cpu_name (:obj:`str`, optional): A chip name in the current architecture (e.g., broadwell, cortex-a76, etc)
+        cuda_target_device (str): A cuda target device (e.g., cuda, nvidia/nvidia-v100, etc)
+        composite_target (List[str]) : TVM composite targets. Defaults to `[cpu]`
+        target (:obj:`str`, optional): tvm.Target (*this parameter will be updated by the above configs*).
+        target_host (:obj:`str`, optional): The host target for tvm.Target (*this parameter will be updated by the above configs*).
+        desired_layout (:obj:`str`, optional): A desired graph layout (e.g., NHWC, NCHW).
+        disabled_pass (:obj:`str`, optional): The list of passes that are disabled in `tvm.relay.build`.
+        opt_level (int): The optimization level. Defaults to 3.
+        export_format (str): The format of `TVMCModel.export_package`. Defaults to tar.
+        cross_compiler (:obj:`str`, optional): The path for a cross compiler to be used when `export_format` is specified as "so".
+        cross_compiler_options (:obj:`str`, optional): The option for the cross compiler.
+
+    """
+
     cpu_target: str = "x86-64"
     cpu_attr: List[str] = field(default_factory=list)
     cpu_name: Optional[str] = None
