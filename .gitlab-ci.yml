@@ -58,7 +58,9 @@ test-doc-build:
     - dgx1
   before_script:
     - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
-    - poetry install --only=docs
+    - poetry install
+    - poetry run ./scripts/build_tvm.sh
+    - poetry run ./scripts/install_torch2trt.sh
   script:
     - poetry run sphinx-build docs docs/_build
 
