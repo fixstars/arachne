@@ -21,4 +21,5 @@ class RuntimeClientBase(metaclass=ABCMeta):
             if not self.finalized:
                 self.finalize()
         except:
-            warnings.warn(UserWarning("Failed to unlock server."))
+            # when server is already shutdown, fail to unlock server.
+            warnings.warn(UserWarning("Failed to unlock server"))
