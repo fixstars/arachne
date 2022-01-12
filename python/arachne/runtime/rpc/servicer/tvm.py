@@ -54,9 +54,9 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         warmup = request.warmup
         repeat = request.repeat
         number = request.number
-        assert isinstance(warmup, int)
-        assert isinstance(repeat, int)
-        assert isinstance(number, int)
+        assert warmup is not None
+        assert repeat is not None
+        assert number is not None
         benchmark_result = self.module.benchmark(warmup=warmup, repeat=repeat, number=number)
         return tvmruntime_pb2.BenchmarkResponse(
             mean_ts=benchmark_result["mean"],
@@ -66,8 +66,8 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         )
 
     def GetOutput(self, request, context):
-        index = request.index
         assert self.module
+        index = request.index
         np_array = self.module.get_output(index)
         for piece in nparray_piece_generator(np_array):
             yield tvmruntime_pb2.GetOutputResponse(np_data=piece)

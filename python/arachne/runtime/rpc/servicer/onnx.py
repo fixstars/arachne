@@ -52,9 +52,9 @@ class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeS
         warmup = request.warmup
         repeat = request.repeat
         number = request.number
-        assert isinstance(warmup, int)
-        assert isinstance(repeat, int)
-        assert isinstance(number, int)
+        assert warmup is not None
+        assert repeat is not None
+        assert number is not None
         benchmark_result = self.module.benchmark(warmup=warmup, repeat=repeat, number=number)
         return onnxruntime_pb2.BenchmarkResponse(
             mean_ts=benchmark_result["mean"],
@@ -64,8 +64,8 @@ class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeS
         )
 
     def GetOutput(self, request, context):
-        index = request.index
         assert self.module
+        index = request.index
         np_array = self.module.get_output(index)
         for piece in nparray_piece_generator(np_array):
             yield onnxruntime_pb2.GetOutputResponse(np_data=piece)

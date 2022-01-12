@@ -60,9 +60,9 @@ class TfLiteRuntimeServicer(
         warmup = request.warmup
         repeat = request.repeat
         number = request.number
-        assert isinstance(warmup, int)
-        assert isinstance(repeat, int)
-        assert isinstance(number, int)
+        assert warmup is not None
+        assert repeat is not None
+        assert number is not None
         benchmark_result = self.module.benchmark(warmup=warmup, repeat=repeat, number=number)
         return tfliteruntime_pb2.BenchmarkResponse(
             mean_ts=benchmark_result["mean"],
