@@ -1,6 +1,9 @@
 
 variables:
+  GIT_SUBMODULE_STRATEGY: recursive
   DOCKER_TEST_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_PIPELINE_ID}
+  ARACHNE_PYTHONPATH: ${CI_PROJECT_DIR}/python
+  TVM_LIBRARY_PATH: ${CI_PROJECT_DIR}/build_tvm
   CUDA_VISIBLE_DEVICES: 7
 
 check-format-diff:
@@ -31,7 +34,7 @@ build-image:
     - docker build -t ${DOCKER_TEST_IMAGE} -f docker/devel-gpu.Dockerfile docker
     - docker push ${DOCKER_TEST_IMAGE}
 
-test:
+test-arachne:
   stage: test
   image: ${DOCKER_TEST_IMAGE}
   needs: ['build-image']
@@ -39,11 +42,25 @@ test:
     - docker
     - dgx1
   before_script:
+    - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
     - poetry install
     - poetry run ./scripts/build_tvm.sh
     - poetry run ./scripts/install_torch2trt.sh
   script:
     - poetry run pytest tests --forked
+
+test-doc-build:
+  stage: test
+  image: ${DOCKER_TEST_IMAGE}
+  needs: ['build-image']
+  tags:
+    - docker
+    - dgx1
+  before_script:
+    - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
+    - poetry install --only=docs
+  script:
+    - poetry run sphinx-build docs docs/_build
 
 
 cleanup-image:
