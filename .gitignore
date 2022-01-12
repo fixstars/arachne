@@ -32,3 +32,6 @@ outputs/
 
 # Temporary data
 tmp/
+
+# Local docs build
+docs/_build

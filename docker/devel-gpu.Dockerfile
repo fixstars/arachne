@@ -130,7 +130,7 @@ RUN ln -s $(which python3) /usr/local/bin/python
 
 # Add a user that UID:GID will be updated by vscode
 ARG USERNAME=developer
-ARG GROUPNAME=develoepr
+ARG GROUPNAME=developer
 ARG UID=1000
 ARG GID=1000
 ARG PASSWORD=developer
@@ -139,6 +139,7 @@ RUN groupadd -g $GID $GROUPNAME && \
     echo $USERNAME:$PASSWORD | chpasswd && \
     echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER $USERNAME
+ENV HOME /home/developer
 
 # install poetry
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - --version 1.2.0a2

@@ -22,7 +22,14 @@ onnxruntime-gpu = "1.6.0"
 onnx = "1.6.0"
 tensorflow = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.4.1-cp36-cp36m-linux_x86_64.whl"}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.docs.dependencies]
+sphinx = "^4.3.2"
+sphinx-rtd-theme = "^1.0.0"
+myst-parser = "^0.16.1"
+sphinx-autobuild = "^2021.3.14"
+autodocsumm = "^0.2.7"
+
+[tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.0"
 flake8 = "^3.9.2"
 black = "~20.8b1"

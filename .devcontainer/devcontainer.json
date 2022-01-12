@@ -21,6 +21,7 @@
         // "tqchen.ffi-navigator",
         "twxs.cmake",
         "yzhang.markdown-all-in-one",
-        "bungcip.better-toml"
+        "bungcip.better-toml",
+        "trond-snekvik.simple-rst"
     ],
 }
