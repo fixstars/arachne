@@ -18,11 +18,14 @@ def test_prohibit_multiple_client(rpc_port=5051):
         server.start()
 
         channel = create_channel(port=rpc_port)
+        client1 = None
         try:
             client1 = TfliteRuntimeClient(channel, model_path)
             # cannot create multiple clients
             client2 = TfliteRuntimeClient(channel, model_path)
         finally:
+            if client1 is not None:
+                client1.finalize()
             channel.close()
             server.stop(0)
 
