@@ -8,4 +8,5 @@
     },
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.diagnosticMode": "workspace",
+    "restructuredtext.confPath": "${workspaceFolder}/docs",
 }

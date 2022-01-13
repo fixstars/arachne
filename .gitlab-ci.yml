@@ -1,0 +1,76 @@
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  DOCKER_TEST_IMAGE: ${CI_REGISTRY_IMAGE}:${CI_PIPELINE_ID}
+  ARACHNE_PYTHONPATH: ${CI_PROJECT_DIR}/python
+  TVM_LIBRARY_PATH: ${CI_PROJECT_DIR}/build/tvm
+  CUDA_VISIBLE_DEVICES: 7
+
+check-format-diff:
+  stage: .pre
+  image: python:3.6
+  tags:
+    - docker
+    - dgx1
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+  script:
+    - python3 -m pip install black isort
+    - isort python --diff --check
+    - black python --diff --check
+
+
+build-image:
+  stage: build
+  image: docker:19.03.14
+  tags:
+    - docker
+    - dgx1
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  script:
+    - docker build -t ${DOCKER_TEST_IMAGE} -f docker/devel-gpu.Dockerfile docker
+    - docker push ${DOCKER_TEST_IMAGE}
+
+test-arachne:
+  stage: test
+  image: ${DOCKER_TEST_IMAGE}
+  needs: ['build-image']
+  tags:
+    - docker
+    - dgx1
+  before_script:
+    - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
+    - poetry install
+    - poetry run ./scripts/build_tvm.sh
+    - poetry run ./scripts/install_torch2trt.sh
+  script:
+    - poetry run pytest tests --forked
+
+test-doc-build:
+  stage: test
+  image: ${DOCKER_TEST_IMAGE}
+  needs: ['build-image']
+  tags:
+    - docker
+    - dgx1
+  before_script:
+    - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
+    - poetry install
+    - poetry run ./scripts/build_tvm.sh
+    - poetry run ./scripts/install_torch2trt.sh
+  script:
+    - poetry run sphinx-build docs docs/_build
+
+
+cleanup-image:
+  stage: .post
+  image: docker:19.03.14
+  tags:
+    - docker
+    - dgx1
+  when: always
+  script:
+    - docker image rm -f ${DOCKER_TEST_IMAGE} || true

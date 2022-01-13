@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+import numpy as np
 import pytest
 import tensorflow as tf
 
@@ -24,6 +25,29 @@ params = {
 }
 
 
+def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
+    input_data = np.array(np.random.random_sample(input_shape), dtype=np.float32)  # type: ignore
+    dout = tf_model(input_data).numpy()  # type: ignore
+
+    interpreter = tf.lite.Interpreter(model_path=tflite_model_path)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    interpreter.set_tensor(input_details[0]["index"], input_data)
+    interpreter.invoke()
+    aout = interpreter.get_tensor(output_details[0]["index"])
+
+    if ptq_method == "none":
+        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+    elif ptq_method == "fp16":
+        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+    elif ptq_method == "dynamic_range":
+        np.testing.assert_allclose(aout, dout, atol=0.2, rtol=0)
+    else:
+        # skip dummy int8
+        pass
+
+
 @pytest.mark.parametrize("model_format, ptq_method", list(params.values()), ids=list(params.keys()))
 def test_tflite_converter(model_format, ptq_method):
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -31,14 +55,16 @@ def test_tflite_converter(model_format, ptq_method):
         model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
         cfg = TFLiteConverterConfig()
         cfg.ptq.method = ptq_method
+        input_shape = [1, 224, 224, 3]
         if model_format == "h5":
             model.save("tmp.h5")
             input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
-            run(input=input, cfg=cfg)
+            output = run(input=input, cfg=cfg)
+
         elif model_format == "saved_model":
             model.save("saved_model")
             input = Model("saved_model", spec=get_model_spec("saved_model"))
-            run(input=input, cfg=cfg)
+            output = run(input=input, cfg=cfg)
         elif model_format == "pb":
             wrapper = tf.function(lambda x: model(x))
             wrapper = wrapper.get_concrete_function(tf.TensorSpec(model.inputs[0].shape, model.inputs[0].dtype))  # type: ignore
@@ -73,4 +99,8 @@ def test_tflite_converter(model_format, ptq_method):
             spec = ModelSpec(inputs=inputs, outputs=outputs)
 
             input = Model("frozen_graph.pb", spec=spec)
-            run(input=input, cfg=cfg)
+            output = run(input=input, cfg=cfg)
+        else:
+            assert False
+
+        check_tflite_output(model, input_shape, ptq_method, output.path)
