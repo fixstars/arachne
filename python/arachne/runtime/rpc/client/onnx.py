@@ -16,17 +16,14 @@ from arachne.runtime.rpc.util.nparray import (
 )
 
 from .client import RuntimeClientBase
-from .file import FileClient
 
 
 class ONNXRuntimeClient(RuntimeClientBase):
     def __init__(self, channel: grpc.Channel, model_path: str, providers=[]):
         super().__init__(channel)
         # 'provider_options' and 'session_options' are not supported
-        self.fileclient = FileClient(channel)
         self.stub = onnxruntime_pb2_grpc.ONNXRuntimeServerStub(channel)
-
-        upload_response = self.fileclient.upload(Path(model_path))
+        upload_response = self.file_stub_mgr.upload(Path(model_path))
         req = onnxruntime_pb2.InitRequest(model_path=upload_response.filepath, providers=providers)
         self.stub.Init(req)
 

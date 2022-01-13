@@ -86,9 +86,10 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         download(url, model_path)
 
         dummy_input = np.array(np.random.random_sample([1, 3, 224, 224]), dtype=np.float32)  # type: ignore
+        ort_opts = {"providers": ["CPUExecutionProvider"]}
 
         # local run
-        rtmodule = arachne.runtime.init(model_file=model_path)
+        rtmodule = arachne.runtime.init(model_file=model_path, **ort_opts)
         assert rtmodule
         rtmodule.set_input(0, dummy_input)
         rtmodule.run()
@@ -97,7 +98,6 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         server = create_server("onnx", rpc_port)
         server.start()
         try:
-            ort_opts = {"providers": ["CPUExecutionProvider"]}
             client = arachne.runtime.rpc.init(model_file=model_path, rpc_port=rpc_port, **ort_opts)
             assert isinstance(client, ONNXRuntimeClient)
             client.set_input(0, dummy_input)

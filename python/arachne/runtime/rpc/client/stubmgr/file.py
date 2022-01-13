@@ -5,7 +5,7 @@ from arachne.runtime.rpc.protobuf import fileserver_pb2, fileserver_pb2_grpc
 from arachne.runtime.rpc.util.file import get_file_chunks
 
 
-class FileClient:
+class FileStubManager:
     def __init__(self, channel):
         self.stub = fileserver_pb2_grpc.FileServerStub(channel)
         response = self.stub.make_tmpdir(fileserver_pb2.MakeTmpDirRequest())

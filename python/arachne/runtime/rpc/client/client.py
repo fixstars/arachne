@@ -3,17 +3,18 @@ from abc import ABCMeta
 
 import grpc
 
-from .serverstatus import ServerStatusClient
+from .stubmgr import FileStubManager, ServerStatusStubManager
 
 
 class RuntimeClientBase(metaclass=ABCMeta):
     def __init__(self, channel: grpc.Channel):
         self.finalized = False
-        self.statusclient = ServerStatusClient(channel)
-        self.statusclient.trylock()
+        self.stats_stub_mgr = ServerStatusStubManager(channel)
+        self.stats_stub_mgr.trylock()
+        self.file_stub_mgr = FileStubManager(channel)
 
     def finalize(self):
-        self.statusclient.unlock()
+        self.stats_stub_mgr.unlock()
         self.finalized = True
 
     def __del__(self):

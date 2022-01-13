@@ -16,7 +16,6 @@ from arachne.runtime.rpc.util.nparray import (
 )
 
 from .client import RuntimeClientBase
-from .file import FileClient
 
 
 class TVMRuntimeClient(RuntimeClientBase):
@@ -27,10 +26,8 @@ class TVMRuntimeClient(RuntimeClientBase):
         **kwargs,
     ):
         super().__init__(channel)
-        self.fileclient = FileClient(channel)
         self.stub = tvmruntime_pb2_grpc.TVMRuntimeServerStub(channel)
-
-        upload_response = self.fileclient.upload(Path(package_path))
+        upload_response = self.file_stub_mgr.upload(Path(package_path))
         req = tvmruntime_pb2.InitRequest(package_path=upload_response.filepath)
         self.stub.Init(req)
 
