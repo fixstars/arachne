@@ -85,9 +85,8 @@ pages:
   artifacts:
     paths:
       - public
-  when: always
-  # only:
-  # - feature/v0.2
+  only:
+  - feature/v0.2
 
 
 cleanup-image:
