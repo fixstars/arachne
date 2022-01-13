@@ -14,7 +14,7 @@ from arachne.runtime.rpc import (
 )
 
 
-def test_tvm_runtime_rpc(rpc_port=5051):
+def test_tvm_runtime_rpc_benchmark(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/tvm_mobilenet.tar"
         tvm_package_path = tmp_dir + "/tvm_mobilenet.tar"
@@ -32,7 +32,7 @@ def test_tvm_runtime_rpc(rpc_port=5051):
             server.stop(0)
 
 
-def test_tflite_runtime_rpc(rpc_port=5051):
+def test_tflite_runtime_rpc_benchmark(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
         model_path = tmp_dir + "/model.tflite"
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
@@ -50,7 +50,7 @@ def test_tflite_runtime_rpc(rpc_port=5051):
             server.stop(0)
 
 
-def test_onnx_runtime_rpc(rpc_port=5051):
+def test_onnx_runtime_rpc_benchmark(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
         url = (
             "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
