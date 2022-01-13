@@ -67,7 +67,7 @@ def test_tflite_runtime_rpc(rpc_port=5051):
             client = arachne.runtime.rpc.init(model_file=model_path, rpc_port=rpc_port)
             assert isinstance(client, TfliteRuntimeClient)
             client.set_input(0, dummy_input)
-            client.invoke()
+            client.run()
             rpc_output = client.get_output(0)
             client.finalize()
         finally:

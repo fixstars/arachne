@@ -17,7 +17,7 @@ message SetInputRequest{
     }
 }
 
-message InvokeRequest{}
+message RunRequest{}
 
 message BenchmarkRequest{
     int32 warmup = 1;
@@ -44,7 +44,7 @@ message GetOutputResponse{
 service TfliteRuntimeServer{
     rpc Init(InitRequest) returns (MsgResponse) {}
     rpc SetInput (stream SetInputRequest) returns (MsgResponse) {}
-    rpc Invoke (InvokeRequest) returns (MsgResponse) {}
+    rpc Run (RunRequest) returns (MsgResponse) {}
     rpc Benchmark (BenchmarkRequest) returns (BenchmarkResponse) {}
     rpc GetOutput (GetOutputRequest) returns (stream GetOutputResponse) {}
 }

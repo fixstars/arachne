@@ -31,32 +31,39 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         logger.info("loading " + package_path)
         self.module = init(package_path)
         assert isinstance(self.module, TVMRuntimeModule)
-        return MsgResponse(msg="OK")
+        return MsgResponse(msg="Init")
 
     def SetInput(self, request_iterator, context):
         assert self.module
         index = next(request_iterator).index
         # select index from 'oneof' structure
         index = index.index_i if index.index_i is not None else index.index_s
-        assert index is not None, "index should not be None"
+        if index is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("index should not be None")
+            return MsgResponse()
+
         byte_extract_func = lambda request: request.np_arr_chunk.buffer
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
-        return MsgResponse(msg="OK")
+        return MsgResponse(msg="SetInput")
 
     def Run(self, request, context):
         assert self.module
         self.module.run()
-        return MsgResponse(msg="OK")
+        return MsgResponse(msg="Run")
 
     def Benchmark(self, request, context):
         assert self.module
         warmup = request.warmup
         repeat = request.repeat
         number = request.number
-        assert warmup is not None
-        assert repeat is not None
-        assert number is not None
+
+        if warmup is None or repeat is None or number is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("warmup, repeat, and number should not be None")
+            return MsgResponse()
+
         benchmark_result = self.module.benchmark(warmup=warmup, repeat=repeat, number=number)
         return tvmruntime_pb2.BenchmarkResponse(
             mean_ts=benchmark_result["mean"],

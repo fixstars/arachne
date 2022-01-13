@@ -36,9 +36,9 @@ class TfliteRuntimeClient(RuntimeClientBase):
 
         self.stub.SetInput(request_generator(index, np_arr))
 
-    def invoke(self):
-        req = tfliteruntime_pb2.InvokeRequest()
-        self.stub.Invoke(req)
+    def run(self):
+        req = tfliteruntime_pb2.RunRequest()
+        self.stub.Run(req)
 
     def get_output(self, index: int) -> np.ndarray:
         req = tfliteruntime_pb2.GetOutputRequest(index=index)

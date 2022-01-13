@@ -47,7 +47,7 @@ def test_conitnue_first_client(rpc_port=5051):
             client2 = TfliteRuntimeClient(channel, model_path)
         except:
             # client1 can continue to be used
-            client1.invoke()
+            client1.run()
             rpc_output = client1.get_output(0)
             client1.finalize()
         finally:

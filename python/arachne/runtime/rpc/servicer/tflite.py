@@ -45,24 +45,31 @@ class TfLiteRuntimeServicer(
         np_arr = None
         byte_extract_func = lambda request: request.np_arr_chunk.buffer
         index = next(request_iterator).index
-        assert index is not None, "index should not be None"
+        if index is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("index should not be None")
+            return MsgResponse()
+
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
         return MsgResponse(msg="SetInput")
 
-    def Invoke(self, request, context):
+    def Run(self, request, context):
         assert self.module
         self.module.run()
-        return MsgResponse(msg="Invoke")
+        return MsgResponse(msg="Run")
 
     def Benchmark(self, request, context):
         assert self.module
         warmup = request.warmup
         repeat = request.repeat
         number = request.number
-        assert warmup is not None
-        assert repeat is not None
-        assert number is not None
+
+        if warmup is None or repeat is None or number is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("warmup, repeat, and number should not be None")
+            return MsgResponse()
+
         benchmark_result = self.module.benchmark(warmup=warmup, repeat=repeat, number=number)
         return tfliteruntime_pb2.BenchmarkResponse(
             mean_ts=benchmark_result["mean"],
