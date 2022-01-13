@@ -1,11 +1,12 @@
 import warnings
+from abc import ABCMeta
 
 import grpc
 
 from .serverstatus import ServerStatusClient
 
 
-class RuntimeClientBase:
+class RuntimeClientBase(metaclass=ABCMeta):
     def __init__(self, channel: grpc.Channel):
         self.finalized = False
         self.statusclient = ServerStatusClient(channel)
@@ -20,4 +21,5 @@ class RuntimeClientBase:
             if not self.finalized:
                 self.finalize()
         except:
-            warnings.warn(UserWarning("Failed to unlock server."))
+            # when server is already shutdown, fail to unlock server.
+            warnings.warn(UserWarning("Failed to unlock server"))

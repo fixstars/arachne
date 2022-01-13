@@ -30,5 +30,4 @@ service FileServer {
   rpc make_tmpdir(MakeTmpDirRequest) returns (MakeTmpDirResponse) {}
   rpc delete_tmpdir(DeleteTmpDirRequest) returns (DeleteTmpDirResponse) {}
   rpc upload(stream FileInfo) returns (Reply) {}
-  rpc download(Request) returns (stream FileInfo) {}
 }

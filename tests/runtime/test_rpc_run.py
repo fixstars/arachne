@@ -4,14 +4,14 @@ import numpy as np
 from tvm.contrib.download import download
 
 import arachne.runtime
+import arachne.runtime.rpc
 import arachne.tools.tvm
 from arachne.runtime.rpc import (
     ONNXRuntimeClient,
     TfliteRuntimeClient,
     TVMRuntimeClient,
-    create_channel,
+    create_server,
 )
-from arachne.server import create_server
 
 
 def test_tvm_runtime_rpc(rpc_port=5051):
@@ -30,16 +30,16 @@ def test_tvm_runtime_rpc(rpc_port=5051):
         local_output = rtmodule.get_output(0)
 
         # rpc run
-        server = create_server(rpc_port)
+        server = create_server("tvm", rpc_port)
         server.start()
-        channel = create_channel(port=rpc_port)
         try:
-            client = TVMRuntimeClient(channel, tvm_package_path)
+            client = arachne.runtime.rpc.init(package_tar=tvm_package_path, rpc_port=rpc_port)
+            assert isinstance(client, TVMRuntimeClient)
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
+            client.finalize()
         finally:
-            channel.close()
             server.stop(0)
         # compare
         np.testing.assert_equal(local_output, rpc_output)
@@ -61,16 +61,16 @@ def test_tflite_runtime_rpc(rpc_port=5051):
         local_output = rtmodule.get_output(0)
 
         # rpc
-        server = create_server(rpc_port)
+        server = create_server("tflite", rpc_port)
         server.start()
-        channel = create_channel(port=rpc_port)
         try:
-            client = TfliteRuntimeClient(channel, model_path)
+            client = arachne.runtime.rpc.init(model_file=model_path, rpc_port=rpc_port)
+            assert isinstance(client, TfliteRuntimeClient)
             client.set_input(0, dummy_input)
-            client.invoke()
+            client.run()
             rpc_output = client.get_output(0)
+            client.finalize()
         finally:
-            channel.close()
             server.stop(0)
 
         # compare
@@ -85,7 +85,6 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         model_path = tmp_dir + "/resnet18.onnx"
         download(url, model_path)
 
-        # dummy_input = np.random.rand(1, 3, 224, 224)
         dummy_input = np.array(np.random.random_sample([1, 3, 224, 224]), dtype=np.float32)  # type: ignore
 
         # local run
@@ -95,17 +94,17 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         rtmodule.run()
         local_output = rtmodule.get_output(0)
         # rpc run
-        server = create_server(rpc_port)
+        server = create_server("onnx", rpc_port)
         server.start()
-        channel = create_channel(port=rpc_port)
         try:
             ort_opts = {"providers": ["CPUExecutionProvider"]}
-            client = ONNXRuntimeClient(channel, model_path, **ort_opts)
+            client = arachne.runtime.rpc.init(model_file=model_path, rpc_port=rpc_port, **ort_opts)
+            assert isinstance(client, ONNXRuntimeClient)
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
+            client.finalize()
         finally:
-            channel.close()
             server.stop(0)
         # compare
         np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)

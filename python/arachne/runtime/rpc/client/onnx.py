@@ -15,8 +15,8 @@ from arachne.runtime.rpc.util.nparray import (
     nparray_piece_generator,
 )
 
+from .client import RuntimeClientBase
 from .file import FileClient
-from .runtimebase import RuntimeClientBase
 
 
 class ONNXRuntimeClient(RuntimeClientBase):
