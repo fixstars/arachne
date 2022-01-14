@@ -20,7 +20,7 @@ from .client import RuntimeClientBase
 class TfliteRuntimeClient(RuntimeClientBase):
     def __init__(self, channel: grpc.Channel, model_path: str, num_threads=1):
         super().__init__(channel)
-        self.stub = tfliteruntime_pb2_grpc.TfliteRuntimeServerStub(channel)
+        self.stub = tfliteruntime_pb2_grpc.TfLiteRuntimeStub(channel)
         response = self.file_stub_mgr.upload(Path(model_path))
         req = tfliteruntime_pb2.InitRequest(model_path=response.filepath, num_threads=num_threads)
         self.stub.Init(req)

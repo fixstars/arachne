@@ -24,7 +24,7 @@ def get_file_chunks(src_filepath, dst_filepath):
 
 class FileStubManager:
     def __init__(self, channel):
-        self.stub = fileserver_pb2_grpc.FileServerStub(channel)
+        self.stub = fileserver_pb2_grpc.FileServiceStub(channel)
         response = self.stub.make_tmpdir(fileserver_pb2.MakeTmpDirRequest())
         self.tmpdir = Path(response.dirname)
 

@@ -23,7 +23,7 @@ def save_chunks_to_file(streams):
     return filename
 
 
-class FileServicer(fileserver_pb2_grpc.FileServerServicer):
+class FileServicer(fileserver_pb2_grpc.FileServiceServicer):
     def __init__(self):
         pass
 

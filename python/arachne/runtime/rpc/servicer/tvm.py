@@ -14,10 +14,10 @@ from .servicer import RuntimeServicerBase, register_runtime_servicer
 logger = Logger.logger()
 
 
-class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServerServicer):
+class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServicer):
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
-        tvmruntime_pb2_grpc.add_TVMRuntimeServerServicer_to_server(TVMRuntimeServicer(), server)
+        tvmruntime_pb2_grpc.add_TVMRuntimeServicer_to_server(TVMRuntimeServicer(), server)
 
     @staticmethod
     def get_name():

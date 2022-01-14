@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13tfliteruntime.proto\x12\rtfliteruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"6\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x13\n\x0bnum_threads\x18\x02 \x01(\x05\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xdf\x02\n\x13TfliteRuntimeServer\x12\x32\n\x04Init\x12\x1a.tfliteruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12<\n\x08SetInput\x12\x1e.tfliteruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\x30\n\x03Run\x12\x19.tfliteruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12P\n\tBenchmark\x12\x1f.tfliteruntime.BenchmarkRequest\x1a .tfliteruntime.BenchmarkResponse\"\x00\x12R\n\tGetOutput\x12\x1f.tfliteruntime.GetOutputRequest\x1a .tfliteruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x13tfliteruntime.proto\x12\rtfliteruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"6\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x13\n\x0bnum_threads\x18\x02 \x01(\x05\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xd9\x02\n\rTfLiteRuntime\x12\x32\n\x04Init\x12\x1a.tfliteruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12<\n\x08SetInput\x12\x1e.tfliteruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\x30\n\x03Run\x12\x19.tfliteruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12P\n\tBenchmark\x12\x1f.tfliteruntime.BenchmarkRequest\x1a .tfliteruntime.BenchmarkResponse\"\x00\x12R\n\tGetOutput\x12\x1f.tfliteruntime.GetOutputRequest\x1a .tfliteruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
   ,
   dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
 
@@ -365,19 +365,19 @@ _sym_db.RegisterMessage(GetOutputResponse)
 
 
 
-_TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
-  name='TfliteRuntimeServer',
-  full_name='tfliteruntime.TfliteRuntimeServer',
+_TFLITERUNTIME = _descriptor.ServiceDescriptor(
+  name='TfLiteRuntime',
+  full_name='tfliteruntime.TfLiteRuntime',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=451,
-  serialized_end=802,
+  serialized_end=796,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
-    full_name='tfliteruntime.TfliteRuntimeServer.Init',
+    full_name='tfliteruntime.TfLiteRuntime.Init',
     index=0,
     containing_service=None,
     input_type=_INITREQUEST,
@@ -387,7 +387,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetInput',
-    full_name='tfliteruntime.TfliteRuntimeServer.SetInput',
+    full_name='tfliteruntime.TfLiteRuntime.SetInput',
     index=1,
     containing_service=None,
     input_type=_SETINPUTREQUEST,
@@ -397,7 +397,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='Run',
-    full_name='tfliteruntime.TfliteRuntimeServer.Run',
+    full_name='tfliteruntime.TfLiteRuntime.Run',
     index=2,
     containing_service=None,
     input_type=_RUNREQUEST,
@@ -407,7 +407,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='Benchmark',
-    full_name='tfliteruntime.TfliteRuntimeServer.Benchmark',
+    full_name='tfliteruntime.TfLiteRuntime.Benchmark',
     index=3,
     containing_service=None,
     input_type=_BENCHMARKREQUEST,
@@ -417,7 +417,7 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetOutput',
-    full_name='tfliteruntime.TfliteRuntimeServer.GetOutput',
+    full_name='tfliteruntime.TfLiteRuntime.GetOutput',
     index=4,
     containing_service=None,
     input_type=_GETOUTPUTREQUEST,
@@ -426,8 +426,8 @@ _TFLITERUNTIMESERVER = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_TFLITERUNTIMESERVER)
+_sym_db.RegisterServiceDescriptor(_TFLITERUNTIME)
 
-DESCRIPTOR.services_by_name['TfliteRuntimeServer'] = _TFLITERUNTIMESERVER
+DESCRIPTOR.services_by_name['TfLiteRuntime'] = _TFLITERUNTIME
 
 # @@protoc_insertion_point(module_scope)

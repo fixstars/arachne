@@ -5,7 +5,7 @@ import grpc
 import fileserver_pb2 as fileserver__pb2
 
 
-class FileServerStub(object):
+class FileServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,23 +15,23 @@ class FileServerStub(object):
             channel: A grpc.Channel.
         """
         self.make_tmpdir = channel.unary_unary(
-                '/FileServer/make_tmpdir',
+                '/FileService/make_tmpdir',
                 request_serializer=fileserver__pb2.MakeTmpDirRequest.SerializeToString,
                 response_deserializer=fileserver__pb2.MakeTmpDirResponse.FromString,
                 )
         self.delete_tmpdir = channel.unary_unary(
-                '/FileServer/delete_tmpdir',
+                '/FileService/delete_tmpdir',
                 request_serializer=fileserver__pb2.DeleteTmpDirRequest.SerializeToString,
                 response_deserializer=fileserver__pb2.DeleteTmpDirResponse.FromString,
                 )
         self.upload = channel.stream_unary(
-                '/FileServer/upload',
+                '/FileService/upload',
                 request_serializer=fileserver__pb2.UploadRequest.SerializeToString,
                 response_deserializer=fileserver__pb2.UploadResponse.FromString,
                 )
 
 
-class FileServerServicer(object):
+class FileServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def make_tmpdir(self, request, context):
@@ -53,7 +53,7 @@ class FileServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_FileServerServicer_to_server(servicer, server):
+def add_FileServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'make_tmpdir': grpc.unary_unary_rpc_method_handler(
                     servicer.make_tmpdir,
@@ -72,12 +72,12 @@ def add_FileServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'FileServer', rpc_method_handlers)
+            'FileService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class FileServer(object):
+class FileService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -91,7 +91,7 @@ class FileServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/FileServer/make_tmpdir',
+        return grpc.experimental.unary_unary(request, target, '/FileService/make_tmpdir',
             fileserver__pb2.MakeTmpDirRequest.SerializeToString,
             fileserver__pb2.MakeTmpDirResponse.FromString,
             options, channel_credentials,
@@ -108,7 +108,7 @@ class FileServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/FileServer/delete_tmpdir',
+        return grpc.experimental.unary_unary(request, target, '/FileService/delete_tmpdir',
             fileserver__pb2.DeleteTmpDirRequest.SerializeToString,
             fileserver__pb2.DeleteTmpDirResponse.FromString,
             options, channel_credentials,
@@ -125,7 +125,7 @@ class FileServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/FileServer/upload',
+        return grpc.experimental.stream_unary(request_iterator, target, '/FileService/upload',
             fileserver__pb2.UploadRequest.SerializeToString,
             fileserver__pb2.UploadResponse.FromString,
             options, channel_credentials,

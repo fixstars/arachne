@@ -14,10 +14,10 @@ from .servicer import RuntimeServicerBase, register_runtime_servicer
 logger = Logger.logger()
 
 
-class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeServerServicer):
+class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeServicer):
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
-        onnxruntime_pb2_grpc.add_ONNXRuntimeServerServicer_to_server(ONNXRuntimeServicer(), server)
+        onnxruntime_pb2_grpc.add_ONNXRuntimeServicer_to_server(ONNXRuntimeServicer(), server)
 
     @staticmethod
     def get_name():

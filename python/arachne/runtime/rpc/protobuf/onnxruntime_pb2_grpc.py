@@ -6,9 +6,8 @@ import msg_response_pb2 as msg__response__pb2
 import onnxruntime_pb2 as onnxruntime__pb2
 
 
-class ONNXRuntimeServerStub(object):
-    """interface
-    """
+class ONNXRuntimeStub(object):
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -17,35 +16,34 @@ class ONNXRuntimeServerStub(object):
             channel: A grpc.Channel.
         """
         self.Init = channel.unary_unary(
-                '/onnxruntime.ONNXRuntimeServer/Init',
+                '/onnxruntime.ONNXRuntime/Init',
                 request_serializer=onnxruntime__pb2.InitRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
-                '/onnxruntime.ONNXRuntimeServer/SetInput',
+                '/onnxruntime.ONNXRuntime/SetInput',
                 request_serializer=onnxruntime__pb2.SetInputRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Run = channel.unary_unary(
-                '/onnxruntime.ONNXRuntimeServer/Run',
+                '/onnxruntime.ONNXRuntime/Run',
                 request_serializer=onnxruntime__pb2.RunRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Benchmark = channel.unary_unary(
-                '/onnxruntime.ONNXRuntimeServer/Benchmark',
+                '/onnxruntime.ONNXRuntime/Benchmark',
                 request_serializer=onnxruntime__pb2.BenchmarkRequest.SerializeToString,
                 response_deserializer=onnxruntime__pb2.BenchmarkResponse.FromString,
                 )
         self.GetOutput = channel.unary_stream(
-                '/onnxruntime.ONNXRuntimeServer/GetOutput',
+                '/onnxruntime.ONNXRuntime/GetOutput',
                 request_serializer=onnxruntime__pb2.GetOutputRequest.SerializeToString,
                 response_deserializer=onnxruntime__pb2.GetOutputResponse.FromString,
                 )
 
 
-class ONNXRuntimeServerServicer(object):
-    """interface
-    """
+class ONNXRuntimeServicer(object):
+    """Missing associated documentation comment in .proto file."""
 
     def Init(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -78,7 +76,7 @@ class ONNXRuntimeServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ONNXRuntimeServerServicer_to_server(servicer, server):
+def add_ONNXRuntimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
@@ -107,14 +105,13 @@ def add_ONNXRuntimeServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'onnxruntime.ONNXRuntimeServer', rpc_method_handlers)
+            'onnxruntime.ONNXRuntime', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class ONNXRuntimeServer(object):
-    """interface
-    """
+class ONNXRuntime(object):
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Init(request,
@@ -127,7 +124,7 @@ class ONNXRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onnxruntime.ONNXRuntimeServer/Init',
+        return grpc.experimental.unary_unary(request, target, '/onnxruntime.ONNXRuntime/Init',
             onnxruntime__pb2.InitRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -144,7 +141,7 @@ class ONNXRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/onnxruntime.ONNXRuntimeServer/SetInput',
+        return grpc.experimental.stream_unary(request_iterator, target, '/onnxruntime.ONNXRuntime/SetInput',
             onnxruntime__pb2.SetInputRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -161,7 +158,7 @@ class ONNXRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onnxruntime.ONNXRuntimeServer/Run',
+        return grpc.experimental.unary_unary(request, target, '/onnxruntime.ONNXRuntime/Run',
             onnxruntime__pb2.RunRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -178,7 +175,7 @@ class ONNXRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onnxruntime.ONNXRuntimeServer/Benchmark',
+        return grpc.experimental.unary_unary(request, target, '/onnxruntime.ONNXRuntime/Benchmark',
             onnxruntime__pb2.BenchmarkRequest.SerializeToString,
             onnxruntime__pb2.BenchmarkResponse.FromString,
             options, channel_credentials,
@@ -195,7 +192,7 @@ class ONNXRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/onnxruntime.ONNXRuntimeServer/GetOutput',
+        return grpc.experimental.unary_stream(request, target, '/onnxruntime.ONNXRuntime/GetOutput',
             onnxruntime__pb2.GetOutputRequest.SerializeToString,
             onnxruntime__pb2.GetOutputResponse.FromString,
             options, channel_credentials,

@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10\x66ileserver.proto\x1a\x11stream_data.proto\"D\n\rUploadRequest\x12\x17\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x06.ChunkH\x00\x12\x12\n\x08\x66ilename\x18\x02 \x01(\tH\x00\x42\x06\n\x04info\"\"\n\x0eUploadResponse\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"\x13\n\x11MakeTmpDirRequest\"%\n\x12MakeTmpDirResponse\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"&\n\x13\x44\x65leteTmpDirRequest\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"\x16\n\x14\x44\x65leteTmpDirResponse2\xb5\x01\n\nFileServer\x12\x38\n\x0bmake_tmpdir\x12\x12.MakeTmpDirRequest\x1a\x13.MakeTmpDirResponse\"\x00\x12>\n\rdelete_tmpdir\x12\x14.DeleteTmpDirRequest\x1a\x15.DeleteTmpDirResponse\"\x00\x12-\n\x06upload\x12\x0e.UploadRequest\x1a\x0f.UploadResponse\"\x00(\x01\x62\x06proto3'
+  serialized_pb=b'\n\x10\x66ileserver.proto\x1a\x11stream_data.proto\"D\n\rUploadRequest\x12\x17\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x06.ChunkH\x00\x12\x12\n\x08\x66ilename\x18\x02 \x01(\tH\x00\x42\x06\n\x04info\"\"\n\x0eUploadResponse\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"\x13\n\x11MakeTmpDirRequest\"%\n\x12MakeTmpDirResponse\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"&\n\x13\x44\x65leteTmpDirRequest\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"\x16\n\x14\x44\x65leteTmpDirResponse2\xb6\x01\n\x0b\x46ileService\x12\x38\n\x0bmake_tmpdir\x12\x12.MakeTmpDirRequest\x1a\x13.MakeTmpDirResponse\"\x00\x12>\n\rdelete_tmpdir\x12\x14.DeleteTmpDirRequest\x1a\x15.DeleteTmpDirResponse\"\x00\x12-\n\x06upload\x12\x0e.UploadRequest\x1a\x0f.UploadResponse\"\x00(\x01\x62\x06proto3'
   ,
   dependencies=[stream__data__pb2.DESCRIPTOR,])
 
@@ -275,19 +275,19 @@ _sym_db.RegisterMessage(DeleteTmpDirResponse)
 
 
 
-_FILESERVER = _descriptor.ServiceDescriptor(
-  name='FileServer',
-  full_name='FileServer',
+_FILESERVICE = _descriptor.ServiceDescriptor(
+  name='FileService',
+  full_name='FileService',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=270,
-  serialized_end=451,
+  serialized_end=452,
   methods=[
   _descriptor.MethodDescriptor(
     name='make_tmpdir',
-    full_name='FileServer.make_tmpdir',
+    full_name='FileService.make_tmpdir',
     index=0,
     containing_service=None,
     input_type=_MAKETMPDIRREQUEST,
@@ -297,7 +297,7 @@ _FILESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='delete_tmpdir',
-    full_name='FileServer.delete_tmpdir',
+    full_name='FileService.delete_tmpdir',
     index=1,
     containing_service=None,
     input_type=_DELETETMPDIRREQUEST,
@@ -307,7 +307,7 @@ _FILESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='upload',
-    full_name='FileServer.upload',
+    full_name='FileService.upload',
     index=2,
     containing_service=None,
     input_type=_UPLOADREQUEST,
@@ -316,8 +316,8 @@ _FILESERVER = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_FILESERVER)
+_sym_db.RegisterServiceDescriptor(_FILESERVICE)
 
-DESCRIPTOR.services_by_name['FileServer'] = _FILESERVER
+DESCRIPTOR.services_by_name['FileService'] = _FILESERVICE
 
 # @@protoc_insertion_point(module_scope)

@@ -25,7 +25,7 @@ message DeleteTmpDirRequest{
 
 message DeleteTmpDirResponse{}
 
-service FileServer {
+service FileService {
   rpc make_tmpdir(MakeTmpDirRequest) returns (MakeTmpDirResponse) {}
   rpc delete_tmpdir(DeleteTmpDirRequest) returns (DeleteTmpDirResponse) {}
   rpc upload(stream UploadRequest) returns (UploadResponse) {}

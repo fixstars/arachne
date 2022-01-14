@@ -1,5 +1,4 @@
 import grpc
-import tensorflow as tf
 
 from arachne.logger import Logger
 from arachne.runtime import init
@@ -16,14 +15,10 @@ from .servicer import RuntimeServicerBase, register_runtime_servicer
 logger = Logger.logger()
 
 
-class TfLiteRuntimeServicer(
-    RuntimeServicerBase, tfliteruntime_pb2_grpc.TfliteRuntimeServerServicer
-):
+class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRuntimeServicer):
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
-        tfliteruntime_pb2_grpc.add_TfliteRuntimeServerServicer_to_server(
-            TfLiteRuntimeServicer(), server
-        )
+        tfliteruntime_pb2_grpc.add_TfLiteRuntimeServicer_to_server(TfLiteRuntimeServicer(), server)
 
     @staticmethod
     def get_name():

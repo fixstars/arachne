@@ -6,9 +6,8 @@ import msg_response_pb2 as msg__response__pb2
 import tvmruntime_pb2 as tvmruntime__pb2
 
 
-class TVMRuntimeServerStub(object):
-    """interface
-    """
+class TVMRuntimeStub(object):
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -17,35 +16,34 @@ class TVMRuntimeServerStub(object):
             channel: A grpc.Channel.
         """
         self.Init = channel.unary_unary(
-                '/tvmruntime.TVMRuntimeServer/Init',
+                '/tvmruntime.TVMRuntime/Init',
                 request_serializer=tvmruntime__pb2.InitRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
-                '/tvmruntime.TVMRuntimeServer/SetInput',
+                '/tvmruntime.TVMRuntime/SetInput',
                 request_serializer=tvmruntime__pb2.SetInputRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Run = channel.unary_unary(
-                '/tvmruntime.TVMRuntimeServer/Run',
+                '/tvmruntime.TVMRuntime/Run',
                 request_serializer=tvmruntime__pb2.RunRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Benchmark = channel.unary_unary(
-                '/tvmruntime.TVMRuntimeServer/Benchmark',
+                '/tvmruntime.TVMRuntime/Benchmark',
                 request_serializer=tvmruntime__pb2.BenchmarkRequest.SerializeToString,
                 response_deserializer=tvmruntime__pb2.BenchmarkResponse.FromString,
                 )
         self.GetOutput = channel.unary_stream(
-                '/tvmruntime.TVMRuntimeServer/GetOutput',
+                '/tvmruntime.TVMRuntime/GetOutput',
                 request_serializer=tvmruntime__pb2.GetOutputRequest.SerializeToString,
                 response_deserializer=tvmruntime__pb2.GetOutputResponse.FromString,
                 )
 
 
-class TVMRuntimeServerServicer(object):
-    """interface
-    """
+class TVMRuntimeServicer(object):
+    """Missing associated documentation comment in .proto file."""
 
     def Init(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -78,7 +76,7 @@ class TVMRuntimeServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_TVMRuntimeServerServicer_to_server(servicer, server):
+def add_TVMRuntimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
@@ -107,14 +105,13 @@ def add_TVMRuntimeServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'tvmruntime.TVMRuntimeServer', rpc_method_handlers)
+            'tvmruntime.TVMRuntime', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class TVMRuntimeServer(object):
-    """interface
-    """
+class TVMRuntime(object):
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Init(request,
@@ -127,7 +124,7 @@ class TVMRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntimeServer/Init',
+        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntime/Init',
             tvmruntime__pb2.InitRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -144,7 +141,7 @@ class TVMRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/tvmruntime.TVMRuntimeServer/SetInput',
+        return grpc.experimental.stream_unary(request_iterator, target, '/tvmruntime.TVMRuntime/SetInput',
             tvmruntime__pb2.SetInputRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -161,7 +158,7 @@ class TVMRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntimeServer/Run',
+        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntime/Run',
             tvmruntime__pb2.RunRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -178,7 +175,7 @@ class TVMRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntimeServer/Benchmark',
+        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntime/Benchmark',
             tvmruntime__pb2.BenchmarkRequest.SerializeToString,
             tvmruntime__pb2.BenchmarkResponse.FromString,
             options, channel_credentials,
@@ -195,7 +192,7 @@ class TVMRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/tvmruntime.TVMRuntimeServer/GetOutput',
+        return grpc.experimental.unary_stream(request, target, '/tvmruntime.TVMRuntime/GetOutput',
             tvmruntime__pb2.GetOutputRequest.SerializeToString,
             tvmruntime__pb2.GetOutputResponse.FromString,
             options, channel_credentials,

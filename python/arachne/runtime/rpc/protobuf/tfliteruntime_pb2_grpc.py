@@ -6,9 +6,8 @@ import msg_response_pb2 as msg__response__pb2
 import tfliteruntime_pb2 as tfliteruntime__pb2
 
 
-class TfliteRuntimeServerStub(object):
-    """interface
-    """
+class TfLiteRuntimeStub(object):
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -17,35 +16,34 @@ class TfliteRuntimeServerStub(object):
             channel: A grpc.Channel.
         """
         self.Init = channel.unary_unary(
-                '/tfliteruntime.TfliteRuntimeServer/Init',
+                '/tfliteruntime.TfLiteRuntime/Init',
                 request_serializer=tfliteruntime__pb2.InitRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
-                '/tfliteruntime.TfliteRuntimeServer/SetInput',
+                '/tfliteruntime.TfLiteRuntime/SetInput',
                 request_serializer=tfliteruntime__pb2.SetInputRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Run = channel.unary_unary(
-                '/tfliteruntime.TfliteRuntimeServer/Run',
+                '/tfliteruntime.TfLiteRuntime/Run',
                 request_serializer=tfliteruntime__pb2.RunRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Benchmark = channel.unary_unary(
-                '/tfliteruntime.TfliteRuntimeServer/Benchmark',
+                '/tfliteruntime.TfLiteRuntime/Benchmark',
                 request_serializer=tfliteruntime__pb2.BenchmarkRequest.SerializeToString,
                 response_deserializer=tfliteruntime__pb2.BenchmarkResponse.FromString,
                 )
         self.GetOutput = channel.unary_stream(
-                '/tfliteruntime.TfliteRuntimeServer/GetOutput',
+                '/tfliteruntime.TfLiteRuntime/GetOutput',
                 request_serializer=tfliteruntime__pb2.GetOutputRequest.SerializeToString,
                 response_deserializer=tfliteruntime__pb2.GetOutputResponse.FromString,
                 )
 
 
-class TfliteRuntimeServerServicer(object):
-    """interface
-    """
+class TfLiteRuntimeServicer(object):
+    """Missing associated documentation comment in .proto file."""
 
     def Init(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -78,7 +76,7 @@ class TfliteRuntimeServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_TfliteRuntimeServerServicer_to_server(servicer, server):
+def add_TfLiteRuntimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
@@ -107,14 +105,13 @@ def add_TfliteRuntimeServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'tfliteruntime.TfliteRuntimeServer', rpc_method_handlers)
+            'tfliteruntime.TfLiteRuntime', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class TfliteRuntimeServer(object):
-    """interface
-    """
+class TfLiteRuntime(object):
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Init(request,
@@ -127,7 +124,7 @@ class TfliteRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfliteRuntimeServer/Init',
+        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfLiteRuntime/Init',
             tfliteruntime__pb2.InitRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -144,7 +141,7 @@ class TfliteRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/tfliteruntime.TfliteRuntimeServer/SetInput',
+        return grpc.experimental.stream_unary(request_iterator, target, '/tfliteruntime.TfLiteRuntime/SetInput',
             tfliteruntime__pb2.SetInputRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -161,7 +158,7 @@ class TfliteRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfliteRuntimeServer/Run',
+        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfLiteRuntime/Run',
             tfliteruntime__pb2.RunRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -178,7 +175,7 @@ class TfliteRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfliteRuntimeServer/Benchmark',
+        return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfLiteRuntime/Benchmark',
             tfliteruntime__pb2.BenchmarkRequest.SerializeToString,
             tfliteruntime__pb2.BenchmarkResponse.FromString,
             options, channel_credentials,
@@ -195,7 +192,7 @@ class TfliteRuntimeServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/tfliteruntime.TfliteRuntimeServer/GetOutput',
+        return grpc.experimental.unary_stream(request, target, '/tfliteruntime.TfLiteRuntime/GetOutput',
             tfliteruntime__pb2.GetOutputRequest.SerializeToString,
             tfliteruntime__pb2.GetOutputResponse.FromString,
             options, channel_credentials,

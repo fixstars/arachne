@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10tvmruntime.proto\x12\ntvmruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"#\n\x0bInitRequest\x12\x14\n\x0cpackage_path\x18\x01 \x01(\t\"6\n\x05Index\x12\x11\n\x07index_i\x18\x01 \x01(\x05H\x00\x12\x11\n\x07index_s\x18\x02 \x01(\tH\x00\x42\x07\n\x05index\"]\n\x0fSetInputRequest\x12\"\n\x05index\x18\x01 \x01(\x0b\x32\x11.tvmruntime.IndexH\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xc7\x02\n\x10TVMRuntimeServer\x12/\n\x04Init\x12\x17.tvmruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12\x39\n\x08SetInput\x12\x1b.tvmruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12-\n\x03Run\x12\x16.tvmruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12J\n\tBenchmark\x12\x1c.tvmruntime.BenchmarkRequest\x1a\x1d.tvmruntime.BenchmarkResponse\"\x00\x12L\n\tGetOutput\x12\x1c.tvmruntime.GetOutputRequest\x1a\x1d.tvmruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x10tvmruntime.proto\x12\ntvmruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"#\n\x0bInitRequest\x12\x14\n\x0cpackage_path\x18\x01 \x01(\t\"6\n\x05Index\x12\x11\n\x07index_i\x18\x01 \x01(\x05H\x00\x12\x11\n\x07index_s\x18\x02 \x01(\tH\x00\x42\x07\n\x05index\"]\n\x0fSetInputRequest\x12\"\n\x05index\x18\x01 \x01(\x0b\x32\x11.tvmruntime.IndexH\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xc1\x02\n\nTVMRuntime\x12/\n\x04Init\x12\x17.tvmruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12\x39\n\x08SetInput\x12\x1b.tvmruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12-\n\x03Run\x12\x16.tvmruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12J\n\tBenchmark\x12\x1c.tvmruntime.BenchmarkRequest\x1a\x1d.tvmruntime.BenchmarkResponse\"\x00\x12L\n\tGetOutput\x12\x1c.tvmruntime.GetOutputRequest\x1a\x1d.tvmruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
   ,
   dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
 
@@ -417,19 +417,19 @@ _sym_db.RegisterMessage(GetOutputResponse)
 
 
 
-_TVMRUNTIMESERVER = _descriptor.ServiceDescriptor(
-  name='TVMRuntimeServer',
-  full_name='tvmruntime.TVMRuntimeServer',
+_TVMRUNTIME = _descriptor.ServiceDescriptor(
+  name='TVMRuntime',
+  full_name='tvmruntime.TVMRuntime',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=501,
-  serialized_end=828,
+  serialized_end=822,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
-    full_name='tvmruntime.TVMRuntimeServer.Init',
+    full_name='tvmruntime.TVMRuntime.Init',
     index=0,
     containing_service=None,
     input_type=_INITREQUEST,
@@ -439,7 +439,7 @@ _TVMRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetInput',
-    full_name='tvmruntime.TVMRuntimeServer.SetInput',
+    full_name='tvmruntime.TVMRuntime.SetInput',
     index=1,
     containing_service=None,
     input_type=_SETINPUTREQUEST,
@@ -449,7 +449,7 @@ _TVMRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='Run',
-    full_name='tvmruntime.TVMRuntimeServer.Run',
+    full_name='tvmruntime.TVMRuntime.Run',
     index=2,
     containing_service=None,
     input_type=_RUNREQUEST,
@@ -459,7 +459,7 @@ _TVMRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='Benchmark',
-    full_name='tvmruntime.TVMRuntimeServer.Benchmark',
+    full_name='tvmruntime.TVMRuntime.Benchmark',
     index=3,
     containing_service=None,
     input_type=_BENCHMARKREQUEST,
@@ -469,7 +469,7 @@ _TVMRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetOutput',
-    full_name='tvmruntime.TVMRuntimeServer.GetOutput',
+    full_name='tvmruntime.TVMRuntime.GetOutput',
     index=4,
     containing_service=None,
     input_type=_GETOUTPUTREQUEST,
@@ -478,8 +478,8 @@ _TVMRUNTIMESERVER = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_TVMRUNTIMESERVER)
+_sym_db.RegisterServiceDescriptor(_TVMRUNTIME)
 
-DESCRIPTOR.services_by_name['TVMRuntimeServer'] = _TVMRUNTIMESERVER
+DESCRIPTOR.services_by_name['TVMRuntime'] = _TVMRUNTIME
 
 # @@protoc_insertion_point(module_scope)

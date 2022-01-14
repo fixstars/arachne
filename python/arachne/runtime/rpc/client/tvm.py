@@ -26,7 +26,7 @@ class TVMRuntimeClient(RuntimeClientBase):
         **kwargs,
     ):
         super().__init__(channel)
-        self.stub = tvmruntime_pb2_grpc.TVMRuntimeServerStub(channel)
+        self.stub = tvmruntime_pb2_grpc.TVMRuntimeStub(channel)
         upload_response = self.file_stub_mgr.upload(Path(package_path))
         req = tvmruntime_pb2.InitRequest(package_path=upload_response.filepath)
         self.stub.Init(req)

@@ -31,6 +31,7 @@ message BenchmarkResponse{
     float max_ts = 3;
     float min_ts = 4;
 }
+
 message GetOutputRequest{
     int32 index = 1;
 }
@@ -39,8 +40,7 @@ message GetOutputResponse{
     bytes np_data = 1;
 }
 
-// interface
-service ONNXRuntimeServer{
+service ONNXRuntime{
     rpc Init(InitRequest) returns (MsgResponse) {}
     rpc SetInput (stream SetInputRequest) returns (MsgResponse) {}
     rpc Run (RunRequest) returns (MsgResponse) {}

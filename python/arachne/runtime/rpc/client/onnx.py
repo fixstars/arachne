@@ -22,7 +22,7 @@ class ONNXRuntimeClient(RuntimeClientBase):
     def __init__(self, channel: grpc.Channel, model_path: str, providers=[]):
         super().__init__(channel)
         # 'provider_options' and 'session_options' are not supported
-        self.stub = onnxruntime_pb2_grpc.ONNXRuntimeServerStub(channel)
+        self.stub = onnxruntime_pb2_grpc.ONNXRuntimeStub(channel)
         upload_response = self.file_stub_mgr.upload(Path(model_path))
         req = onnxruntime_pb2.InitRequest(model_path=upload_response.filepath, providers=providers)
         self.stub.Init(req)

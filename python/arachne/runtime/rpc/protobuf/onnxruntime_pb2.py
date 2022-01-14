@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11onnxruntime.proto\x12\x0bonnxruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"4\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x11\n\tproviders\x18\x02 \x03(\t\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xcf\x02\n\x11ONNXRuntimeServer\x12\x30\n\x04Init\x12\x18.onnxruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12:\n\x08SetInput\x12\x1c.onnxruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12.\n\x03Run\x12\x17.onnxruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12L\n\tBenchmark\x12\x1d.onnxruntime.BenchmarkRequest\x1a\x1e.onnxruntime.BenchmarkResponse\"\x00\x12N\n\tGetOutput\x12\x1d.onnxruntime.GetOutputRequest\x1a\x1e.onnxruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x11onnxruntime.proto\x12\x0bonnxruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"4\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x11\n\tproviders\x18\x02 \x03(\t\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xc9\x02\n\x0bONNXRuntime\x12\x30\n\x04Init\x12\x18.onnxruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12:\n\x08SetInput\x12\x1c.onnxruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12.\n\x03Run\x12\x17.onnxruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12L\n\tBenchmark\x12\x1d.onnxruntime.BenchmarkRequest\x1a\x1e.onnxruntime.BenchmarkResponse\"\x00\x12N\n\tGetOutput\x12\x1d.onnxruntime.GetOutputRequest\x1a\x1e.onnxruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
   ,
   dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
 
@@ -365,19 +365,19 @@ _sym_db.RegisterMessage(GetOutputResponse)
 
 
 
-_ONNXRUNTIMESERVER = _descriptor.ServiceDescriptor(
-  name='ONNXRuntimeServer',
-  full_name='onnxruntime.ONNXRuntimeServer',
+_ONNXRUNTIME = _descriptor.ServiceDescriptor(
+  name='ONNXRuntime',
+  full_name='onnxruntime.ONNXRuntime',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=445,
-  serialized_end=780,
+  serialized_end=774,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
-    full_name='onnxruntime.ONNXRuntimeServer.Init',
+    full_name='onnxruntime.ONNXRuntime.Init',
     index=0,
     containing_service=None,
     input_type=_INITREQUEST,
@@ -387,7 +387,7 @@ _ONNXRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='SetInput',
-    full_name='onnxruntime.ONNXRuntimeServer.SetInput',
+    full_name='onnxruntime.ONNXRuntime.SetInput',
     index=1,
     containing_service=None,
     input_type=_SETINPUTREQUEST,
@@ -397,7 +397,7 @@ _ONNXRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='Run',
-    full_name='onnxruntime.ONNXRuntimeServer.Run',
+    full_name='onnxruntime.ONNXRuntime.Run',
     index=2,
     containing_service=None,
     input_type=_RUNREQUEST,
@@ -407,7 +407,7 @@ _ONNXRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='Benchmark',
-    full_name='onnxruntime.ONNXRuntimeServer.Benchmark',
+    full_name='onnxruntime.ONNXRuntime.Benchmark',
     index=3,
     containing_service=None,
     input_type=_BENCHMARKREQUEST,
@@ -417,7 +417,7 @@ _ONNXRUNTIMESERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='GetOutput',
-    full_name='onnxruntime.ONNXRuntimeServer.GetOutput',
+    full_name='onnxruntime.ONNXRuntime.GetOutput',
     index=4,
     containing_service=None,
     input_type=_GETOUTPUTREQUEST,
@@ -426,8 +426,8 @@ _ONNXRUNTIMESERVER = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_ONNXRUNTIMESERVER)
+_sym_db.RegisterServiceDescriptor(_ONNXRUNTIME)
 
-DESCRIPTOR.services_by_name['ONNXRuntimeServer'] = _ONNXRUNTIMESERVER
+DESCRIPTOR.services_by_name['ONNXRuntime'] = _ONNXRUNTIME
 
 # @@protoc_insertion_point(module_scope)

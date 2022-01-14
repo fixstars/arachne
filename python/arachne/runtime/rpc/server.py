@@ -26,7 +26,7 @@ def create_server(runtime_name: str, port: int):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
     server_status_pb2_grpc.add_ServerStatusServicer_to_server(ServerStatusServicer(), server)
-    fileserver_pb2_grpc.add_FileServerServicer_to_server(FileServicer(), server)
+    fileserver_pb2_grpc.add_FileServiceServicer_to_server(FileServicer(), server)
 
     servicer_class = get_runtime_servicer(runtime_name)
     assert servicer_class is not None
