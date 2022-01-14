@@ -1,3 +1,5 @@
+import os
+
 import grpc
 
 from arachne.logger import Logger
@@ -29,6 +31,15 @@ class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRu
 
     def Init(self, request, context):
         model_path = request.model_path
+        if model_path is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("model_path should not be None")
+            return MsgResponse()
+        elif not os.path.exists(model_path):
+            context.set_code(grpc.StatusCode.RESOURCE_EXHAUSTED)
+            context.set_details(f"model_path {model_path} does not exist")
+            return MsgResponse()
+
         logger.info("loading " + model_path)
         self.module = init(model_file=model_path)
         assert isinstance(self.module, TFLiteRuntimeModule)
@@ -38,13 +49,13 @@ class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRu
         assert self.module
         index = None
         np_arr = None
-        byte_extract_func = lambda request: request.np_arr_chunk.buffer
         index = next(request_iterator).index
         if index is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("index should not be None")
             return MsgResponse()
 
+        byte_extract_func = lambda request: request.np_arr_chunk.buffer
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
         return MsgResponse(msg="SetInput")

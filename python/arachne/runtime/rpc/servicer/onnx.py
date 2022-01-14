@@ -1,3 +1,5 @@
+import os
+
 import grpc
 
 from arachne.logger import Logger
@@ -28,6 +30,15 @@ class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeS
 
     def Init(self, request, context):
         model_path = request.model_path
+        if model_path is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("model_path should not be None")
+            return MsgResponse()
+        elif not os.path.exists(model_path):
+            context.set_code(grpc.StatusCode.RESOURCE_EXHAUSTED)
+            context.set_details(f"model_path {model_path} does not exist")
+            return MsgResponse()
+
         logger.info("loading " + model_path)
         self.module = init(model_file=request.model_path, providers=request.providers)
         assert isinstance(self.module, ONNXRuntimeModule)

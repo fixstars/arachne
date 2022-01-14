@@ -1,3 +1,5 @@
+import os
+
 import grpc
 
 from arachne.logger import Logger
@@ -28,6 +30,15 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
 
     def Init(self, request, context):
         package_path = request.package_path
+        if package_path is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("model_path should not be None")
+            return MsgResponse()
+        elif not os.path.exists(package_path):
+            context.set_code(grpc.StatusCode.RESOURCE_EXHAUSTED)
+            context.set_details(f"model_path {package_path} does not exist")
+            return MsgResponse()
+
         logger.info("loading " + package_path)
         self.module = init(package_path)
         assert isinstance(self.module, TVMRuntimeModule)
