@@ -1,8 +1,25 @@
 import os
 from pathlib import Path
 
-from arachne.runtime.rpc.protobuf import fileserver_pb2, fileserver_pb2_grpc
-from arachne.runtime.rpc.util.file import get_file_chunks
+from arachne.runtime.rpc.protobuf import (
+    fileserver_pb2,
+    fileserver_pb2_grpc,
+    stream_data_pb2,
+)
+
+CHUNK_SIZE = 1024 * 1024  # 1MB
+
+
+def get_file_chunks(src_filepath, dst_filepath):
+    with open(src_filepath, "rb") as f:
+        yield fileserver_pb2.UploadRequest(filename=dst_filepath)
+        while True:
+            piece = f.read(CHUNK_SIZE)
+            if len(piece) == 0:
+                return
+            chunk = stream_data_pb2.Chunk(buffer=piece)
+            fileinfo = fileserver_pb2.UploadRequest(chunk=chunk)
+            yield fileinfo
 
 
 class FileStubManager:

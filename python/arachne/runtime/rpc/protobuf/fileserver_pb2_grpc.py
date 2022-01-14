@@ -26,8 +26,8 @@ class FileServerStub(object):
                 )
         self.upload = channel.stream_unary(
                 '/FileServer/upload',
-                request_serializer=fileserver__pb2.FileInfo.SerializeToString,
-                response_deserializer=fileserver__pb2.Reply.FromString,
+                request_serializer=fileserver__pb2.UploadRequest.SerializeToString,
+                response_deserializer=fileserver__pb2.UploadResponse.FromString,
                 )
 
 
@@ -67,8 +67,8 @@ def add_FileServerServicer_to_server(servicer, server):
             ),
             'upload': grpc.stream_unary_rpc_method_handler(
                     servicer.upload,
-                    request_deserializer=fileserver__pb2.FileInfo.FromString,
-                    response_serializer=fileserver__pb2.Reply.SerializeToString,
+                    request_deserializer=fileserver__pb2.UploadRequest.FromString,
+                    response_serializer=fileserver__pb2.UploadResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -126,7 +126,7 @@ class FileServer(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_unary(request_iterator, target, '/FileServer/upload',
-            fileserver__pb2.FileInfo.SerializeToString,
-            fileserver__pb2.Reply.FromString,
+            fileserver__pb2.UploadRequest.SerializeToString,
+            fileserver__pb2.UploadResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

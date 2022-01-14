@@ -4,9 +4,23 @@ import tempfile
 
 from arachne.logger import Logger
 from arachne.runtime.rpc.protobuf import fileserver_pb2, fileserver_pb2_grpc
-from arachne.runtime.rpc.util.file import get_file_chunks, save_chunks_to_file
 
 logger = Logger.logger()
+
+
+def save_chunks_to_file(streams):
+    filename = None
+    f = None
+    for stream in streams:
+        if f is None:
+            filename = stream.filename
+            assert filename
+            f = open(filename, "wb")
+            continue
+        f.write(stream.chunk.buffer)
+    if f is not None:
+        f.close()
+    return filename
 
 
 class FileServicer(fileserver_pb2_grpc.FileServerServicer):
@@ -27,4 +41,4 @@ class FileServicer(fileserver_pb2_grpc.FileServerServicer):
 
     def upload(self, request_iterator, context):
         filename = save_chunks_to_file(request_iterator)
-        return fileserver_pb2.Reply(filepath=filename)
+        return fileserver_pb2.UploadResponse(filepath=filename)

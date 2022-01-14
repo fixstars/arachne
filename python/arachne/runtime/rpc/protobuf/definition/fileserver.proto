@@ -2,32 +2,31 @@ syntax = "proto3";
 
 import "stream_data.proto";
 
-message Request {
-  string filepath = 1;
-}
-
-message Reply {
-  string filepath = 1;
-}
-
-message FileInfo {
+message UploadRequest {
   oneof info{
     Chunk chunk = 1;
     string filename = 2;
   }
 }
 
+message UploadResponse {
+  string filepath = 1;
+}
+
 message MakeTmpDirRequest{}
+
 message MakeTmpDirResponse{
   string dirname = 1;
 }
+
 message DeleteTmpDirRequest{
   string dirname = 1;
 }
+
 message DeleteTmpDirResponse{}
 
 service FileServer {
   rpc make_tmpdir(MakeTmpDirRequest) returns (MakeTmpDirResponse) {}
   rpc delete_tmpdir(DeleteTmpDirRequest) returns (DeleteTmpDirResponse) {}
-  rpc upload(stream FileInfo) returns (Reply) {}
+  rpc upload(stream UploadRequest) returns (UploadResponse) {}
 }

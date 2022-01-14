@@ -20,94 +20,30 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10\x66ileserver.proto\x1a\x11stream_data.proto\"\x1b\n\x07Request\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"\x19\n\x05Reply\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"?\n\x08\x46ileInfo\x12\x17\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x06.ChunkH\x00\x12\x12\n\x08\x66ilename\x18\x02 \x01(\tH\x00\x42\x06\n\x04info\"\x13\n\x11MakeTmpDirRequest\"%\n\x12MakeTmpDirResponse\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"&\n\x13\x44\x65leteTmpDirRequest\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"\x16\n\x14\x44\x65leteTmpDirResponse2\xa7\x01\n\nFileServer\x12\x38\n\x0bmake_tmpdir\x12\x12.MakeTmpDirRequest\x1a\x13.MakeTmpDirResponse\"\x00\x12>\n\rdelete_tmpdir\x12\x14.DeleteTmpDirRequest\x1a\x15.DeleteTmpDirResponse\"\x00\x12\x1f\n\x06upload\x12\t.FileInfo\x1a\x06.Reply\"\x00(\x01\x62\x06proto3'
+  serialized_pb=b'\n\x10\x66ileserver.proto\x1a\x11stream_data.proto\"D\n\rUploadRequest\x12\x17\n\x05\x63hunk\x18\x01 \x01(\x0b\x32\x06.ChunkH\x00\x12\x12\n\x08\x66ilename\x18\x02 \x01(\tH\x00\x42\x06\n\x04info\"\"\n\x0eUploadResponse\x12\x10\n\x08\x66ilepath\x18\x01 \x01(\t\"\x13\n\x11MakeTmpDirRequest\"%\n\x12MakeTmpDirResponse\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"&\n\x13\x44\x65leteTmpDirRequest\x12\x0f\n\x07\x64irname\x18\x01 \x01(\t\"\x16\n\x14\x44\x65leteTmpDirResponse2\xb5\x01\n\nFileServer\x12\x38\n\x0bmake_tmpdir\x12\x12.MakeTmpDirRequest\x1a\x13.MakeTmpDirResponse\"\x00\x12>\n\rdelete_tmpdir\x12\x14.DeleteTmpDirRequest\x1a\x15.DeleteTmpDirResponse\"\x00\x12-\n\x06upload\x12\x0e.UploadRequest\x1a\x0f.UploadResponse\"\x00(\x01\x62\x06proto3'
   ,
   dependencies=[stream__data__pb2.DESCRIPTOR,])
 
 
 
 
-_REQUEST = _descriptor.Descriptor(
-  name='Request',
-  full_name='Request',
+_UPLOADREQUEST = _descriptor.Descriptor(
+  name='UploadRequest',
+  full_name='UploadRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='filepath', full_name='Request.filepath', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=39,
-  serialized_end=66,
-)
-
-
-_REPLY = _descriptor.Descriptor(
-  name='Reply',
-  full_name='Reply',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='filepath', full_name='Reply.filepath', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=68,
-  serialized_end=93,
-)
-
-
-_FILEINFO = _descriptor.Descriptor(
-  name='FileInfo',
-  full_name='FileInfo',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='chunk', full_name='FileInfo.chunk', index=0,
+      name='chunk', full_name='UploadRequest.chunk', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='filename', full_name='FileInfo.filename', index=1,
+      name='filename', full_name='UploadRequest.filename', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -125,13 +61,45 @@ _FILEINFO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='info', full_name='FileInfo.info',
+      name='info', full_name='UploadRequest.info',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=95,
-  serialized_end=158,
+  serialized_start=39,
+  serialized_end=107,
+)
+
+
+_UPLOADRESPONSE = _descriptor.Descriptor(
+  name='UploadResponse',
+  full_name='UploadResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='filepath', full_name='UploadResponse.filepath', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=109,
+  serialized_end=143,
 )
 
 
@@ -155,8 +123,8 @@ _MAKETMPDIRREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=160,
-  serialized_end=179,
+  serialized_start=145,
+  serialized_end=164,
 )
 
 
@@ -187,8 +155,8 @@ _MAKETMPDIRRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=181,
-  serialized_end=218,
+  serialized_start=166,
+  serialized_end=203,
 )
 
 
@@ -219,8 +187,8 @@ _DELETETMPDIRREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=220,
-  serialized_end=258,
+  serialized_start=205,
+  serialized_end=243,
 )
 
 
@@ -244,46 +212,38 @@ _DELETETMPDIRRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=260,
-  serialized_end=282,
+  serialized_start=245,
+  serialized_end=267,
 )
 
-_FILEINFO.fields_by_name['chunk'].message_type = stream__data__pb2._CHUNK
-_FILEINFO.oneofs_by_name['info'].fields.append(
-  _FILEINFO.fields_by_name['chunk'])
-_FILEINFO.fields_by_name['chunk'].containing_oneof = _FILEINFO.oneofs_by_name['info']
-_FILEINFO.oneofs_by_name['info'].fields.append(
-  _FILEINFO.fields_by_name['filename'])
-_FILEINFO.fields_by_name['filename'].containing_oneof = _FILEINFO.oneofs_by_name['info']
-DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
-DESCRIPTOR.message_types_by_name['Reply'] = _REPLY
-DESCRIPTOR.message_types_by_name['FileInfo'] = _FILEINFO
+_UPLOADREQUEST.fields_by_name['chunk'].message_type = stream__data__pb2._CHUNK
+_UPLOADREQUEST.oneofs_by_name['info'].fields.append(
+  _UPLOADREQUEST.fields_by_name['chunk'])
+_UPLOADREQUEST.fields_by_name['chunk'].containing_oneof = _UPLOADREQUEST.oneofs_by_name['info']
+_UPLOADREQUEST.oneofs_by_name['info'].fields.append(
+  _UPLOADREQUEST.fields_by_name['filename'])
+_UPLOADREQUEST.fields_by_name['filename'].containing_oneof = _UPLOADREQUEST.oneofs_by_name['info']
+DESCRIPTOR.message_types_by_name['UploadRequest'] = _UPLOADREQUEST
+DESCRIPTOR.message_types_by_name['UploadResponse'] = _UPLOADRESPONSE
 DESCRIPTOR.message_types_by_name['MakeTmpDirRequest'] = _MAKETMPDIRREQUEST
 DESCRIPTOR.message_types_by_name['MakeTmpDirResponse'] = _MAKETMPDIRRESPONSE
 DESCRIPTOR.message_types_by_name['DeleteTmpDirRequest'] = _DELETETMPDIRREQUEST
 DESCRIPTOR.message_types_by_name['DeleteTmpDirResponse'] = _DELETETMPDIRRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Request = _reflection.GeneratedProtocolMessageType('Request', (_message.Message,), {
-  'DESCRIPTOR' : _REQUEST,
+UploadRequest = _reflection.GeneratedProtocolMessageType('UploadRequest', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADREQUEST,
   '__module__' : 'fileserver_pb2'
-  # @@protoc_insertion_point(class_scope:Request)
+  # @@protoc_insertion_point(class_scope:UploadRequest)
   })
-_sym_db.RegisterMessage(Request)
+_sym_db.RegisterMessage(UploadRequest)
 
-Reply = _reflection.GeneratedProtocolMessageType('Reply', (_message.Message,), {
-  'DESCRIPTOR' : _REPLY,
+UploadResponse = _reflection.GeneratedProtocolMessageType('UploadResponse', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADRESPONSE,
   '__module__' : 'fileserver_pb2'
-  # @@protoc_insertion_point(class_scope:Reply)
+  # @@protoc_insertion_point(class_scope:UploadResponse)
   })
-_sym_db.RegisterMessage(Reply)
-
-FileInfo = _reflection.GeneratedProtocolMessageType('FileInfo', (_message.Message,), {
-  'DESCRIPTOR' : _FILEINFO,
-  '__module__' : 'fileserver_pb2'
-  # @@protoc_insertion_point(class_scope:FileInfo)
-  })
-_sym_db.RegisterMessage(FileInfo)
+_sym_db.RegisterMessage(UploadResponse)
 
 MakeTmpDirRequest = _reflection.GeneratedProtocolMessageType('MakeTmpDirRequest', (_message.Message,), {
   'DESCRIPTOR' : _MAKETMPDIRREQUEST,
@@ -322,8 +282,8 @@ _FILESERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=285,
-  serialized_end=452,
+  serialized_start=270,
+  serialized_end=451,
   methods=[
   _descriptor.MethodDescriptor(
     name='make_tmpdir',
@@ -350,8 +310,8 @@ _FILESERVER = _descriptor.ServiceDescriptor(
     full_name='FileServer.upload',
     index=2,
     containing_service=None,
-    input_type=_FILEINFO,
-    output_type=_REPLY,
+    input_type=_UPLOADREQUEST,
+    output_type=_UPLOADRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
