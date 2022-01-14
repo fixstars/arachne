@@ -25,6 +25,16 @@ params = {
 }
 
 
+def create_dummy_representative_dataset():
+    datasets = []
+    shape = [1, 224, 224, 3]
+    dtype = "float32"
+    for _ in range(100):
+        datasets.append(np.random.rand(*shape).astype(np.dtype(dtype)))  # type: ignore
+
+    np.save("dummy.npy", datasets)
+
+
 def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
     input_data = np.array(np.random.random_sample(input_shape), dtype=np.float32)  # type: ignore
     dout = tf_model(input_data).numpy()  # type: ignore
@@ -55,6 +65,9 @@ def test_tflite_converter(model_format, ptq_method):
         model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
         cfg = TFLiteConverterConfig()
         cfg.ptq.method = ptq_method
+        if ptq_method == "int8":
+            create_dummy_representative_dataset()
+            cfg.ptq.representative_dataset = "dummy.npy"
         input_shape = [1, 224, 224, 3]
         if model_format == "h5":
             model.save("tmp.h5")

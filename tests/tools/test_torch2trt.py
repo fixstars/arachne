@@ -12,6 +12,16 @@ from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.tools.torch2trt import Torch2TRTConfig, run
 
 
+def create_dummy_representative_dataset():
+    datasets = []
+    shape = [1, 3, 224, 224]
+    dtype = "float32"
+    for _ in range(100):
+        datasets.append(np.random.rand(*shape).astype(np.dtype(dtype)))  # type: ignore
+
+    np.save("dummy.npy", datasets)
+
+
 def check_torch2trt_output(torch_model, input_shape, precision, torch_trt_model_path):
     input_data = np.array(np.random.random_sample(input_shape), dtype=np.float32)  # type: ignore
     torch_input = torch.from_numpy(input_data).clone()
@@ -68,4 +78,6 @@ def test_torch2trt_int8(calib_algo):
         cfg = Torch2TRTConfig()
         cfg.int8_mode = True
         cfg.int8_calib_algorithm = calib_algo
+        create_dummy_representative_dataset()
+        cfg.int8_calib_dataset = "dummy.npy"
         run(input_model, cfg)
