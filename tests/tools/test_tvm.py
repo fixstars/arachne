@@ -12,6 +12,7 @@ import torch.onnx
 import torchvision
 import tvm
 from tvm.contrib import graph_executor
+from tvm.contrib.download import download
 from tvm.contrib.graph_executor import GraphModule
 
 from arachne.data import Model, ModelSpec, TensorSpec
@@ -103,19 +104,17 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
         elif model_format == "tflite":
-            model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
-            converter = tf.lite.TFLiteConverter.from_keras_model(model)
-            tflite_model = converter.convert()
+            url = (
+                "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
+            )
 
-            filename = "model.tflite"
-            output_path = os.getcwd() + "/" + filename
-            with open(output_path, "wb") as w:
-                w.write(tflite_model)
-            input = Model("model.tflite", spec=get_model_spec("model.tflite"))
+            model_path = "mobilenet.tflite"
+            download(url, model_path)
+            input = Model(model_path, spec=get_model_spec(model_path))
             output = run(input=input, cfg=cfg)
 
             check_tvm_output(
-                "model.tflite", model_format, [1, 224, 224, 3], output.path, device_type
+                "mobilenet.tflite", model_format, [1, 224, 224, 3], output.path, device_type
             )
 
         elif model_format == "pb":
@@ -159,11 +158,13 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
         elif model_format == "onnx":
-            resnet18 = torchvision.models.resnet18(pretrained=True)
-            dummy_input = torch.randn(1, 3, 224, 224)
-            onnx_model_path = "./resnet18.onnx"
-            torch.onnx.export(resnet18, dummy_input, onnx_model_path)
-            input = Model("./resnet18.onnx", spec=get_model_spec("resnet18.onnx"))
+            url = (
+                "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
+            )
+
+            model_path = "resnet18.onnx"
+            download(url, model_path)
+            input = Model(model_path, spec=get_model_spec(model_path))
             output = run(input=input, cfg=cfg)
 
             check_tvm_output(
