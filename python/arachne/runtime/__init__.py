@@ -22,8 +22,8 @@ def validate_environment(env: dict) -> bool:
             if cudnn_version != dep["cudnn"]:
                 return False
         if "tensorrt" in dep:
-            cudnn_version = get_tensorrt_version()
-            if cudnn_version != dep["tensorrt"]:
+            tensorrt_version = get_tensorrt_version()
+            if tensorrt_version != dep["tensorrt"]:
                 return False
         if "pip" in dep:
             for pkg in dep["pip"]:
