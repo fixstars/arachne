@@ -12,7 +12,7 @@ _sym_db = _symbol_database.Default()
 
 
 import msg_response_pb2 as msg__response__pb2
-import stream_data_pb2 as stream__data__pb2
+import runtime_message_pb2 as runtime__message__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -21,30 +21,30 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11onnxruntime.proto\x12\x0bonnxruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"4\n\x0bInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x11\n\tproviders\x18\x02 \x03(\t\"J\n\x0fSetInputRequest\x12\x0f\n\x05index\x18\x01 \x01(\x05H\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xc9\x02\n\x0bONNXRuntime\x12\x30\n\x04Init\x12\x18.onnxruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12:\n\x08SetInput\x12\x1c.onnxruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12.\n\x03Run\x12\x17.onnxruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12L\n\tBenchmark\x12\x1d.onnxruntime.BenchmarkRequest\x1a\x1e.onnxruntime.BenchmarkResponse\"\x00\x12N\n\tGetOutput\x12\x1d.onnxruntime.GetOutputRequest\x1a\x1e.onnxruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x11onnxruntime.proto\x12\x0bonnxruntime\x1a\x12msg_response.proto\x1a\x15runtime_message.proto\"8\n\x0fONNXInitRequest\x12\x12\n\nmodel_path\x18\x01 \x01(\t\x12\x11\n\tproviders\x18\x02 \x03(\t2\x85\x02\n\x0bONNXRuntime\x12\x34\n\x04Init\x12\x1c.onnxruntime.ONNXInitRequest\x1a\x0c.MsgResponse\"\x00\x12.\n\x08SetInput\x12\x10.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\"\n\x03Run\x12\x0b.RunRequest\x1a\x0c.MsgResponse\"\x00\x12\x34\n\tBenchmark\x12\x11.BenchmarkRequest\x1a\x12.BenchmarkResponse\"\x00\x12\x36\n\tGetOutput\x12\x11.GetOutputRequest\x1a\x12.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
   ,
-  dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
+  dependencies=[msg__response__pb2.DESCRIPTOR,runtime__message__pb2.DESCRIPTOR,])
 
 
 
 
-_INITREQUEST = _descriptor.Descriptor(
-  name='InitRequest',
-  full_name='onnxruntime.InitRequest',
+_ONNXINITREQUEST = _descriptor.Descriptor(
+  name='ONNXInitRequest',
+  full_name='onnxruntime.ONNXInitRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='model_path', full_name='onnxruntime.InitRequest.model_path', index=0,
+      name='model_path', full_name='onnxruntime.ONNXInitRequest.model_path', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='providers', full_name='onnxruntime.InitRequest.providers', index=1,
+      name='providers', full_name='onnxruntime.ONNXInitRequest.providers', index=1,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -62,306 +62,19 @@ _INITREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=73,
-  serialized_end=125,
+  serialized_start=77,
+  serialized_end=133,
 )
 
-
-_SETINPUTREQUEST = _descriptor.Descriptor(
-  name='SetInputRequest',
-  full_name='onnxruntime.SetInputRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='index', full_name='onnxruntime.SetInputRequest.index', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='np_arr_chunk', full_name='onnxruntime.SetInputRequest.np_arr_chunk', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='data', full_name='onnxruntime.SetInputRequest.data',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-  ],
-  serialized_start=127,
-  serialized_end=201,
-)
-
-
-_RUNREQUEST = _descriptor.Descriptor(
-  name='RunRequest',
-  full_name='onnxruntime.RunRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=203,
-  serialized_end=215,
-)
-
-
-_BENCHMARKREQUEST = _descriptor.Descriptor(
-  name='BenchmarkRequest',
-  full_name='onnxruntime.BenchmarkRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='warmup', full_name='onnxruntime.BenchmarkRequest.warmup', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='repeat', full_name='onnxruntime.BenchmarkRequest.repeat', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='number', full_name='onnxruntime.BenchmarkRequest.number', index=2,
-      number=3, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=217,
-  serialized_end=283,
-)
-
-
-_BENCHMARKRESPONSE = _descriptor.Descriptor(
-  name='BenchmarkResponse',
-  full_name='onnxruntime.BenchmarkResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='mean_ts', full_name='onnxruntime.BenchmarkResponse.mean_ts', index=0,
-      number=1, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='std_ts', full_name='onnxruntime.BenchmarkResponse.std_ts', index=1,
-      number=2, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='max_ts', full_name='onnxruntime.BenchmarkResponse.max_ts', index=2,
-      number=3, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='min_ts', full_name='onnxruntime.BenchmarkResponse.min_ts', index=3,
-      number=4, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=285,
-  serialized_end=369,
-)
-
-
-_GETOUTPUTREQUEST = _descriptor.Descriptor(
-  name='GetOutputRequest',
-  full_name='onnxruntime.GetOutputRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='index', full_name='onnxruntime.GetOutputRequest.index', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=371,
-  serialized_end=404,
-)
-
-
-_GETOUTPUTRESPONSE = _descriptor.Descriptor(
-  name='GetOutputResponse',
-  full_name='onnxruntime.GetOutputResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='np_data', full_name='onnxruntime.GetOutputResponse.np_data', index=0,
-      number=1, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=406,
-  serialized_end=442,
-)
-
-_SETINPUTREQUEST.fields_by_name['np_arr_chunk'].message_type = stream__data__pb2._CHUNK
-_SETINPUTREQUEST.oneofs_by_name['data'].fields.append(
-  _SETINPUTREQUEST.fields_by_name['index'])
-_SETINPUTREQUEST.fields_by_name['index'].containing_oneof = _SETINPUTREQUEST.oneofs_by_name['data']
-_SETINPUTREQUEST.oneofs_by_name['data'].fields.append(
-  _SETINPUTREQUEST.fields_by_name['np_arr_chunk'])
-_SETINPUTREQUEST.fields_by_name['np_arr_chunk'].containing_oneof = _SETINPUTREQUEST.oneofs_by_name['data']
-DESCRIPTOR.message_types_by_name['InitRequest'] = _INITREQUEST
-DESCRIPTOR.message_types_by_name['SetInputRequest'] = _SETINPUTREQUEST
-DESCRIPTOR.message_types_by_name['RunRequest'] = _RUNREQUEST
-DESCRIPTOR.message_types_by_name['BenchmarkRequest'] = _BENCHMARKREQUEST
-DESCRIPTOR.message_types_by_name['BenchmarkResponse'] = _BENCHMARKRESPONSE
-DESCRIPTOR.message_types_by_name['GetOutputRequest'] = _GETOUTPUTREQUEST
-DESCRIPTOR.message_types_by_name['GetOutputResponse'] = _GETOUTPUTRESPONSE
+DESCRIPTOR.message_types_by_name['ONNXInitRequest'] = _ONNXINITREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-InitRequest = _reflection.GeneratedProtocolMessageType('InitRequest', (_message.Message,), {
-  'DESCRIPTOR' : _INITREQUEST,
+ONNXInitRequest = _reflection.GeneratedProtocolMessageType('ONNXInitRequest', (_message.Message,), {
+  'DESCRIPTOR' : _ONNXINITREQUEST,
   '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.InitRequest)
+  # @@protoc_insertion_point(class_scope:onnxruntime.ONNXInitRequest)
   })
-_sym_db.RegisterMessage(InitRequest)
-
-SetInputRequest = _reflection.GeneratedProtocolMessageType('SetInputRequest', (_message.Message,), {
-  'DESCRIPTOR' : _SETINPUTREQUEST,
-  '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.SetInputRequest)
-  })
-_sym_db.RegisterMessage(SetInputRequest)
-
-RunRequest = _reflection.GeneratedProtocolMessageType('RunRequest', (_message.Message,), {
-  'DESCRIPTOR' : _RUNREQUEST,
-  '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.RunRequest)
-  })
-_sym_db.RegisterMessage(RunRequest)
-
-BenchmarkRequest = _reflection.GeneratedProtocolMessageType('BenchmarkRequest', (_message.Message,), {
-  'DESCRIPTOR' : _BENCHMARKREQUEST,
-  '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.BenchmarkRequest)
-  })
-_sym_db.RegisterMessage(BenchmarkRequest)
-
-BenchmarkResponse = _reflection.GeneratedProtocolMessageType('BenchmarkResponse', (_message.Message,), {
-  'DESCRIPTOR' : _BENCHMARKRESPONSE,
-  '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.BenchmarkResponse)
-  })
-_sym_db.RegisterMessage(BenchmarkResponse)
-
-GetOutputRequest = _reflection.GeneratedProtocolMessageType('GetOutputRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETOUTPUTREQUEST,
-  '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.GetOutputRequest)
-  })
-_sym_db.RegisterMessage(GetOutputRequest)
-
-GetOutputResponse = _reflection.GeneratedProtocolMessageType('GetOutputResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GETOUTPUTRESPONSE,
-  '__module__' : 'onnxruntime_pb2'
-  # @@protoc_insertion_point(class_scope:onnxruntime.GetOutputResponse)
-  })
-_sym_db.RegisterMessage(GetOutputResponse)
+_sym_db.RegisterMessage(ONNXInitRequest)
 
 
 
@@ -372,15 +85,15 @@ _ONNXRUNTIME = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=445,
-  serialized_end=774,
+  serialized_start=136,
+  serialized_end=397,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
     full_name='onnxruntime.ONNXRuntime.Init',
     index=0,
     containing_service=None,
-    input_type=_INITREQUEST,
+    input_type=_ONNXINITREQUEST,
     output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -390,7 +103,7 @@ _ONNXRUNTIME = _descriptor.ServiceDescriptor(
     full_name='onnxruntime.ONNXRuntime.SetInput',
     index=1,
     containing_service=None,
-    input_type=_SETINPUTREQUEST,
+    input_type=runtime__message__pb2._SETINPUTREQUEST,
     output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -400,7 +113,7 @@ _ONNXRUNTIME = _descriptor.ServiceDescriptor(
     full_name='onnxruntime.ONNXRuntime.Run',
     index=2,
     containing_service=None,
-    input_type=_RUNREQUEST,
+    input_type=runtime__message__pb2._RUNREQUEST,
     output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -410,8 +123,8 @@ _ONNXRUNTIME = _descriptor.ServiceDescriptor(
     full_name='onnxruntime.ONNXRuntime.Benchmark',
     index=3,
     containing_service=None,
-    input_type=_BENCHMARKREQUEST,
-    output_type=_BENCHMARKRESPONSE,
+    input_type=runtime__message__pb2._BENCHMARKREQUEST,
+    output_type=runtime__message__pb2._BENCHMARKRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
@@ -420,8 +133,8 @@ _ONNXRUNTIME = _descriptor.ServiceDescriptor(
     full_name='onnxruntime.ONNXRuntime.GetOutput',
     index=4,
     containing_service=None,
-    input_type=_GETOUTPUTREQUEST,
-    output_type=_GETOUTPUTRESPONSE,
+    input_type=runtime__message__pb2._GETOUTPUTREQUEST,
+    output_type=runtime__message__pb2._GETOUTPUTRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

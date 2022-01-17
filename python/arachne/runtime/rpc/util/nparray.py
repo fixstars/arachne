@@ -3,12 +3,11 @@ import io
 import numpy as np
 
 
-def nparray_piece_generator(np_array: np.ndarray):
+def nparray_piece_generator(np_array: np.ndarray, CHUNK_SIZE=1024 * 1024):
     with io.BytesIO() as f:
         np.save(f, np_array)
         f.seek(0)
         while True:
-            CHUNK_SIZE = 1024 * 1024
             piece = f.read(CHUNK_SIZE)
             if len(piece) == 0:
                 return

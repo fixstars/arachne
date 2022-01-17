@@ -1,10 +1,12 @@
 syntax = "proto3";
 
 import "msg_response.proto";
+import "runtime_message.proto";
 import "stream_data.proto";
 
 package tvmruntime;
-message InitRequest{
+
+message TVMInitRequest{
     string package_path = 1;
 }
 
@@ -15,39 +17,17 @@ message Index {
     }
 }
 
-message SetInputRequest{
+message TVMSetInputRequest{
     oneof data{
         Index index = 1;
         Chunk np_arr_chunk = 2;
     }
 }
 
-message RunRequest{}
-
-message BenchmarkRequest{
-    int32 warmup = 1;
-    int32 repeat = 2;
-    int32 number = 3;
-}
-
-message BenchmarkResponse{
-    float mean_ts = 1;
-    float std_ts = 2;
-    float max_ts = 3;
-    float min_ts = 4;
-}
-
-message GetOutputRequest{
-    int32 index = 1;
-}
-
-message GetOutputResponse{
-    bytes np_data = 1;
-}
 
 service TVMRuntime{
-    rpc Init(InitRequest) returns (MsgResponse) {}
-    rpc SetInput (stream SetInputRequest) returns (MsgResponse) {}
+    rpc Init(TVMInitRequest) returns (MsgResponse) {}
+    rpc SetInput (stream TVMSetInputRequest) returns (MsgResponse) {}
     rpc Run (RunRequest) returns (MsgResponse) {}
     rpc Benchmark (BenchmarkRequest) returns (BenchmarkResponse) {}
     rpc GetOutput (GetOutputRequest) returns (stream GetOutputResponse) {}

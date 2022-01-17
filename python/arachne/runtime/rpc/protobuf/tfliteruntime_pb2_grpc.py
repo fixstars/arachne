@@ -3,6 +3,7 @@
 import grpc
 
 import msg_response_pb2 as msg__response__pb2
+import runtime_message_pb2 as runtime__message__pb2
 import tfliteruntime_pb2 as tfliteruntime__pb2
 
 
@@ -17,28 +18,28 @@ class TfLiteRuntimeStub(object):
         """
         self.Init = channel.unary_unary(
                 '/tfliteruntime.TfLiteRuntime/Init',
-                request_serializer=tfliteruntime__pb2.InitRequest.SerializeToString,
+                request_serializer=tfliteruntime__pb2.TfLiteInitRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
                 '/tfliteruntime.TfLiteRuntime/SetInput',
-                request_serializer=tfliteruntime__pb2.SetInputRequest.SerializeToString,
+                request_serializer=runtime__message__pb2.SetInputRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Run = channel.unary_unary(
                 '/tfliteruntime.TfLiteRuntime/Run',
-                request_serializer=tfliteruntime__pb2.RunRequest.SerializeToString,
+                request_serializer=runtime__message__pb2.RunRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Benchmark = channel.unary_unary(
                 '/tfliteruntime.TfLiteRuntime/Benchmark',
-                request_serializer=tfliteruntime__pb2.BenchmarkRequest.SerializeToString,
-                response_deserializer=tfliteruntime__pb2.BenchmarkResponse.FromString,
+                request_serializer=runtime__message__pb2.BenchmarkRequest.SerializeToString,
+                response_deserializer=runtime__message__pb2.BenchmarkResponse.FromString,
                 )
         self.GetOutput = channel.unary_stream(
                 '/tfliteruntime.TfLiteRuntime/GetOutput',
-                request_serializer=tfliteruntime__pb2.GetOutputRequest.SerializeToString,
-                response_deserializer=tfliteruntime__pb2.GetOutputResponse.FromString,
+                request_serializer=runtime__message__pb2.GetOutputRequest.SerializeToString,
+                response_deserializer=runtime__message__pb2.GetOutputResponse.FromString,
                 )
 
 
@@ -80,28 +81,28 @@ def add_TfLiteRuntimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
-                    request_deserializer=tfliteruntime__pb2.InitRequest.FromString,
+                    request_deserializer=tfliteruntime__pb2.TfLiteInitRequest.FromString,
                     response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'SetInput': grpc.stream_unary_rpc_method_handler(
                     servicer.SetInput,
-                    request_deserializer=tfliteruntime__pb2.SetInputRequest.FromString,
+                    request_deserializer=runtime__message__pb2.SetInputRequest.FromString,
                     response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'Run': grpc.unary_unary_rpc_method_handler(
                     servicer.Run,
-                    request_deserializer=tfliteruntime__pb2.RunRequest.FromString,
+                    request_deserializer=runtime__message__pb2.RunRequest.FromString,
                     response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'Benchmark': grpc.unary_unary_rpc_method_handler(
                     servicer.Benchmark,
-                    request_deserializer=tfliteruntime__pb2.BenchmarkRequest.FromString,
-                    response_serializer=tfliteruntime__pb2.BenchmarkResponse.SerializeToString,
+                    request_deserializer=runtime__message__pb2.BenchmarkRequest.FromString,
+                    response_serializer=runtime__message__pb2.BenchmarkResponse.SerializeToString,
             ),
             'GetOutput': grpc.unary_stream_rpc_method_handler(
                     servicer.GetOutput,
-                    request_deserializer=tfliteruntime__pb2.GetOutputRequest.FromString,
-                    response_serializer=tfliteruntime__pb2.GetOutputResponse.SerializeToString,
+                    request_deserializer=runtime__message__pb2.GetOutputRequest.FromString,
+                    response_serializer=runtime__message__pb2.GetOutputResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -125,7 +126,7 @@ class TfLiteRuntime(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfLiteRuntime/Init',
-            tfliteruntime__pb2.InitRequest.SerializeToString,
+            tfliteruntime__pb2.TfLiteInitRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -142,7 +143,7 @@ class TfLiteRuntime(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_unary(request_iterator, target, '/tfliteruntime.TfLiteRuntime/SetInput',
-            tfliteruntime__pb2.SetInputRequest.SerializeToString,
+            runtime__message__pb2.SetInputRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -159,7 +160,7 @@ class TfLiteRuntime(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfLiteRuntime/Run',
-            tfliteruntime__pb2.RunRequest.SerializeToString,
+            runtime__message__pb2.RunRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -176,8 +177,8 @@ class TfLiteRuntime(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tfliteruntime.TfLiteRuntime/Benchmark',
-            tfliteruntime__pb2.BenchmarkRequest.SerializeToString,
-            tfliteruntime__pb2.BenchmarkResponse.FromString,
+            runtime__message__pb2.BenchmarkRequest.SerializeToString,
+            runtime__message__pb2.BenchmarkResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -193,7 +194,7 @@ class TfLiteRuntime(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/tfliteruntime.TfLiteRuntime/GetOutput',
-            tfliteruntime__pb2.GetOutputRequest.SerializeToString,
-            tfliteruntime__pb2.GetOutputResponse.FromString,
+            runtime__message__pb2.GetOutputRequest.SerializeToString,
+            runtime__message__pb2.GetOutputResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

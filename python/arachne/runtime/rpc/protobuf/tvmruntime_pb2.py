@@ -12,6 +12,7 @@ _sym_db = _symbol_database.Default()
 
 
 import msg_response_pb2 as msg__response__pb2
+import runtime_message_pb2 as runtime__message__pb2
 import stream_data_pb2 as stream__data__pb2
 
 
@@ -21,23 +22,23 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10tvmruntime.proto\x12\ntvmruntime\x1a\x12msg_response.proto\x1a\x11stream_data.proto\"#\n\x0bInitRequest\x12\x14\n\x0cpackage_path\x18\x01 \x01(\t\"6\n\x05Index\x12\x11\n\x07index_i\x18\x01 \x01(\x05H\x00\x12\x11\n\x07index_s\x18\x02 \x01(\tH\x00\x42\x07\n\x05index\"]\n\x0fSetInputRequest\x12\"\n\x05index\x18\x01 \x01(\x0b\x32\x11.tvmruntime.IndexH\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta\"\x0c\n\nRunRequest\"B\n\x10\x42\x65nchmarkRequest\x12\x0e\n\x06warmup\x18\x01 \x01(\x05\x12\x0e\n\x06repeat\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"T\n\x11\x42\x65nchmarkResponse\x12\x0f\n\x07mean_ts\x18\x01 \x01(\x02\x12\x0e\n\x06std_ts\x18\x02 \x01(\x02\x12\x0e\n\x06max_ts\x18\x03 \x01(\x02\x12\x0e\n\x06min_ts\x18\x04 \x01(\x02\"!\n\x10GetOutputRequest\x12\r\n\x05index\x18\x01 \x01(\x05\"$\n\x11GetOutputResponse\x12\x0f\n\x07np_data\x18\x01 \x01(\x0c\x32\xc1\x02\n\nTVMRuntime\x12/\n\x04Init\x12\x17.tvmruntime.InitRequest\x1a\x0c.MsgResponse\"\x00\x12\x39\n\x08SetInput\x12\x1b.tvmruntime.SetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12-\n\x03Run\x12\x16.tvmruntime.RunRequest\x1a\x0c.MsgResponse\"\x00\x12J\n\tBenchmark\x12\x1c.tvmruntime.BenchmarkRequest\x1a\x1d.tvmruntime.BenchmarkResponse\"\x00\x12L\n\tGetOutput\x12\x1c.tvmruntime.GetOutputRequest\x1a\x1d.tvmruntime.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
+  serialized_pb=b'\n\x10tvmruntime.proto\x12\ntvmruntime\x1a\x12msg_response.proto\x1a\x15runtime_message.proto\x1a\x11stream_data.proto\"&\n\x0eTVMInitRequest\x12\x14\n\x0cpackage_path\x18\x01 \x01(\t\"6\n\x05Index\x12\x11\n\x07index_i\x18\x01 \x01(\x05H\x00\x12\x11\n\x07index_s\x18\x02 \x01(\tH\x00\x42\x07\n\x05index\"`\n\x12TVMSetInputRequest\x12\"\n\x05index\x18\x01 \x01(\x0b\x32\x11.tvmruntime.IndexH\x00\x12\x1e\n\x0cnp_arr_chunk\x18\x02 \x01(\x0b\x32\x06.ChunkH\x00\x42\x06\n\x04\x64\x61ta2\x90\x02\n\nTVMRuntime\x12\x32\n\x04Init\x12\x1a.tvmruntime.TVMInitRequest\x1a\x0c.MsgResponse\"\x00\x12<\n\x08SetInput\x12\x1e.tvmruntime.TVMSetInputRequest\x1a\x0c.MsgResponse\"\x00(\x01\x12\"\n\x03Run\x12\x0b.RunRequest\x1a\x0c.MsgResponse\"\x00\x12\x34\n\tBenchmark\x12\x11.BenchmarkRequest\x1a\x12.BenchmarkResponse\"\x00\x12\x36\n\tGetOutput\x12\x11.GetOutputRequest\x1a\x12.GetOutputResponse\"\x00\x30\x01\x62\x06proto3'
   ,
-  dependencies=[msg__response__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
+  dependencies=[msg__response__pb2.DESCRIPTOR,runtime__message__pb2.DESCRIPTOR,stream__data__pb2.DESCRIPTOR,])
 
 
 
 
-_INITREQUEST = _descriptor.Descriptor(
-  name='InitRequest',
-  full_name='tvmruntime.InitRequest',
+_TVMINITREQUEST = _descriptor.Descriptor(
+  name='TVMInitRequest',
+  full_name='tvmruntime.TVMInitRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='package_path', full_name='tvmruntime.InitRequest.package_path', index=0,
+      name='package_path', full_name='tvmruntime.TVMInitRequest.package_path', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -55,8 +56,8 @@ _INITREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=71,
-  serialized_end=106,
+  serialized_start=94,
+  serialized_end=132,
 )
 
 
@@ -99,28 +100,28 @@ _INDEX = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=108,
-  serialized_end=162,
+  serialized_start=134,
+  serialized_end=188,
 )
 
 
-_SETINPUTREQUEST = _descriptor.Descriptor(
-  name='SetInputRequest',
-  full_name='tvmruntime.SetInputRequest',
+_TVMSETINPUTREQUEST = _descriptor.Descriptor(
+  name='TVMSetInputRequest',
+  full_name='tvmruntime.TVMSetInputRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='index', full_name='tvmruntime.SetInputRequest.index', index=0,
+      name='index', full_name='tvmruntime.TVMSetInputRequest.index', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='np_arr_chunk', full_name='tvmruntime.SetInputRequest.np_arr_chunk', index=1,
+      name='np_arr_chunk', full_name='tvmruntime.TVMSetInputRequest.np_arr_chunk', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -138,201 +139,13 @@ _SETINPUTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='data', full_name='tvmruntime.SetInputRequest.data',
+      name='data', full_name='tvmruntime.TVMSetInputRequest.data',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=164,
-  serialized_end=257,
-)
-
-
-_RUNREQUEST = _descriptor.Descriptor(
-  name='RunRequest',
-  full_name='tvmruntime.RunRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=259,
-  serialized_end=271,
-)
-
-
-_BENCHMARKREQUEST = _descriptor.Descriptor(
-  name='BenchmarkRequest',
-  full_name='tvmruntime.BenchmarkRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='warmup', full_name='tvmruntime.BenchmarkRequest.warmup', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='repeat', full_name='tvmruntime.BenchmarkRequest.repeat', index=1,
-      number=2, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='number', full_name='tvmruntime.BenchmarkRequest.number', index=2,
-      number=3, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=273,
-  serialized_end=339,
-)
-
-
-_BENCHMARKRESPONSE = _descriptor.Descriptor(
-  name='BenchmarkResponse',
-  full_name='tvmruntime.BenchmarkResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='mean_ts', full_name='tvmruntime.BenchmarkResponse.mean_ts', index=0,
-      number=1, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='std_ts', full_name='tvmruntime.BenchmarkResponse.std_ts', index=1,
-      number=2, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='max_ts', full_name='tvmruntime.BenchmarkResponse.max_ts', index=2,
-      number=3, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='min_ts', full_name='tvmruntime.BenchmarkResponse.min_ts', index=3,
-      number=4, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=341,
-  serialized_end=425,
-)
-
-
-_GETOUTPUTREQUEST = _descriptor.Descriptor(
-  name='GetOutputRequest',
-  full_name='tvmruntime.GetOutputRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='index', full_name='tvmruntime.GetOutputRequest.index', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=427,
-  serialized_end=460,
-)
-
-
-_GETOUTPUTRESPONSE = _descriptor.Descriptor(
-  name='GetOutputResponse',
-  full_name='tvmruntime.GetOutputResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='np_data', full_name='tvmruntime.GetOutputResponse.np_data', index=0,
-      number=1, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=462,
-  serialized_end=498,
+  serialized_start=190,
+  serialized_end=286,
 )
 
 _INDEX.oneofs_by_name['index'].fields.append(
@@ -341,30 +154,25 @@ _INDEX.fields_by_name['index_i'].containing_oneof = _INDEX.oneofs_by_name['index
 _INDEX.oneofs_by_name['index'].fields.append(
   _INDEX.fields_by_name['index_s'])
 _INDEX.fields_by_name['index_s'].containing_oneof = _INDEX.oneofs_by_name['index']
-_SETINPUTREQUEST.fields_by_name['index'].message_type = _INDEX
-_SETINPUTREQUEST.fields_by_name['np_arr_chunk'].message_type = stream__data__pb2._CHUNK
-_SETINPUTREQUEST.oneofs_by_name['data'].fields.append(
-  _SETINPUTREQUEST.fields_by_name['index'])
-_SETINPUTREQUEST.fields_by_name['index'].containing_oneof = _SETINPUTREQUEST.oneofs_by_name['data']
-_SETINPUTREQUEST.oneofs_by_name['data'].fields.append(
-  _SETINPUTREQUEST.fields_by_name['np_arr_chunk'])
-_SETINPUTREQUEST.fields_by_name['np_arr_chunk'].containing_oneof = _SETINPUTREQUEST.oneofs_by_name['data']
-DESCRIPTOR.message_types_by_name['InitRequest'] = _INITREQUEST
+_TVMSETINPUTREQUEST.fields_by_name['index'].message_type = _INDEX
+_TVMSETINPUTREQUEST.fields_by_name['np_arr_chunk'].message_type = stream__data__pb2._CHUNK
+_TVMSETINPUTREQUEST.oneofs_by_name['data'].fields.append(
+  _TVMSETINPUTREQUEST.fields_by_name['index'])
+_TVMSETINPUTREQUEST.fields_by_name['index'].containing_oneof = _TVMSETINPUTREQUEST.oneofs_by_name['data']
+_TVMSETINPUTREQUEST.oneofs_by_name['data'].fields.append(
+  _TVMSETINPUTREQUEST.fields_by_name['np_arr_chunk'])
+_TVMSETINPUTREQUEST.fields_by_name['np_arr_chunk'].containing_oneof = _TVMSETINPUTREQUEST.oneofs_by_name['data']
+DESCRIPTOR.message_types_by_name['TVMInitRequest'] = _TVMINITREQUEST
 DESCRIPTOR.message_types_by_name['Index'] = _INDEX
-DESCRIPTOR.message_types_by_name['SetInputRequest'] = _SETINPUTREQUEST
-DESCRIPTOR.message_types_by_name['RunRequest'] = _RUNREQUEST
-DESCRIPTOR.message_types_by_name['BenchmarkRequest'] = _BENCHMARKREQUEST
-DESCRIPTOR.message_types_by_name['BenchmarkResponse'] = _BENCHMARKRESPONSE
-DESCRIPTOR.message_types_by_name['GetOutputRequest'] = _GETOUTPUTREQUEST
-DESCRIPTOR.message_types_by_name['GetOutputResponse'] = _GETOUTPUTRESPONSE
+DESCRIPTOR.message_types_by_name['TVMSetInputRequest'] = _TVMSETINPUTREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-InitRequest = _reflection.GeneratedProtocolMessageType('InitRequest', (_message.Message,), {
-  'DESCRIPTOR' : _INITREQUEST,
+TVMInitRequest = _reflection.GeneratedProtocolMessageType('TVMInitRequest', (_message.Message,), {
+  'DESCRIPTOR' : _TVMINITREQUEST,
   '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.InitRequest)
+  # @@protoc_insertion_point(class_scope:tvmruntime.TVMInitRequest)
   })
-_sym_db.RegisterMessage(InitRequest)
+_sym_db.RegisterMessage(TVMInitRequest)
 
 Index = _reflection.GeneratedProtocolMessageType('Index', (_message.Message,), {
   'DESCRIPTOR' : _INDEX,
@@ -373,47 +181,12 @@ Index = _reflection.GeneratedProtocolMessageType('Index', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Index)
 
-SetInputRequest = _reflection.GeneratedProtocolMessageType('SetInputRequest', (_message.Message,), {
-  'DESCRIPTOR' : _SETINPUTREQUEST,
+TVMSetInputRequest = _reflection.GeneratedProtocolMessageType('TVMSetInputRequest', (_message.Message,), {
+  'DESCRIPTOR' : _TVMSETINPUTREQUEST,
   '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.SetInputRequest)
+  # @@protoc_insertion_point(class_scope:tvmruntime.TVMSetInputRequest)
   })
-_sym_db.RegisterMessage(SetInputRequest)
-
-RunRequest = _reflection.GeneratedProtocolMessageType('RunRequest', (_message.Message,), {
-  'DESCRIPTOR' : _RUNREQUEST,
-  '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.RunRequest)
-  })
-_sym_db.RegisterMessage(RunRequest)
-
-BenchmarkRequest = _reflection.GeneratedProtocolMessageType('BenchmarkRequest', (_message.Message,), {
-  'DESCRIPTOR' : _BENCHMARKREQUEST,
-  '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.BenchmarkRequest)
-  })
-_sym_db.RegisterMessage(BenchmarkRequest)
-
-BenchmarkResponse = _reflection.GeneratedProtocolMessageType('BenchmarkResponse', (_message.Message,), {
-  'DESCRIPTOR' : _BENCHMARKRESPONSE,
-  '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.BenchmarkResponse)
-  })
-_sym_db.RegisterMessage(BenchmarkResponse)
-
-GetOutputRequest = _reflection.GeneratedProtocolMessageType('GetOutputRequest', (_message.Message,), {
-  'DESCRIPTOR' : _GETOUTPUTREQUEST,
-  '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.GetOutputRequest)
-  })
-_sym_db.RegisterMessage(GetOutputRequest)
-
-GetOutputResponse = _reflection.GeneratedProtocolMessageType('GetOutputResponse', (_message.Message,), {
-  'DESCRIPTOR' : _GETOUTPUTRESPONSE,
-  '__module__' : 'tvmruntime_pb2'
-  # @@protoc_insertion_point(class_scope:tvmruntime.GetOutputResponse)
-  })
-_sym_db.RegisterMessage(GetOutputResponse)
+_sym_db.RegisterMessage(TVMSetInputRequest)
 
 
 
@@ -424,15 +197,15 @@ _TVMRUNTIME = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=501,
-  serialized_end=822,
+  serialized_start=289,
+  serialized_end=561,
   methods=[
   _descriptor.MethodDescriptor(
     name='Init',
     full_name='tvmruntime.TVMRuntime.Init',
     index=0,
     containing_service=None,
-    input_type=_INITREQUEST,
+    input_type=_TVMINITREQUEST,
     output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -442,7 +215,7 @@ _TVMRUNTIME = _descriptor.ServiceDescriptor(
     full_name='tvmruntime.TVMRuntime.SetInput',
     index=1,
     containing_service=None,
-    input_type=_SETINPUTREQUEST,
+    input_type=_TVMSETINPUTREQUEST,
     output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -452,7 +225,7 @@ _TVMRUNTIME = _descriptor.ServiceDescriptor(
     full_name='tvmruntime.TVMRuntime.Run',
     index=2,
     containing_service=None,
-    input_type=_RUNREQUEST,
+    input_type=runtime__message__pb2._RUNREQUEST,
     output_type=msg__response__pb2._MSGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -462,8 +235,8 @@ _TVMRUNTIME = _descriptor.ServiceDescriptor(
     full_name='tvmruntime.TVMRuntime.Benchmark',
     index=3,
     containing_service=None,
-    input_type=_BENCHMARKREQUEST,
-    output_type=_BENCHMARKRESPONSE,
+    input_type=runtime__message__pb2._BENCHMARKREQUEST,
+    output_type=runtime__message__pb2._BENCHMARKRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
@@ -472,8 +245,8 @@ _TVMRUNTIME = _descriptor.ServiceDescriptor(
     full_name='tvmruntime.TVMRuntime.GetOutput',
     index=4,
     containing_service=None,
-    input_type=_GETOUTPUTREQUEST,
-    output_type=_GETOUTPUTRESPONSE,
+    input_type=runtime__message__pb2._GETOUTPUTREQUEST,
+    output_type=runtime__message__pb2._GETOUTPUTRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

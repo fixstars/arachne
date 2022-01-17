@@ -4,11 +4,11 @@ import grpc
 
 import msg_response_pb2 as msg__response__pb2
 import runtime_message_pb2 as runtime__message__pb2
-import tvmruntime_pb2 as tvmruntime__pb2
 
 
-class TVMRuntimeStub(object):
-    """Missing associated documentation comment in .proto file."""
+class RuntimeStub(object):
+    """Runtime Base Interface: servicer is not implemented.
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -17,34 +17,35 @@ class TVMRuntimeStub(object):
             channel: A grpc.Channel.
         """
         self.Init = channel.unary_unary(
-                '/tvmruntime.TVMRuntime/Init',
-                request_serializer=tvmruntime__pb2.TVMInitRequest.SerializeToString,
+                '/Runtime/Init',
+                request_serializer=runtime__message__pb2.InitRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.SetInput = channel.stream_unary(
-                '/tvmruntime.TVMRuntime/SetInput',
-                request_serializer=tvmruntime__pb2.TVMSetInputRequest.SerializeToString,
+                '/Runtime/SetInput',
+                request_serializer=runtime__message__pb2.SetInputRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Run = channel.unary_unary(
-                '/tvmruntime.TVMRuntime/Run',
+                '/Runtime/Run',
                 request_serializer=runtime__message__pb2.RunRequest.SerializeToString,
                 response_deserializer=msg__response__pb2.MsgResponse.FromString,
                 )
         self.Benchmark = channel.unary_unary(
-                '/tvmruntime.TVMRuntime/Benchmark',
+                '/Runtime/Benchmark',
                 request_serializer=runtime__message__pb2.BenchmarkRequest.SerializeToString,
                 response_deserializer=runtime__message__pb2.BenchmarkResponse.FromString,
                 )
         self.GetOutput = channel.unary_stream(
-                '/tvmruntime.TVMRuntime/GetOutput',
+                '/Runtime/GetOutput',
                 request_serializer=runtime__message__pb2.GetOutputRequest.SerializeToString,
                 response_deserializer=runtime__message__pb2.GetOutputResponse.FromString,
                 )
 
 
-class TVMRuntimeServicer(object):
-    """Missing associated documentation comment in .proto file."""
+class RuntimeServicer(object):
+    """Runtime Base Interface: servicer is not implemented.
+    """
 
     def Init(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -77,16 +78,16 @@ class TVMRuntimeServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_TVMRuntimeServicer_to_server(servicer, server):
+def add_RuntimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Init': grpc.unary_unary_rpc_method_handler(
                     servicer.Init,
-                    request_deserializer=tvmruntime__pb2.TVMInitRequest.FromString,
+                    request_deserializer=runtime__message__pb2.InitRequest.FromString,
                     response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'SetInput': grpc.stream_unary_rpc_method_handler(
                     servicer.SetInput,
-                    request_deserializer=tvmruntime__pb2.TVMSetInputRequest.FromString,
+                    request_deserializer=runtime__message__pb2.SetInputRequest.FromString,
                     response_serializer=msg__response__pb2.MsgResponse.SerializeToString,
             ),
             'Run': grpc.unary_unary_rpc_method_handler(
@@ -106,13 +107,14 @@ def add_TVMRuntimeServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'tvmruntime.TVMRuntime', rpc_method_handlers)
+            'Runtime', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class TVMRuntime(object):
-    """Missing associated documentation comment in .proto file."""
+class Runtime(object):
+    """Runtime Base Interface: servicer is not implemented.
+    """
 
     @staticmethod
     def Init(request,
@@ -125,8 +127,8 @@ class TVMRuntime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntime/Init',
-            tvmruntime__pb2.TVMInitRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/Runtime/Init',
+            runtime__message__pb2.InitRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -142,8 +144,8 @@ class TVMRuntime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/tvmruntime.TVMRuntime/SetInput',
-            tvmruntime__pb2.TVMSetInputRequest.SerializeToString,
+        return grpc.experimental.stream_unary(request_iterator, target, '/Runtime/SetInput',
+            runtime__message__pb2.SetInputRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -159,7 +161,7 @@ class TVMRuntime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntime/Run',
+        return grpc.experimental.unary_unary(request, target, '/Runtime/Run',
             runtime__message__pb2.RunRequest.SerializeToString,
             msg__response__pb2.MsgResponse.FromString,
             options, channel_credentials,
@@ -176,7 +178,7 @@ class TVMRuntime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tvmruntime.TVMRuntime/Benchmark',
+        return grpc.experimental.unary_unary(request, target, '/Runtime/Benchmark',
             runtime__message__pb2.BenchmarkRequest.SerializeToString,
             runtime__message__pb2.BenchmarkResponse.FromString,
             options, channel_credentials,
@@ -193,7 +195,7 @@ class TVMRuntime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/tvmruntime.TVMRuntime/GetOutput',
+        return grpc.experimental.unary_stream(request, target, '/Runtime/GetOutput',
             runtime__message__pb2.GetOutputRequest.SerializeToString,
             runtime__message__pb2.GetOutputResponse.FromString,
             options, channel_credentials,
