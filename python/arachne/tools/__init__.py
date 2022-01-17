@@ -7,8 +7,7 @@ from .openvino_mo import register_openvino_mo_config
 from .tflite_converter import register_tflite_converter_config
 from .tftrt import register_tftrt_config
 from .torch2onnx import register_torch2onnx_config
-
-# from .torch2trt import register_torch2trt_config
+from .torch2trt import register_torch2trt_config
 from .tvm import register_tvm_config
 
 
@@ -18,7 +17,7 @@ def register_tools_config():
     register_tflite_converter_config()
     register_tftrt_config()
     register_torch2onnx_config()
-    # register_torch2trt_config()
+    register_torch2trt_config()
     register_tvm_config()
 
 
