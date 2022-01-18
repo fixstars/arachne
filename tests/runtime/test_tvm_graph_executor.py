@@ -19,7 +19,7 @@ def test_tvm_runtime():
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
 
-        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        model = tf.keras.applications.mobilenet.MobileNet()
         model.save("tmp.h5")
 
         cfg = TVMConfig()

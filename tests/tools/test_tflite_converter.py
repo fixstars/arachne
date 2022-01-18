@@ -62,7 +62,7 @@ def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
 def test_tflite_converter(model_format, ptq_method):
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
-        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        model = tf.keras.applications.mobilenet.MobileNet()
         cfg = TFLiteConverterConfig()
         cfg.ptq.method = ptq_method
         if ptq_method == "int8":

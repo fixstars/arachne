@@ -87,6 +87,15 @@ def check_tvm_output(
     "model_format, composite_target", list(params.values()), ids=list(params.keys())
 )
 def test_tvm(model_format, composite_target):
+
+    gpus = tf.config.experimental.list_physical_devices("GPU")
+    if gpus:
+        try:
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+        except RuntimeError as e:
+            print(e)
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
         cfg = TVMConfig()
@@ -94,7 +103,7 @@ def test_tvm(model_format, composite_target):
         cfg.composite_target = composite_target
         device_type = "cuda" if "cuda" in composite_target else "cpu"
         if model_format == "h5":
-            model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+            model = tf.keras.applications.mobilenet.MobileNet()
             model.save("tmp.h5")
             input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
             input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
@@ -118,7 +127,7 @@ def test_tvm(model_format, composite_target):
             )
 
         elif model_format == "pb":
-            model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+            model = tf.keras.applications.mobilenet.MobileNet()
             model.save("tmp.h5")
             wrapper = tf.function(lambda x: model(x))
             wrapper = wrapper.get_concrete_function(tf.TensorSpec(model.inputs[0].shape, model.inputs[0].dtype))  # type: ignore
