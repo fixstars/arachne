@@ -44,7 +44,7 @@ test-arachne:
   before_script:
     - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
     - poetry install
-    - poetry run ./scripts/build_tvm.sh
+    - poetry run ./scripts/install_tvm.sh
     - poetry run ./scripts/install_torch2trt.sh
   script:
     - poetry run pytest tests --forked
@@ -59,7 +59,7 @@ test-doc-build:
   before_script:
     - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
     - poetry install
-    - poetry run ./scripts/build_tvm.sh
+    - poetry run ./scripts/install_tvm.sh
     - poetry run ./scripts/install_torch2trt.sh
   script:
     - poetry run sphinx-build docs docs/_build
