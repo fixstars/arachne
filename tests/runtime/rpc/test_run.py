@@ -74,7 +74,7 @@ def test_tflite_runtime_rpc(rpc_port=5051):
             server.stop(0)
 
         # compare
-        np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)
+        np.testing.assert_equal(local_output, rpc_output)
 
 
 def test_onnx_runtime_rpc(rpc_port=5051):
@@ -107,4 +107,4 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         finally:
             server.stop(0)
         # compare
-        np.testing.assert_allclose(local_output, rpc_output, rtol=1e-5, atol=1e-5)
+        np.testing.assert_equal(local_output, rpc_output)
