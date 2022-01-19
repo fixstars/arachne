@@ -7,7 +7,7 @@ from arachne.registry import Registry
 from arachne.runtime.module import RuntimeModule
 from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_message_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
-from arachne.runtime.rpc.util.nparray import (
+from arachne.runtime.rpc.utils.nparray import (
     generator_to_np_array,
     nparray_piece_generator,
 )

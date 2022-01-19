@@ -6,7 +6,7 @@ import grpc
 import numpy as np
 
 from arachne.runtime.rpc.protobuf import runtime_message_pb2, stream_data_pb2
-from arachne.runtime.rpc.util.nparray import (
+from arachne.runtime.rpc.utils.nparray import (
     generator_to_np_array,
     nparray_piece_generator,
 )

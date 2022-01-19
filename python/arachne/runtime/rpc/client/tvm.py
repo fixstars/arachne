@@ -9,7 +9,7 @@ from arachne.runtime.rpc.protobuf import (
     tvmruntime_pb2,
     tvmruntime_pb2_grpc,
 )
-from arachne.runtime.rpc.util.nparray import nparray_piece_generator
+from arachne.runtime.rpc.utils.nparray import nparray_piece_generator
 
 from .client import RuntimeClientBase
 
