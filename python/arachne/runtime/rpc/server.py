@@ -3,7 +3,7 @@ from concurrent import futures
 
 import grpc
 
-from arachne.logger import Logger
+from arachne.runtime.rpc.logger import Logger
 
 from .protobuf import fileserver_pb2_grpc, server_status_pb2_grpc
 from .servicer import (

@@ -1,6 +1,6 @@
 import grpc
 
-from arachne.logger import Logger
+from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import server_status_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 

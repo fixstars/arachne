@@ -7,7 +7,7 @@ class Logger(object):
     stream_handler.setFormatter(formatter)
     stream_handler.setLevel(logging.INFO)
 
-    my_logger = logging.Logger("Arachne")
+    my_logger = logging.Logger("arachne.runtime.rpc")
     my_logger.addHandler(stream_handler)
 
     @staticmethod

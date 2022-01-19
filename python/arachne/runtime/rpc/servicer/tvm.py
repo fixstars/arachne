@@ -2,8 +2,8 @@ import os
 
 import grpc
 
-from arachne.logger import Logger
 from arachne.runtime import TVMRuntimeModule, init
+from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import tvmruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 from arachne.runtime.rpc.utils.nparray import generator_to_np_array

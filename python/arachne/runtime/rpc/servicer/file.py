@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-from arachne.logger import Logger
+from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import fileserver_pb2, fileserver_pb2_grpc
 
 logger = Logger.logger()
