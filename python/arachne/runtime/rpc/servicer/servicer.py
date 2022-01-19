@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from typing import List, Optional, Type
+from collections import OrderedDict
+from typing import Dict, Generic, List, Optional, Type, TypeVar
 
 import grpc
 
-from arachne.registry import Registry
 from arachne.runtime.module import RuntimeModule
 from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_message_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -72,16 +72,32 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
             yield runtime_message_pb2.GetOutputResponse(np_data=piece)
 
 
-RuntimeServicerRegistry = Registry[str, Type[RuntimeServicerBase]]()
+class RuntimeServicerRegistry:
+    def __init__(self):
+        self._registries: Dict[str, Type[RuntimeServicerBase]] = OrderedDict()
+
+    def register(self, key: str, value: Type[RuntimeServicerBase], override=False):
+        assert override or key not in self._registries.keys()
+        self._registries[key] = value
+        return value
+
+    def get(self, key: str) -> Optional[Type[RuntimeServicerBase]]:
+        return self._registries.get(key)
+
+    def list(self) -> List[str]:
+        return list(self._registries.keys())
+
+
+_runtime_servicer_registry = RuntimeServicerRegistry()
 
 
 def get_runtime_servicer(key: str) -> Optional[Type[RuntimeServicerBase]]:
-    return RuntimeServicerRegistry.get(key)
+    return _runtime_servicer_registry.get(key)
 
 
 def register_runtime_servicer(servicer: Type[RuntimeServicerBase]):
-    RuntimeServicerRegistry.register(servicer.get_name(), servicer)
+    _runtime_servicer_registry.register(servicer.get_name(), servicer)
 
 
 def runtime_servicer_list() -> List[str]:
-    return RuntimeServicerRegistry.list()
+    return _runtime_servicer_registry.list()
