@@ -45,6 +45,51 @@ def test_tvm_runtime_rpc(rpc_port=5051):
         np.testing.assert_equal(local_output, rpc_output)
 
 
+def test_tvm_runtime_rpc(rpc_port=5051):
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/tvm_mobilenet.tar"
+        tvm_package_path = tmp_dir + "/tvm_mobilenet.tar"
+        download(url, tvm_package_path)
+
+        dummy_input = np.array(np.random.random_sample([1, 224, 224, 3]), dtype=np.float32)  # type: ignore
+        import tarfile
+
+        model_file = None
+        env_file = None
+        with tarfile.open(tvm_package_path, "r:gz") as tar:
+            for m in tar.getmembers():
+                if m.name == "env.yaml":
+                    env_file = m.name
+                else:
+                    model_file = m.name
+            tar.extractall(".")
+        assert model_file is not None
+        assert env_file is not None
+        # local run
+        rtmodule = arachne.runtime.init(model_file=model_file, env_file=env_file)
+        assert rtmodule
+        rtmodule.set_input(0, dummy_input)
+        rtmodule.run()
+        local_output = rtmodule.get_output(0)
+
+        # rpc run
+        server = create_server("tvm", rpc_port)
+        server.start()
+        try:
+            client = arachne.runtime.rpc.init(
+                model_file=model_file, env_file=env_file, rpc_port=rpc_port
+            )
+            assert isinstance(client, TVMRuntimeClient)
+            client.set_input(0, dummy_input)
+            client.run()
+            rpc_output = client.get_output(0)
+            client.finalize()
+        finally:
+            server.stop(0)
+        # compare
+        np.testing.assert_equal(local_output, rpc_output)
+
+
 def test_tflite_runtime_rpc(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
         model_path = tmp_dir + "/model.tflite"

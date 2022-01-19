@@ -20,6 +20,7 @@ from .servicer import (
 def init(
     package_tar: Optional[str] = None,
     model_file: Optional[str] = None,
+    env_file: Optional[str] = None,
     rpc_host: str = "localhost",
     rpc_port: int = 5051,
     **kwargs,
@@ -39,8 +40,14 @@ def init(
     assert model_file is not None
 
     channel = create_channel(rpc_host, rpc_port)
+
     if model_file.endswith(".tar"):
-        assert package_tar is not None
+        if package_tar is None:
+            assert env_file is not None
+            package_tar = "./package.tar"
+            with tarfile.open(package_tar, "w:gz") as tar:
+                tar.add(model_file, arcname=model_file.split("/")[-1])
+                tar.add(env_file, arcname="env.yaml")
         return TVMRuntimeClient(channel, package_tar, **kwargs)
     elif model_file.endswith(".tflite"):
         return TfliteRuntimeClient(channel, model_file, **kwargs)
