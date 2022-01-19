@@ -45,7 +45,7 @@ def test_tvm_runtime_rpc(rpc_port=5051):
         np.testing.assert_equal(local_output, rpc_output)
 
 
-def test_tvm_runtime_rpc(rpc_port=5051):
+def test_tvm_runtime_rpc2(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/tvm_mobilenet.tar"
         tvm_package_path = tmp_dir + "/tvm_mobilenet.tar"
