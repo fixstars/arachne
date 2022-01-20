@@ -9,9 +9,16 @@ from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
 from omegaconf import MISSING, DictConfig, OmegaConf
 
+from arachne.tools.openvino2tf import register_openvino2tf_config
+from arachne.tools.openvino_mo import register_openvino_mo_config
+from arachne.tools.tflite_converter import register_tflite_converter_config
+from arachne.tools.tftrt import register_tftrt_config
+from arachne.tools.torch2onnx import register_torch2onnx_config
+from arachne.tools.torch2trt import register_torch2trt_config
+from arachne.tools.tvm import register_tvm_config
+
 from .config.base import BaseConfig
 from .data import Model
-from .tools import get_all_tools, register_tools_config
 from .utils import (
     get_model_spec,
     get_tool_config_objects,
@@ -19,6 +26,20 @@ from .utils import (
     load_model_spec,
     save_model,
 )
+
+
+def register_tools_config():
+    register_openvino2tf_config()
+    register_openvino_mo_config()
+    register_tflite_converter_config()
+    register_tftrt_config()
+    register_torch2onnx_config()
+    register_torch2trt_config()
+    register_tvm_config()
+
+
+def get_all_tools() -> List[str]:
+    return list(get_tool_config_objects().keys())
 
 
 @dataclass
