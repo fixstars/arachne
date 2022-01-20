@@ -87,7 +87,7 @@ def run(input: Model, cfg: TFLiteConverterConfig) -> Model:
         converter.target_spec.supported_ops.add(tf.lite.OpsSet.SELECT_TF_OPS)
 
     if cfg.ptq.method != "none":
-        converter.optimizations = [tf.lite.Optimize.DEFAULT]
+        converter.optimizations = [tf.lite.Optimize.DEFAULT]  # type: ignore
         if cfg.ptq.method == "dynamic_range":
             pass
         elif cfg.ptq.method == "fp16":

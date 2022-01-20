@@ -10,7 +10,7 @@ import arachne.runtime
 def test_tflite_runtime():
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
-        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        model = tf.keras.applications.mobilenet.MobileNet()
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
         tflite_model = converter.convert()
