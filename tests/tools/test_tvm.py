@@ -17,7 +17,7 @@ from tvm.contrib.graph_executor import GraphModule
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.runtime.module.tvm import _open_module_file
-from arachne.tools.tvm import TVMConfig, run
+from arachne.tools.tvm import TVMConfig, get_predefined_config, run
 from arachne.utils import get_model_spec
 
 params = {
@@ -185,3 +185,18 @@ def test_tvm(model_format, composite_target):
             output = run(input=input, cfg=cfg)
 
             check_tvm_output("model.pth", model_format, [1, 3, 224, 224], output.path, device_type)
+
+
+@pytest.mark.parametrize("target", ["dgx-1", "dgx-s", "jetson-nano", "jetson-xavier-nx", "rasp4b64"])
+def test_predefined_config(target):
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+
+        cfg = get_predefined_config("dgx-1")
+
+        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        model.save("tmp.h5")
+        input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
+        input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
+        input.spec.outputs[0].shape = [1, 1000]  # type: ignore
+        run(input=input, cfg=cfg)

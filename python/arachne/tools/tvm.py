@@ -1,6 +1,7 @@
 import itertools
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, List, Optional
 
 import hydra
@@ -77,6 +78,17 @@ def register_tvm_config() -> None:
         package="tools.tvm",
         node=TVMConfig,
     )
+
+
+def get_predefined_config(target: str) -> TVMConfig:
+    config_path = str(Path(__file__).parents[1]) + "/config/tvm_target/" + target + ".yaml"
+    pre_defined_conf = OmegaConf.load(config_path)
+    override_args = dict()
+    for k in pre_defined_conf.keys():
+        if "defaults" == k:
+            continue
+        override_args[k] = pre_defined_conf[k]  # type: ignore
+    return TVMConfig(**override_args)
 
 
 def _load_as_tvmc_model(input: Model) -> TVMCModel:
@@ -249,7 +261,7 @@ def run(input: Model, cfg: TVMConfig) -> Model:
     return Model(path=package_path, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

@@ -61,7 +61,7 @@ def run(input: Model, cfg: OpenVINOModelOptConfig) -> Model:
     return Model(path=output_dir, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
