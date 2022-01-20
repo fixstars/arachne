@@ -76,7 +76,7 @@ def run(input: Model, cfg: Torch2ONNXConfig) -> Model:
     return Model(filename, spec=get_model_spec(filename))
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

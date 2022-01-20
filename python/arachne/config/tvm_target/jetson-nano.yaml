@@ -1,0 +1,12 @@
+# @package tools.tvm
+defaults:
+  - /tools/tvm
+
+cpu_target: aarch64
+cpu_attr:
+- +neon
+cpu_name: cortex-a57
+cuda_target_device: nvidia/jetson-nano
+composite_target:
+- tensorrt
+- cuda

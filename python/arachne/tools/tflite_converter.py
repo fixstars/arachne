@@ -122,7 +122,7 @@ def run(input: Model, cfg: TFLiteConverterConfig) -> Model:
     return Model(path=output_path, spec=get_model_spec(output_path))
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

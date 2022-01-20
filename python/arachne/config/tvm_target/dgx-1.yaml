@@ -1,0 +1,13 @@
+# @package tools.tvm
+defaults:
+  - /tools/tvm
+
+cpu_target: x86-64
+cpu_attr:
+- +fma
+- +avx2
+cpu_name: broadwell
+cuda_target_device: nvidia/nvidia-v100
+composite_target:
+- tensorrt
+- cuda

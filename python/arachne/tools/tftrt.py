@@ -85,7 +85,7 @@ def run(input: Model, cfg: TFTRTConfig) -> Model:
     return Model(path=output_saved_model_dir, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
