@@ -69,4 +69,5 @@ filter_files = true
 skip_glob = "*/3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*"
 
 [tool.pyright]
+exclude = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]
 ignore = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]
