@@ -39,12 +39,7 @@ def create_server(runtime_name: str, port: int):
 def start_server(server: grpc.Server, port: int):
     server.start()
     logger.info(f"server is running on port: {port}")
-
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        server.stop(0)
+    server.wait_for_termination()
 
 
 if __name__ == "__main__":
