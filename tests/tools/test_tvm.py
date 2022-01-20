@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+import tarfile
 import tempfile
 from typing import List
 
@@ -108,9 +111,7 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
         elif model_format == "tflite":
-            url = (
-                "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
-            )
+            url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
 
             model_path = "mobilenet.tflite"
             download(url, model_path)
@@ -162,9 +163,7 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
         elif model_format == "onnx":
-            url = (
-                "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
-            )
+            url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
 
             model_path = "resnet18.onnx"
             download(url, model_path)
@@ -191,7 +190,9 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("model.pth", model_format, [1, 3, 224, 224], output.path, device_type)
 
 
-@pytest.mark.parametrize("target", ["dgx-1", "dgx-s", "jetson-nano", "jetson-xavier-nx", "rasp4b64"])
+@pytest.mark.parametrize(
+    "target", ["dgx-1", "dgx-s", "jetson-nano", "jetson-xavier-nx", "rasp4b64"]
+)
 def test_predefined_config(target):
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
@@ -204,3 +205,31 @@ def test_predefined_config(target):
         input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
         input.spec.outputs[0].shape = [1, 1000]  # type: ignore
         run(input=input, cfg=cfg)
+
+
+def test_cli():
+    # Due to the test time, we only test one case
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+        url = (
+            "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
+        )
+
+        model_path = "resnet18.onnx"
+        download(url, model_path)
+        ret = subprocess.run(
+            [sys.executable, "-m", "arachne.tools.tvm", "input=resnet18.onnx", "output=output.tar"]
+        )
+
+        assert ret.returncode == 0
+
+        model_file = None
+        with tarfile.open("output.tar", "r:gz") as tar:
+            for m in tar.getmembers():
+                if m.name.endswith(".tar"):
+                    model_file = m.name
+            tar.extractall(".")
+
+        assert model_file is not None
+        check_tvm_output("resnet18.onnx", "onnx", [1, 3, 224, 224], model_file, "cpu")

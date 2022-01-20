@@ -1,10 +1,15 @@
 import os
+import subprocess
+import sys
+import tarfile
 import tempfile
+from dataclasses import asdict
 
 import numpy as np
 import onnxruntime as ort
 import torch
 import torchvision
+import yaml
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.tools.torch2onnx import Torch2ONNXConfig, run
@@ -36,3 +41,44 @@ def test_torch2onnx():
         cfg = Torch2ONNXConfig()
         output = run(input_model, cfg)
         check_torch2onnx_output(resnet18, [1, 3, 224, 224], output.path)
+
+
+def test_cli():
+    # Due to the test time, we only test one case
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+        resnet18 = torchvision.models.resnet18(pretrained=True)
+        model_path = "resnet18.pt"
+        torch.save(resnet18, f=model_path)
+
+        spec = ModelSpec(
+            inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
+            outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
+        )
+
+        with open("spec.yaml", "w") as file:
+            yaml.dump(asdict(spec), file)
+
+        ret = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "arachne.tools.torch2onnx",
+                f"input={model_path}",
+                "input_spec=spec.yaml",
+                "output=output.tar",
+            ]
+        )
+
+        assert ret.returncode == 0
+
+        model_file = None
+        with tarfile.open("output.tar", "r:gz") as tar:
+            for m in tar.getmembers():
+                if m.name.endswith(".onnx"):
+                    model_file = m.name
+            tar.extractall(".")
+
+        assert model_file is not None
+        check_torch2onnx_output(resnet18, [1, 3, 224, 224], model_file)
