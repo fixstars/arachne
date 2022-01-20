@@ -18,7 +18,8 @@ from tvm.contrib.graph_executor import GraphModule
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.runtime.module.tvm import _open_module_file
 from arachne.tools.tvm import TVMConfig, get_predefined_config, run
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
+from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 params = {
     "keras-cpu": ("h5", ["cpu"]),
@@ -88,13 +89,7 @@ def check_tvm_output(
 )
 def test_tvm(model_format, composite_target):
 
-    gpus = tf.config.experimental.list_physical_devices("GPU")
-    if gpus:
-        try:
-            for gpu in gpus:
-                tf.config.experimental.set_memory_growth(gpu, True)
-        except RuntimeError as e:
-            print(e)
+    make_tf_gpu_usage_growth()
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
@@ -201,9 +196,9 @@ def test_predefined_config(target):
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
 
-        cfg = get_predefined_config("dgx-1")
+        cfg = get_predefined_config(target)
 
-        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        model = tf.keras.applications.mobilenet.MobileNet()
         model.save("tmp.h5")
         input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
         input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore

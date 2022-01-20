@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.tools.tflite_converter import TFLiteConverterConfig, run
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
 
 params = {
     "keras": ("h5", "none"),

@@ -11,7 +11,7 @@ from arachne.tools.openvino2tf import OpenVINO2TFConfig
 from arachne.tools.openvino2tf import run as run_openvino2tf
 from arachne.tools.openvino_mo import OpenVINOModelOptConfig
 from arachne.tools.openvino_mo import run as run_openvino_mo
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
 
 
 def test_openvino2tf():

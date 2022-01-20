@@ -19,13 +19,8 @@ from tvm.driver.tvmc.frontends import load_model
 from tvm.driver.tvmc.model import TVMCModel
 from tvm.relay.backend.executor_factory import GraphExecutorFactoryModule
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model
 

@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from arachne.data import Model
 from arachne.tools.tftrt import TFTRTConfig, run
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
 
 
 def create_dummy_representative_dataset():

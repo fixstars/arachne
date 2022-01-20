@@ -10,13 +10,8 @@ from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model, TensorSpec
 
