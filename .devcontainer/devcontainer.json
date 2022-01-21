@@ -1,11 +1,19 @@
 {
     "name": "arachne",
-    "dockerFile": "../docker/devel-gpu.Dockerfile",
+    "build": {
+        "dockerfile": "../docker/devel-gpu.Dockerfile",
+        "target": "base",
+    },
     "context": "../docker",
-    "remoteEnv": { "PYTHONPATH": "/workspaces/arachne/python", "TVM_LIBRARY_PATH": "/workspaces/arachne/build/tvm"},
+    "remoteEnv": {
+        "PYTHONPATH": "/workspaces/arachne/python",
+        "TVM_LIBRARY_PATH": "/workspaces/arachne/build/tvm"
+    },
     "workspaceFolder": "/workspaces/arachne",
     "remoteUser": "developer",
-    "mounts": ["source=/raid/datasets,target=/datasets,type=bind,consistency=cached"],
+    "mounts": [
+        "source=/raid/datasets,target=/datasets,type=bind,consistency=cached"
+    ],
     "forwardPorts": [
         8888
     ],
