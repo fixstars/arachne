@@ -24,7 +24,9 @@ ARG UBUNTU_VERSION=18.04
 ARG ARCH=
 ARG CUDA=10.2
 ARG CUDNN_MAJOR_VERSION=8
-FROM nvidia/cuda${ARCH:+-$ARCH}:${CUDA}-cudnn${CUDNN_MAJOR_VERSION}-devel-ubuntu${UBUNTU_VERSION}
+
+# Stage 1: base image
+FROM nvidia/cuda${ARCH:+-$ARCH}:${CUDA}-cudnn${CUDNN_MAJOR_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS base
 # ARCH and CUDA are specified again because the FROM directive resets ARGs
 # (but their default value is retained if set previously)
 ARG UBUNTU_VERSION
@@ -54,16 +56,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get update && \
     if [[ ${CUDA} == *"10."* ]]; then\
-        apt-get install -y --no-install-recommends \
-        libcublas10 \
-        libcublas-dev; \
+    apt-get install -y --no-install-recommends \
+    libcublas10 \
+    libcublas-dev; \
     else \
-        apt-get install -y --no-install-recommends \
-        libcublas-${CUDA/./-} \
-        libcufft-${CUDA/./-} \
-        libcurand-${CUDA/./-} \
-        libcusolver-${CUDA/./-} \
-        libcusparse-${CUDA/./-}; \
+    apt-get install -y --no-install-recommends \
+    libcublas-${CUDA/./-} \
+    libcufft-${CUDA/./-} \
+    libcurand-${CUDA/./-} \
+    libcusolver-${CUDA/./-} \
+    libcusparse-${CUDA/./-}; \
     fi
 
 
@@ -72,19 +74,19 @@ ARG LIBNVINFER=7.2.3-1
 ARG LIBNVINFER_MAJOR_VERSION=7
 ENV LIBNVINFER_APT_VER ${LIBNVINFER}+cuda${CUDA}
 RUN [[ "${ARCH}" = "ppc64le" ]] || { apt-get update && \
-        apt-get update && \
-        apt-get install -y --no-install-recommends libnvinfer${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-        libnvinfer-plugin${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-        libnvparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-        libnvonnxparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-        python3-libnvinfer=${LIBNVINFER_APT_VER} \
-        python3-libnvinfer-dev=${LIBNVINFER_APT_VER} \
-        libnvinfer-dev=${LIBNVINFER_APT_VER} \
-        libnvinfer-plugin-dev=${LIBNVINFER_APT_VER} \
-        libnvparsers-dev=${LIBNVINFER_APT_VER} \
-        libnvonnxparsers-dev=${LIBNVINFER_APT_VER} \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*; }
+    apt-get update && \
+    apt-get install -y --no-install-recommends libnvinfer${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
+    libnvinfer-plugin${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
+    libnvparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
+    libnvonnxparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
+    python3-libnvinfer=${LIBNVINFER_APT_VER} \
+    python3-libnvinfer-dev=${LIBNVINFER_APT_VER} \
+    libnvinfer-dev=${LIBNVINFER_APT_VER} \
+    libnvinfer-plugin-dev=${LIBNVINFER_APT_VER} \
+    libnvparsers-dev=${LIBNVINFER_APT_VER} \
+    libnvonnxparsers-dev=${LIBNVINFER_APT_VER} \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*; }
 
 ## For tensorrt
 RUN curl -O https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
@@ -145,3 +147,16 @@ ENV HOME /home/developer
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - --version 1.2.0a2
 ENV PATH $HOME/.local/bin:$PATH
 
+
+# Stage 2: including src image
+# Clone src
+FROM base AS src
+
+# You need a personal access token of GitLab for cloning from gitlab, 
+ARG GITLAB_USERNAME=oauth2
+ARG GITLAB_ACCESS_TOKEN
+RUN if [[ -z "$GITLAB_ACCESS_TOKEN" ]] ; then \
+    printf "\nERROR: This Dockerfile needs the personal access token of gitlab.fixstars.com, please specify by:\ndocker build --build-arg GITLAB_ACCESS_TOKEN=<your_personal_access_token>\n" && \
+    exit 1; fi
+
+RUN git clone --recursive https://${GITLAB_USERNAME}:${GITLAB_ACCESS_TOKEN}@gitlab.fixstars.com/arachne/arachne.git $HOME/arachne_src
