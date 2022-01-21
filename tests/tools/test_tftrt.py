@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+import tarfile
 import tempfile
 
 import numpy as np
@@ -7,7 +10,8 @@ import tensorflow as tf
 
 from arachne.data import Model
 from arachne.tools.tftrt import TFTRTConfig, run
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
+from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 
 def create_dummy_representative_dataset():
@@ -54,3 +58,35 @@ def test_tftrt(precision):
 
         output = run(input_model, cfg)
         check_tftrt_output(model, [1, 224, 224, 3], precision, output.path)
+
+
+def test_cli():
+    # Due to the test time, we only test one case
+    make_tf_gpu_usage_growth()
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+        model = tf.keras.applications.mobilenet.MobileNet()
+        model.save("saved_model")
+
+        ret = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "arachne.tools.tftrt",
+                "input=saved_model",
+                "output=output.tar",
+            ]
+        )
+
+        assert ret.returncode == 0
+
+        model_path = None
+        with tarfile.open("output.tar", "r:gz") as tar:
+            for m in tar.getmembers():
+                if m.name.endswith("saved_model"):
+                    model_path = m.name
+            tar.extractall(".")
+
+        assert model_path is not None
+        check_tftrt_output(model, [1, 224, 224, 3], "FP32", model_path)

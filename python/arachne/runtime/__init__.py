@@ -4,7 +4,11 @@ from typing import Optional
 
 import yaml
 
-from ..utils import get_cuda_version, get_cudnn_version, get_tensorrt_version
+from ..utils.version_utils import (
+    get_cuda_version,
+    get_cudnn_version,
+    get_tensorrt_version,
+)
 from .module import RuntimeModule
 from .module.onnx import ONNXRuntimeModule
 from .module.tflite import TFLiteRuntimeModule

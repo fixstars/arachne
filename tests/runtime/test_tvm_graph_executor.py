@@ -12,7 +12,7 @@ import arachne.runtime
 from arachne.data import Model
 from arachne.runtime.module.tvm import _open_module_file
 from arachne.tools.tvm import TVMConfig, run
-from arachne.utils import get_model_spec, save_model
+from arachne.utils.model_utils import get_model_spec, save_model
 
 
 def test_tvm_runtime():

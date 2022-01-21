@@ -11,14 +11,29 @@ from omegaconf import MISSING, DictConfig, OmegaConf
 
 from .config.base import BaseConfig
 from .data import Model
-from .tools import get_all_tools, register_tools_config
-from .utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    load_model_spec,
-    save_model,
-)
+from .tools.openvino2tf import register_openvino2tf_config
+from .tools.openvino_mo import register_openvino_mo_config
+from .tools.tflite_converter import register_tflite_converter_config
+from .tools.tftrt import register_tftrt_config
+from .tools.torch2onnx import register_torch2onnx_config
+from .tools.torch2trt import register_torch2trt_config
+from .tools.tvm import register_tvm_config
+from .utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from .utils.model_utils import get_model_spec, load_model_spec, save_model
+
+
+def register_tools_config():
+    register_openvino2tf_config()
+    register_openvino_mo_config()
+    register_tflite_converter_config()
+    register_tftrt_config()
+    register_torch2onnx_config()
+    register_torch2trt_config()
+    register_tvm_config()
+
+
+def get_all_tools() -> List[str]:
+    return list(get_tool_config_objects().keys())
 
 
 @dataclass

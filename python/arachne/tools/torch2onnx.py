@@ -10,14 +10,9 @@ from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    get_torch_dtype_from_string,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
+from arachne.utils.torch_utils import get_torch_dtype_from_string
 
 from ..data import Model
 
