@@ -57,6 +57,7 @@ exclude = '''
     | \.vscode
     | 3rdparty
     | docker\/
+    | python\/arachne\/runtime\/rpc\/protobuf\/*
   )/
 )
 '''
@@ -66,7 +67,7 @@ profile = "black"
 multi_line_output = 3
 src_paths = ["python/arachne"]
 filter_files = true
-skip_glob = "*/3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*"
+skip_glob = "python/arachne/runtime/rpc/protobuf/*, */3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*,"
 
 [tool.pyright]
 exclude = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]

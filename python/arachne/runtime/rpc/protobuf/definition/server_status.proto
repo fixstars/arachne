@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "msg_response.proto";
+
+package server_status;
+
+message LockRequest{}
+message UnlockRequest{}
+
+service ServerStatus{
+    rpc Lock(LockRequest) returns (MsgResponse) {}
+    rpc Unlock(UnlockRequest) returns (MsgResponse) {}
+}
