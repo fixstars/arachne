@@ -23,7 +23,9 @@ def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:
 
 
 def create_server(runtime_name: str, port: int):
-    server = grpc.server(thread_pool=futures.ThreadPoolExecutor(max_workers=1), options=(('grpc.so_reuseport', 0),))
+    server = grpc.server(
+        thread_pool=futures.ThreadPoolExecutor(max_workers=1), options=(("grpc.so_reuseport", 0),)
+    )
 
     server_status_pb2_grpc.add_ServerStatusServicer_to_server(ServerStatusServicer(), server)
     fileserver_pb2_grpc.add_FileServiceServicer_to_server(FileServicer(), server)
