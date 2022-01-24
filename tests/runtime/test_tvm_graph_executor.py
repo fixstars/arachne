@@ -10,6 +10,8 @@ from tvm.contrib.graph_executor import GraphModule
 
 import arachne.runtime
 from arachne.runtime.module.tvm import _open_module_file
+from arachne.tools.tvm import TVMConfig, run
+from arachne.utils.model_utils import get_model_spec, save_model
 
 
 def test_tvm_runtime():

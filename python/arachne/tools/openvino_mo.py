@@ -8,13 +8,8 @@ from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model
 
@@ -61,7 +56,7 @@ def run(input: Model, cfg: OpenVINOModelOptConfig) -> Model:
     return Model(path=output_dir, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

@@ -1,6 +1,7 @@
 import itertools
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, List, Optional
 
 import hydra
@@ -18,13 +19,8 @@ from tvm.driver.tvmc.frontends import load_model
 from tvm.driver.tvmc.model import TVMCModel
 from tvm.relay.backend.executor_factory import GraphExecutorFactoryModule
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model
 
@@ -77,6 +73,17 @@ def register_tvm_config() -> None:
         package="tools.tvm",
         node=TVMConfig,
     )
+
+
+def get_predefined_config(target: str) -> TVMConfig:
+    config_path = str(Path(__file__).parents[1]) + "/config/tvm_target/" + target + ".yaml"
+    pre_defined_conf = OmegaConf.load(config_path)
+    override_args = dict()
+    for k in pre_defined_conf.keys():
+        if "defaults" == k:
+            continue
+        override_args[k] = pre_defined_conf[k]  # type: ignore
+    return TVMConfig(**override_args)
 
 
 def _load_as_tvmc_model(input: Model) -> TVMCModel:
@@ -249,7 +256,7 @@ def run(input: Model, cfg: TVMConfig) -> Model:
     return Model(path=package_path, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

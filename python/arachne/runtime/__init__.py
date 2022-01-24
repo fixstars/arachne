@@ -4,7 +4,11 @@ from typing import Optional
 
 import yaml
 
-from ..utils import get_cuda_version, get_cudnn_version, get_tensorrt_version
+from ..utils.version_utils import (
+    get_cuda_version,
+    get_cudnn_version,
+    get_tensorrt_version,
+)
 from .module import RuntimeModule
 from .module.onnx import ONNXRuntimeModule
 from .module.tflite import TFLiteRuntimeModule
@@ -22,8 +26,8 @@ def validate_environment(env: dict) -> bool:
             if cudnn_version != dep["cudnn"]:
                 return False
         if "tensorrt" in dep:
-            cudnn_version = get_tensorrt_version()
-            if cudnn_version != dep["tensorrt"]:
+            tensorrt_version = get_tensorrt_version()
+            if tensorrt_version != dep["tensorrt"]:
                 return False
         if "pip" in dep:
             for pkg in dep["pip"]:

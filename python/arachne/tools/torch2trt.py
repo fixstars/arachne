@@ -12,14 +12,9 @@ from omegaconf import MISSING, DictConfig, OmegaConf
 from torch2trt import DEFAULT_CALIBRATION_ALGORITHM
 from torch2trt import torch2trt as run_torch2trt
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    get_torch_dtype_from_string,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
+from arachne.utils.torch_utils import get_torch_dtype_from_string
 
 from ..data import Model
 
@@ -116,7 +111,7 @@ def run(input: Model, cfg: Torch2TRTConfig) -> Model:
     return Model(filename, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

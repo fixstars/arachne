@@ -52,6 +52,15 @@ arachne.tools.torch2onnx
     :undoc-members:
 
 
+.. _api-tools-torch2trt:
+
+arachne.tools.torch2trt
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: arachne.tools.torch2trt
+    :members:
+    :undoc-members:
+
 
 .. _api-tools-tvm:
 

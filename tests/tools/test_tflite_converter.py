@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+import tarfile
 import tempfile
 
 import numpy as np
@@ -7,7 +10,8 @@ import tensorflow as tf
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.tools.tflite_converter import TFLiteConverterConfig, run
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
+from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 params = {
     "keras": ("h5", "none"),
@@ -23,6 +27,16 @@ params = {
     "pb-fp16": ("pb", "fp16"),
     "pb-int8": ("pb", "int8"),
 }
+
+
+def create_dummy_representative_dataset():
+    datasets = []
+    shape = [1, 224, 224, 3]
+    dtype = "float32"
+    for _ in range(100):
+        datasets.append(np.random.rand(*shape).astype(np.dtype(dtype)))  # type: ignore
+
+    np.save("dummy.npy", datasets)
 
 
 def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
@@ -52,9 +66,12 @@ def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
 def test_tflite_converter(model_format, ptq_method):
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
-        model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+        model = tf.keras.applications.mobilenet.MobileNet()
         cfg = TFLiteConverterConfig()
         cfg.ptq.method = ptq_method
+        if ptq_method == "int8":
+            create_dummy_representative_dataset()
+            cfg.ptq.representative_dataset = "dummy.npy"
         input_shape = [1, 224, 224, 3]
         if model_format == "h5":
             model.save("tmp.h5")
@@ -104,3 +121,36 @@ def test_tflite_converter(model_format, ptq_method):
             assert False
 
         check_tflite_output(model, input_shape, ptq_method, output.path)
+
+
+def test_cli():
+    # Due to the test time, we only test one case
+
+    make_tf_gpu_usage_growth()
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+        model = tf.keras.applications.mobilenet.MobileNet()
+        model.save("saved_model")
+
+        ret = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "arachne.tools.tflite_converter",
+                "input=saved_model",
+                "output=output.tar",
+            ]
+        )
+
+        assert ret.returncode == 0
+
+        model_path = None
+        with tarfile.open("output.tar", "r:gz") as tar:
+            for m in tar.getmembers():
+                if m.name.endswith(".tflite"):
+                    model_path = m.name
+            tar.extractall(".")
+
+        assert model_path is not None
+        check_tflite_output(model, [1, 224, 224, 3], "none", model_path)

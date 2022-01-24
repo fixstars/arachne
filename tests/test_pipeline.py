@@ -9,7 +9,7 @@ from omegaconf import OmegaConf
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.pipeline import PipelineConfig, get_default_tool_configs, run
-from arachne.utils import get_model_spec
+from arachne.utils.model_utils import get_model_spec
 
 
 @pytest.mark.parametrize("pipeline", [["tflite_converter", "tvm"], ["tftrt"]])

@@ -4,18 +4,14 @@ from typing import Any, List, Optional
 
 import hydra
 import numpy as np
+import tensorflow as tf
 from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
-from arachne.utils import (
-    get_model_spec,
-    get_tool_config_objects,
-    get_tool_run_objects,
-    load_model_spec,
-    save_model,
-)
+from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model, TensorSpec
 
@@ -52,9 +48,14 @@ def run(input: Model, cfg: TFTRTConfig) -> Model:
     params = params._replace(minimum_segment_size=cfg.minimum_segment_size)
     params = params._replace(maximum_cached_engines=cfg.maximum_cached_engines)
     params = params._replace(use_calibration=cfg.use_calibration)
-    params = params._replace(is_dynamic_op=cfg.is_dynamic_op)
-    params = params._replace(max_batch_size=cfg.max_batch_size)
     params = params._replace(allow_build_at_runtime=cfg.allow_build_at_runtime)
+
+    tf_version = tf.__version__.split(".")
+    tf_major_version = int(tf_version[0])
+    tf_minor_version = int(tf_version[1])
+    if tf_major_version == 2 and tf_minor_version < 4:
+        params = params._replace(is_dynamic_op=cfg.is_dynamic_op)
+        params = params._replace(max_batch_size=cfg.max_batch_size)
 
     converter = trt.TrtGraphConverterV2(input_saved_model_dir=input.path, conversion_params=params)
 
@@ -85,7 +86,7 @@ def run(input: Model, cfg: TFTRTConfig) -> Model:
     return Model(path=output_saved_model_dir, spec=input.spec)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 

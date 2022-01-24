@@ -12,7 +12,6 @@ torch = "1.8.0"
 torchvision = "0.9.0"
 tensorflow-datasets = "^4.4.0"
 hydra-core = "^1.1.1"
-tflite = "^2.4.0"
 packaging = "^21.3"
 openvino-dev = "^2021.4.2"
 rawpy = "0.16.0"
@@ -20,7 +19,9 @@ kedro = "^0.17.6"
 openvino2tensorflow = "^1.27.1"
 onnxruntime-gpu = "1.6.0"
 onnx = "1.6.0"
-tensorflow = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.4.1-cp36-cp36m-linux_x86_64.whl"}
+tensorflow = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.5.2-cp36-cp36m-linux_x86_64.whl"}
+tflite = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tflite-2.5.2-py3-none-any.whl"}
+pyparsing = "2.4.7"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^4.3.2"
@@ -69,4 +70,5 @@ filter_files = true
 skip_glob = "python/arachne/runtime/rpc/protobuf/*, */3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*,"
 
 [tool.pyright]
+exclude = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]
 ignore = ["./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]

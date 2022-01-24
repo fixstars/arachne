@@ -42,3 +42,32 @@ Using in your code
 
     output = arachne.tools.tvm.run(input=input, cfg=cfg)
 
+
+To use pre-defined targets
+--------------------------
+
+.. code:: bash
+
+    python -m arachne.tools.tvm \
+        input=/path/to/model \
+        input_spec=/path/to/model_spec.yaml \
+        output=output.tar \
+        +tvm_target=dgx-1
+
+
+.. code:: python
+
+    from arachne.data import Model
+    from aracune.utils import get_model_spec
+    import arachne.tools.tvm
+
+    model_file = "mobilenet.h5"
+    input_model = Model(model_file, spec=get_model_spec(model_file))
+
+    # Overwrite the spec for single-batch
+    input_model.spec.inputs[0].shape = [1, 224, 224, 3]
+    input_model.spec.outputs[0].shape = [1, 1000]
+
+    # Setup tvm config
+    cfg = arachne.tools.tvm.get_predefined_config("dgx-1")
+    output = arachne.tools.tvm.run(input=input, cfg=cfg)

@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+import tarfile
 import tempfile
 from typing import List
 
@@ -12,12 +15,14 @@ import torch.onnx
 import torchvision
 import tvm
 from tvm.contrib import graph_executor
+from tvm.contrib.download import download
 from tvm.contrib.graph_executor import GraphModule
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.runtime.module.tvm import _open_module_file
-from arachne.tools.tvm import TVMConfig, run
-from arachne.utils import get_model_spec
+from arachne.tools.tvm import TVMConfig, get_predefined_config, run
+from arachne.utils.model_utils import get_model_spec
+from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 params = {
     "keras-cpu": ("h5", ["cpu"]),
@@ -86,6 +91,9 @@ def check_tvm_output(
     "model_format, composite_target", list(params.values()), ids=list(params.keys())
 )
 def test_tvm(model_format, composite_target):
+
+    make_tf_gpu_usage_growth()
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
         cfg = TVMConfig()
@@ -93,7 +101,7 @@ def test_tvm(model_format, composite_target):
         cfg.composite_target = composite_target
         device_type = "cuda" if "cuda" in composite_target else "cpu"
         if model_format == "h5":
-            model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+            model = tf.keras.applications.mobilenet.MobileNet()
             model.save("tmp.h5")
             input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
             input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
@@ -103,23 +111,19 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
         elif model_format == "tflite":
-            model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
-            converter = tf.lite.TFLiteConverter.from_keras_model(model)
-            tflite_model = converter.convert()
+            url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
 
-            filename = "model.tflite"
-            output_path = os.getcwd() + "/" + filename
-            with open(output_path, "wb") as w:
-                w.write(tflite_model)
-            input = Model("model.tflite", spec=get_model_spec("model.tflite"))
+            model_path = "mobilenet.tflite"
+            download(url, model_path)
+            input = Model(model_path, spec=get_model_spec(model_path))
             output = run(input=input, cfg=cfg)
 
             check_tvm_output(
-                "model.tflite", model_format, [1, 224, 224, 3], output.path, device_type
+                "mobilenet.tflite", model_format, [1, 224, 224, 3], output.path, device_type
             )
 
         elif model_format == "pb":
-            model: tf.keras.Model = tf.keras.applications.mobilenet.MobileNet()
+            model = tf.keras.applications.mobilenet.MobileNet()
             model.save("tmp.h5")
             wrapper = tf.function(lambda x: model(x))
             wrapper = wrapper.get_concrete_function(tf.TensorSpec(model.inputs[0].shape, model.inputs[0].dtype))  # type: ignore
@@ -159,11 +163,11 @@ def test_tvm(model_format, composite_target):
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
         elif model_format == "onnx":
-            resnet18 = torchvision.models.resnet18(pretrained=True)
-            dummy_input = torch.randn(1, 3, 224, 224)
-            onnx_model_path = "./resnet18.onnx"
-            torch.onnx.export(resnet18, dummy_input, onnx_model_path)
-            input = Model("./resnet18.onnx", spec=get_model_spec("resnet18.onnx"))
+            url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
+
+            model_path = "resnet18.onnx"
+            download(url, model_path)
+            input = Model(model_path, spec=get_model_spec(model_path))
             output = run(input=input, cfg=cfg)
 
             check_tvm_output(
@@ -184,3 +188,48 @@ def test_tvm(model_format, composite_target):
             output = run(input=input, cfg=cfg)
 
             check_tvm_output("model.pth", model_format, [1, 3, 224, 224], output.path, device_type)
+
+
+@pytest.mark.parametrize(
+    "target", ["dgx-1", "dgx-s", "jetson-nano", "jetson-xavier-nx", "rasp4b64"]
+)
+def test_predefined_config(target):
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+
+        cfg = get_predefined_config(target)
+
+        model = tf.keras.applications.mobilenet.MobileNet()
+        model.save("tmp.h5")
+        input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
+        input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
+        input.spec.outputs[0].shape = [1, 1000]  # type: ignore
+        run(input=input, cfg=cfg)
+
+
+def test_cli():
+    # Due to the test time, we only test one case
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
+        url = (
+            "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
+        )
+
+        model_path = "resnet18.onnx"
+        download(url, model_path)
+        ret = subprocess.run(
+            [sys.executable, "-m", "arachne.tools.tvm", "input=resnet18.onnx", "output=output.tar"]
+        )
+
+        assert ret.returncode == 0
+
+        model_file = None
+        with tarfile.open("output.tar", "r:gz") as tar:
+            for m in tar.getmembers():
+                if m.name.endswith(".tar"):
+                    model_file = m.name
+            tar.extractall(".")
+
+        assert model_file is not None
+        check_tvm_output("resnet18.onnx", "onnx", [1, 3, 224, 224], model_file, "cpu")
