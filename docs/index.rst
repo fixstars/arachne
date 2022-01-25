@@ -24,6 +24,7 @@ This tool also provides runtime functionality to test your models on remote devi
    tools/index
    pipeline
    runtime
+   yolox
 
 
 .. toctree::
