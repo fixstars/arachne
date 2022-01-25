@@ -56,11 +56,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get update && \
     if [[ ${CUDA} == *"10."* ]]; then\
-    apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends --allow-change-held-packages\
     libcublas10 \
     libcublas-dev; \
     else \
-    apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends --allow-change-held-packages\
     libcublas-${CUDA/./-} \
     libcufft-${CUDA/./-} \
     libcurand-${CUDA/./-} \
