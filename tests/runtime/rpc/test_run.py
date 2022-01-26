@@ -100,7 +100,7 @@ def test_tflite_runtime_rpc(rpc_port=5051):
         assert rtmodule
 
         # local
-        dummy_input = np.random.rand(1, 224, 224, 3).astype(np.float32)
+        dummy_input = np.random.rand(1, 224, 224, 3).astype(np.float32)  # type: ignore
         rtmodule.set_input(0, dummy_input)
         rtmodule.run()
         local_output = rtmodule.get_output(0)
