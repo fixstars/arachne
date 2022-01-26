@@ -90,7 +90,7 @@ def run(input: Model, cfg: PipelineConfig) -> Model:
     return data_catalog.load(prev_output)
 
 
-@hydra.main(config_path=None, config_name="config")
+@hydra.main(config_path="config", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
