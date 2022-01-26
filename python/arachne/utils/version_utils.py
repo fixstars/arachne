@@ -5,7 +5,7 @@ import subprocess
 def get_tensorrt_version():
     dist = platform.linux_distribution()[0]
     if dist == "Ubuntu" or dist == "Debian":
-        result = subprocess.check_output("dpkg -l | grep libnvinfer-dev", shell=True)
+        result = subprocess.check_output("dpkg -l | grep libnvinfer-dev", shell=True, env={})
         return result.decode().strip().split()[2]
     else:
         # TODO: Support Fedora (RedHat)
@@ -13,14 +13,16 @@ def get_tensorrt_version():
 
 
 def get_cuda_version():
-    result = subprocess.check_output("nvcc --version", shell=True)
+    result = subprocess.check_output(
+        "nvcc --version", shell=True, env={"PATH": "/usr/local/cuda/bin/"}
+    )
     return result.decode().strip().split("\n")[-1].replace(",", "").split()[-2]
 
 
 def get_cudnn_version():
     dist = platform.linux_distribution()[0]
     if dist == "Ubuntu" or dist == "Debian":
-        result = subprocess.check_output("dpkg -l | grep libcudnn", shell=True)
+        result = subprocess.check_output("dpkg -l | grep libcudnn", shell=True, env={})
         return result.decode().strip().split()[2]
     else:
         # TODO: Support Fedora (RedHat)
