@@ -21,10 +21,8 @@ This tool also provides runtime functionality to test your models on remote devi
    :maxdepth: 1
    :caption: User Guide
 
-   tools/index
-   pipeline
-   runtime
-   yolox
+   tutorials/index
+   guides/index
 
 
 .. toctree::
