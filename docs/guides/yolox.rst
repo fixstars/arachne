@@ -25,7 +25,7 @@ Clone YOLOX repository and open the directory in vscode and run :code:`Remote-Co
     code ./YOLOX
 
 | The following steps are done inside the docker container.
-| Run `setup_arachne.sh` to setup virtual environment and install requirements for YOLOX.
+| Run :code:`setup_arachne.sh` to setup virtual environment and install requirements for YOLOX.
 
 .. code:: bash
 
@@ -49,8 +49,9 @@ Export :code:`yolox_s.pth` in onnx format.
     wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.pth
     python tools/export_onnx.py --output-name yolox_s.onnx -n yolox-s -c yolox_s.pth
 
-Create :code:`yolox_s.yaml` as the following, and compile yolox-s with :code:`arachne.tools`.
+Compile yolox-s with :code:`arachne.tools`.
 You can select :code:`cpu, cuda, or tensorrt` for :code:`tools.tvm.composite_target`.
+Model spec is defined in :code:`yaml/yolox-s.yml`:
 
 .. code:: yaml
 
@@ -74,9 +75,58 @@ You can select :code:`cpu, cuda, or tensorrt` for :code:`tools.tvm.composite_tar
 
     python -m arachne.tools.tvm \
         input=./yolox_s.onnx \
-        input_spec=./yolox_s.yaml \
+        input_spec=./yaml/yolox_s.yml \
         output=./yolox_s.tar \
-        tools.tvm.composite_target=[tensorrt]
+        tools.tvm.composite_target=[tensorrt,cpu]
+
+Run compiled model
+##################
+
+Run compiled model using :code:`arachne.runtime.module`.
+
+.. code:: python
+
+    import cv2
+    import torch
+    import numpy as np
+
+    from yolox.utils import postprocess as util_postprocess
+    from yolox.utils import demo_postprocess, vis
+    from yolox.data.datasets import COCO_CLASSES
+    import arachne.runtime
+
+    def preprocess(img):
+        resized_img = cv2.resize(orig_img, (640, 640))
+        resized_img = resized_img.transpose(2, 0, 1)
+        resized_img = resized_img[np.newaxis, :, :, :]
+        return resized_img
+
+
+    def postprocess(outputs):
+        outputs = demo_postprocess(outputs, (640, 640))
+        outputs = util_postprocess(outputs, 80, conf_thre=0.40, nms_thre=0.45)
+        output = outputs[0]
+        bboxes = output[:, 0:4]
+        ratio = (640 / orig_img.shape[0], 640 / orig_img.shape[1])
+        bboxes[:, 0] /= ratio[1]
+        bboxes[:, 1] /= ratio[0]
+        bboxes[:, 2] /= ratio[1]
+        bboxes[:, 3] /= ratio[0]
+        cls = output[:, 6]
+        scores = output[:, 4] * output[:, 5]
+        return bboxes, scores, cls
+
+
+    orig_img = cv2.imread("./assets/dog.jpg")
+    input_data = preprocess(orig_img)
+    rtmod = arachne.runtime.init(package_tar="./yolox_s.tar")
+    rtmod.set_input(0, input_data)
+    rtmod.run()
+    outputs = rtmod.get_output(0)
+    outputs = torch.from_numpy(outputs)
+    bboxes, scores, cls = postprocess(outputs)
+    vis_res = vis(orig_img, bboxes, scores, cls, conf=0.40, class_names=COCO_CLASSES)
+    cv2.imwrite("result.jpg", vis_res)
 
 Evaluate compiled model
 #######################
