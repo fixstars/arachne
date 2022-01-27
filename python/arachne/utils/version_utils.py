@@ -1,3 +1,4 @@
+import os
 import platform
 import subprocess
 
@@ -5,7 +6,9 @@ import subprocess
 def get_tensorrt_version():
     dist = platform.linux_distribution()[0]
     if dist == "Ubuntu" or dist == "Debian":
-        result = subprocess.check_output("dpkg -l | grep libnvinfer-dev", shell=True, env={})
+        result = subprocess.check_output(
+            "dpkg -l | grep libnvinfer-dev", shell=True, env={"PATH": os.environ["PATH"]}
+        )
         return result.decode().strip().split()[2]
     else:
         # TODO: Support Fedora (RedHat)
@@ -13,16 +16,16 @@ def get_tensorrt_version():
 
 
 def get_cuda_version():
-    result = subprocess.check_output(
-        "nvcc --version", shell=True, env={"PATH": "/usr/local/cuda/bin/"}
-    )
+    result = subprocess.check_output("nvcc --version", shell=True, env={"PATH": os.environ["PATH"]})
     return result.decode().strip().split("\n")[-1].replace(",", "").split()[-2]
 
 
 def get_cudnn_version():
     dist = platform.linux_distribution()[0]
     if dist == "Ubuntu" or dist == "Debian":
-        result = subprocess.check_output("dpkg -l | grep libcudnn", shell=True, env={})
+        result = subprocess.check_output(
+            "dpkg -l | grep libcudnn", shell=True, env={"PATH": os.environ["PATH"]}
+        )
         return result.decode().strip().split()[2]
     else:
         # TODO: Support Fedora (RedHat)
@@ -30,5 +33,7 @@ def get_cudnn_version():
 
 
 def get_torch2trt_version():
-    result = subprocess.check_output("pip show torch2trt", shell=True)
+    result = subprocess.check_output(
+        "pip show torch2trt", shell=True, env={"PATH": os.environ["PATH"]}
+    )
     return result.decode().strip().split("\n")[1].split()[1]
