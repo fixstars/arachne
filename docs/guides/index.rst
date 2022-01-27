@@ -6,3 +6,4 @@ How to guide
    :maxdepth: 1
 
    tf2_od_api
+   yolox
