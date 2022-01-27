@@ -174,4 +174,4 @@ Evaluation results are the following:
     Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.724
 
 | :code:`ArachneCOCOEvaluator` is an implementation of inference execution by arachne.
-| See also `arachne_example.ipyenb <https://gitlab.fixstars.com/arachne/models/YOLOX/-/blob/main/arachne_example.ipyenb>`_ in YOLOX repository.
+| See also `arachne_example.ipyenb <https://gitlab.fixstars.com/arachne/models/YOLOX/-/blob/issue/2_compile_arachne_v2/arachne_example.ipynb>`_ in YOLOX repository.
