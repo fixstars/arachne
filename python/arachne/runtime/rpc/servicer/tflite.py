@@ -13,6 +13,8 @@ logger = Logger.logger()
 
 
 class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRuntimeServicer):
+    """Servicer for TfLiteRuntime"""
+
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
         tfliteruntime_pb2_grpc.add_TfLiteRuntimeServicer_to_server(TfLiteRuntimeServicer(), server)
@@ -25,6 +27,16 @@ class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRu
         pass
 
     def Init(self, request, context):
+        """Initialize TfLiteRuntimeModule
+
+        Args:
+            request : | TfLiteInitRequest
+                      | :code:`request.model_path` (str): path to the tflite file on the server side
+                      | :code:`request.num_threads` (int): num_threads to set tfliteInterpreter. Defaults to 1.
+            context :
+        Returns:
+            MsgResponse
+        """
         model_path = request.model_path
         if model_path is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)

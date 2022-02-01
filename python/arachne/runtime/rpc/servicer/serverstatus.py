@@ -8,10 +8,21 @@ logger = Logger.logger()
 
 
 class ServerStatusServicer(server_status_pb2_grpc.ServerStatusServicer):
+    """ServerStatusServicer prevents multiple clients to connect.
+
+    Only one client per server can be connected at the same time.
+    """
+
     def __init__(self):
         self.is_busy = False
 
     def Lock(self, request, context):
+        """
+        Lock server. If it fails, set an error to response context.
+
+        Returns:
+            MsgResponse:
+        """
         if self.is_busy:
             context.set_code(grpc.StatusCode.PERMISSION_DENIED)
             context.set_details("server is being used by other client")
@@ -22,6 +33,12 @@ class ServerStatusServicer(server_status_pb2_grpc.ServerStatusServicer):
             return MsgResponse(msg="locked")
 
     def Unlock(self, request, context):
+        """
+        Unlock server.
+
+        Returns:
+            MsgResponse:
+        """
         if self.is_busy:
             logger.info("server is unlocked from client")
             self.is_busy = False

@@ -9,3 +9,4 @@ User tutorial
    tools/index
    pipeline
    runtime
+   rpc

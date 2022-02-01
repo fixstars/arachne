@@ -14,6 +14,8 @@ logger = Logger.logger()
 
 
 class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServicer):
+    """Servicer for TVMRuntime"""
+
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
         tvmruntime_pb2_grpc.add_TVMRuntimeServicer_to_server(TVMRuntimeServicer(), server)
@@ -26,6 +28,15 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         pass
 
     def Init(self, request, context):
+        """Initialize TVMRuntimeModule
+
+        Args:
+            request : | TfLiteInitRequest
+                      | :code:`request.package_path` (str): path to model tar archive on the server side
+            context :
+        Returns:
+            MsgResponse
+        """
         package_path = request.package_path
         if package_path is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -42,6 +53,18 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         return MsgResponse(msg="Init")
 
     def SetInput(self, request_iterator, context):
+        """Set input parameter to runtime module.
+
+        Args:
+            request_iterator : | iterator of SetInputRequest
+                               | :code:`request_iterator.index.index_i` (int): layer index to set data
+                               | :code:`request_iterator.index.index_s` (str): layer name to set data
+                               | :code:`request_iterator.np_arr_chunk.buffer` (bytes): byte chunk data of np.ndarray
+            context :
+
+        Returns:
+            MsgResponse
+        """
         assert self.module
         index = next(request_iterator).index
         # select index from 'oneof' structure
