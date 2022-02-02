@@ -15,7 +15,18 @@ from .stubmgr import FileStubManager, ServerStatusStubManager
 
 
 class RuntimeClientBase(metaclass=ABCMeta):
+    """Base class of runtime client.
+
+    Method interface is almost the same as arachne.runtime.module.
+    """
+
     def __init__(self, channel: grpc.Channel, stub):
+        """
+
+        Args:
+            channel (grpc.Channel): channel to connect server
+            stub : stub instance of gRPC generated stub class
+        """
         self.finalized = False
         self.stats_stub_mgr = ServerStatusStubManager(channel)
         self.stats_stub_mgr.trylock()
@@ -23,6 +34,7 @@ class RuntimeClientBase(metaclass=ABCMeta):
         self.stub = stub
 
     def finalize(self):
+        """Request to unlock server."""
         self.stats_stub_mgr.unlock()
         self.finalized = True
 
@@ -34,20 +46,36 @@ class RuntimeClientBase(metaclass=ABCMeta):
             # when server is already shutdown, fail to unlock server.
             warnings.warn(UserWarning("Failed to unlock server"))
 
-    def set_input(self, index: int, np_arr: np.ndarray):
-        def request_generator(index, np_arr):
-            yield runtime_message_pb2.SetInputRequest(index=index)
+    def set_input(self, idx: int, np_arr: np.ndarray):
+        """Requset to set input parameter.
+
+        Args:
+            idx (int): layer index to set data
+            np_arr (np.ndarray): input data
+        """
+
+        def request_generator(idx, np_arr):
+            yield runtime_message_pb2.SetInputRequest(index=idx)
             for piece in nparray_piece_generator(np_arr):
                 chunk = stream_data_pb2.Chunk(buffer=piece)
                 yield runtime_message_pb2.SetInputRequest(np_arr_chunk=chunk)
 
-        self.stub.SetInput(request_generator(index, np_arr))
+        self.stub.SetInput(request_generator(idx, np_arr))
 
     def run(self):
+        """Request to invoke inference."""
         req = runtime_message_pb2.RunRequest()
         self.stub.Run(req)
 
     def get_output(self, index: int) -> np.ndarray:
+        """Request to get inference output.
+
+        Args:
+            index (int): layer index to get output
+
+        Returns:
+            np.ndarray: output data
+        """
         req = runtime_message_pb2.GetOutputRequest(index=index)
         response_generator = self.stub.GetOutput(req)
         byte_extract_func = lambda response: response.np_data
@@ -56,6 +84,16 @@ class RuntimeClientBase(metaclass=ABCMeta):
         return np_array
 
     def benchmark(self, warmup: int = 1, repeat: int = 10, number: int = 1) -> Dict:
+        """Request to run benchmark.
+
+        Args:
+            warmup (int, optional): [description]. Defaults to 1.
+            repeat (int, optional): [description]. Defaults to 10.
+            number (int, optional): [description]. Defaults to 1.
+
+        Returns:
+            Dict: benchmark result
+        """
         req = runtime_message_pb2.BenchmarkRequest(warmup=warmup, repeat=repeat, number=number)
         response = self.stub.Benchmark(req)
 

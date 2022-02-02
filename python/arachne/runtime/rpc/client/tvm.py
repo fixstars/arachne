@@ -21,6 +21,12 @@ class TVMRuntimeClient(RuntimeClientBase):
         package_path: str,
         **kwargs,
     ):
+        """RuntimeClient for tvm
+
+        Args:
+            channel (grpc.Channel): channel to connect server
+            package_path (str): path to :code:`.tar` package file
+        """
         stub = tvmruntime_pb2_grpc.TVMRuntimeStub(channel)
         super().__init__(channel, stub)
         upload_response = self.file_stub_mgr.upload(Path(package_path))
@@ -28,6 +34,13 @@ class TVMRuntimeClient(RuntimeClientBase):
         self.stub.Init(req)
 
     def set_input(self, idx: Union[int, str], value: np.ndarray):
+        """Request to set input parameter.
+
+        Args:
+            idx (Union[int, str]): layer index or layer name to set data
+            value (np.ndarray): input data
+        """
+
         def request_generator(idx, value):
             if isinstance(idx, int):
                 idx = tvmruntime_pb2.Index(index_i=idx)

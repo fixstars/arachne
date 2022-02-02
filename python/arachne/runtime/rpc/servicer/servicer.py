@@ -14,20 +14,45 @@ from arachne.runtime.rpc.utils.nparray import (
 
 
 class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
+    """Base class of runtime servicer"""
+
     @staticmethod
     @abstractmethod
     def register_servicer_to_server(server: grpc.Server):
+        """Register servicer to server using grpc generated function
+
+        :code:`<runtime name>_pb2_grpc.add_<runtime name>RuntimeServicer_to_server`
+
+        Args:
+            server(grpc.Server): server to register servicer
+        """
         pass
 
     @staticmethod
     @abstractmethod
     def get_name() -> str:
+        """runtime name"""
         pass
 
     def __init__(self):
-        self.module: RuntimeModule
+        self.module: RuntimeModule  #: runtime module for inference
+
+    @abstractmethod
+    def Init(self, request, context):
+        """abstract method to initialize runtime module."""
 
     def SetInput(self, request_iterator, context):
+        """Set input parameter to runtime module.
+
+        Args:
+            request_iterator : | iterator of SetInputRequest
+                               | :code:`request_iterator.index` (int): layer index to set data
+                               | :code:`request_iterator.np_arr_chunk.buffer` (bytes): byte chunk data of np.ndarray
+            context :
+
+        Returns:
+            MsgResponse
+        """
         assert self.module
         index = next(request_iterator).index
         if index is None:
@@ -41,11 +66,30 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
         return MsgResponse(msg="SetInput")
 
     def Run(self, request, context):
+        """Invoke inference on runtime module.
+
+        Args:
+            request : SetInputRequest
+            context :
+        Returns:
+            MsgResponse
+        """
         assert self.module
         self.module.run()
         return MsgResponse(msg="Run")
 
     def Benchmark(self, request, context):
+        """Run benchmark on runtime module.
+
+        Args:
+            request : | BenchmarkRequest
+                      | :code:`request.warmup` (int)
+                      | :code:`request.repeat` (int)
+                      | :code:`request.number` (int)
+            context :
+        Returns:
+            BenchmarkResponse
+        """
         assert self.module
         warmup = request.warmup
         repeat = request.repeat
@@ -65,6 +109,15 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
         )
 
     def GetOutput(self, request, context):
+        """Get output from runtime module.
+
+        Args:
+            request : | GetOutputRequest
+                      | :code:`request.index` (int): layer index to get output
+            context :
+        Returns:
+            GetOutputResponse
+        """
         assert self.module
         index = request.index
         np_array = self.module.get_output(index)

@@ -9,6 +9,13 @@ from .client import RuntimeClientBase
 
 class ONNXRuntimeClient(RuntimeClientBase):
     def __init__(self, channel: grpc.Channel, model_path: str, providers=[]):
+        """RuntimeClient for onnx
+
+        Args:
+            channel (grpc.Channel): channel to connect server
+            model_path (str): path to :code:`.onnx` model file
+            providers (list, optional): :code:`providers` to set onnxruntime.InferenceSession. Defaults to [].
+        """
         stub = onnxruntime_pb2_grpc.ONNXRuntimeStub(channel)
         super().__init__(channel, stub)
         # 'provider_options' and 'session_options' are not supported

@@ -17,12 +17,30 @@ logger = Logger.logger()
 
 
 def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:
+    """Create gRPC channel.
+
+    Args:
+        host (str, optional): Defaults to "localhost".
+        port (int, optional): Defaults to 5051.
+
+    Returns:
+        grpc.Channel:
+    """
     rpc_address = f"{host}:{port}"
     channel = grpc.insecure_channel(rpc_address)
     return channel
 
 
 def create_server(runtime_name: str, port: int):
+    """Create the server by specifying the runtime.
+
+    Args:
+        runtime_name (str): The servicer corresponding to the specified runtime is registered with the server.
+        port (int):
+
+    Returns:
+        grpc.Server
+    """
     server = grpc.server(
         thread_pool=futures.ThreadPoolExecutor(max_workers=1), options=(("grpc.so_reuseport", 0),)
     )
@@ -39,6 +57,7 @@ def create_server(runtime_name: str, port: int):
 
 
 def start_server(server: grpc.Server, port: int):
+    """Start server and wait for termination."""
     server.start()
     logger.info(f"server is running on port: {port}")
     server.wait_for_termination()
