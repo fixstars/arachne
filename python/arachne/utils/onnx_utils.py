@@ -7,7 +7,7 @@ def get_onnx_model_spec(model_path: str) -> ModelSpec:
     inputs = []
     outputs = []
 
-    session = ort.InferenceSession(model_path)
+    session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
     for inp in session.get_inputs():
         dtype = inp.type.replace("tensor(", "").replace(")", "")
         if dtype == "float":
