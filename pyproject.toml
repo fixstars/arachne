@@ -22,6 +22,7 @@ onnx = "1.6.0"
 tensorflow = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.5.2-cp36-cp36m-linux_x86_64.whl"}
 tflite = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tflite-2.5.2-py3-none-any.whl"}
 pyparsing = "2.4.7"
+onnx-simplifier = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/onnx_simplifier-0.3.6-py3-none-any.whl"}
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^4.3.2"

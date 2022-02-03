@@ -1137,6 +1137,38 @@ typing-extensions = ">=3.6.2.1"
 mypy = ["mypy (==0.600)"]
 
 [[package]]
+name = "onnx-simplifier"
+version = "0.3.6"
+description = "Simplify your ONNX model"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+onnx = "*"
+onnxoptimizer = ">=0.2.5"
+onnxruntime-gpu = ">=1.6.0"
+protobuf = ">=3.7.0"
+
+[package.source]
+type = "url"
+url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/onnx_simplifier-0.3.6-py3-none-any.whl"
+
+[[package]]
+name = "onnxoptimizer"
+version = "0.2.6"
+description = "Open Neural Network Exchange"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+onnx = "*"
+
+[package.extras]
+mypy = ["mypy (==0.600)"]
+
+[[package]]
 name = "onnxruntime-gpu"
 version = "1.6.0"
 description = "ONNX Runtime Python bindings"
@@ -2027,6 +2059,7 @@ wrapt = ">=1.12.1,<1.13.0"
 [package.source]
 type = "url"
 url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.5.2-cp36-cp36m-linux_x86_64.whl"
+
 [[package]]
 name = "tensorflow-datasets"
 version = "4.4.0"
@@ -2136,6 +2169,7 @@ python-versions = "*"
 [package.source]
 type = "url"
 url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tflite-2.5.2-py3-none-any.whl"
+
 [[package]]
 name = "threadpoolctl"
 version = "3.0.0"
@@ -2354,7 +2388,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.3,<3.9"
-content-hash = "2c794971c2e7b25717142ba354242f1b3a1268090a7ffc5a664eb1ab146fc93d"
+content-hash = "46a2fa57214c7b039e6638f0219736beecbb407fe54990dc377b9a19907553e4"
 
 [metadata.files]
 absl-py = [
@@ -3067,6 +3101,21 @@ onnx = [
     {file = "onnx-1.6.0-cp37-cp37m-win32.whl", hash = "sha256:a78d7f0b784b26890f50cb48d7b1718db63f10ed3196cb023dd70631001c73a3"},
     {file = "onnx-1.6.0-cp37-cp37m-win_amd64.whl", hash = "sha256:912264fedd3df4647b31a4b7cd167982d54b4641eaf91bc1a9982c5eb9ebcb5f"},
     {file = "onnx-1.6.0.tar.gz", hash = "sha256:3b88c3fe521151651a0403c4d131cb2e0311bd28b753ef692020a432a81ce345"},
+]
+onnx-simplifier = []
+onnxoptimizer = [
+    {file = "onnxoptimizer-0.2.6-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:b12a06ce647d9827553bf07070327de236b1f8b547fe6896755ae775ddc11f94"},
+    {file = "onnxoptimizer-0.2.6-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:cb751d8b44cef3099d5c2ccfadeb772ab9c56d300fd9dfa1fdaa3cf71e279b77"},
+    {file = "onnxoptimizer-0.2.6-cp36-cp36m-win_amd64.whl", hash = "sha256:f2978ef9fac7fd99c01ecef8fb7981a695f91eb2251d73ac25eeba57672e41fe"},
+    {file = "onnxoptimizer-0.2.6-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:eebfb8a63eb0d8710ce116b72b78ec20b04b4997b673ec02dccee0e54fe4869b"},
+    {file = "onnxoptimizer-0.2.6-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:5c4338ffbcb29ee5e7bccec01fa60b72528a495d680f30203be0c06fbb34949c"},
+    {file = "onnxoptimizer-0.2.6-cp37-cp37m-win_amd64.whl", hash = "sha256:4ba0d23a9f580f3579079e226f1e75ff9e3d2d6011ca71b9f6e4cbfd6a2d2113"},
+    {file = "onnxoptimizer-0.2.6-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:2e98f9f915929397eec5e98cf3ad217a2a56cf77d5b9f06b7878a2672bff6c20"},
+    {file = "onnxoptimizer-0.2.6-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:870bf2741716e2be4bd24a46de2fb27ffbe5ee215df3f891f531f747d19e398b"},
+    {file = "onnxoptimizer-0.2.6-cp38-cp38-win_amd64.whl", hash = "sha256:c4e6573a981949cc662e425c503e4d69440a02d5512a7693701ef1da1cbb0a33"},
+    {file = "onnxoptimizer-0.2.6-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:0c05bbf023af64394394e3c98597b45785634cbd4ea5d80b2f15134889d6239c"},
+    {file = "onnxoptimizer-0.2.6-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:9a9bbbaf58c739d68ec88f50d6f667cb131ccbafa6b0f91d0aee5886b1ce8a03"},
+    {file = "onnxoptimizer-0.2.6-cp39-cp39-win_amd64.whl", hash = "sha256:7557b4a22b656c46956a21ac806ac18b5889a2b0447fbaf65e37881dac1ff97c"},
 ]
 onnxruntime-gpu = [
     {file = "onnxruntime_gpu-1.6.0-cp35-cp35m-manylinux2014_x86_64.whl", hash = "sha256:e329dceb3506d7da202e3f490dd75db6d465be368ee8a6f62fada282a2d565a9"},
@@ -3920,16 +3969,28 @@ tokenizers = [
     {file = "tokenizers-0.11.3-cp310-cp310-win32.whl", hash = "sha256:9a26a63888b4744c6ba6f61948a23c711acdadf7c3319ea4936145d2fd6b86a8"},
     {file = "tokenizers-0.11.3-cp310-cp310-win_amd64.whl", hash = "sha256:e53cc7d7c78fe0ffb8cf9c39cfdccc5fcf34eedc27f3dd45102af073de2d4c18"},
     {file = "tokenizers-0.11.3-cp36-cp36m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:297126201eefa645933d8f3b0954ee43d88a60a6747bcbe1e043011b3c851e32"},
+    {file = "tokenizers-0.11.3-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2abce6657308cfba6eb1812facfaef8f66b65e977dfc2cefba315f8059d0bbec"},
+    {file = "tokenizers-0.11.3-cp36-cp36m-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:eb0684fc0973eb8d1ac15dec188b0522e4feaf5253863c4e07a6c8d7f147a52e"},
+    {file = "tokenizers-0.11.3-cp36-cp36m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:1b4a1e28b8bf5be9cac048ffa0f68814472341fae484a5e2d2bcf3ede9360c8b"},
     {file = "tokenizers-0.11.3-cp37-cp37m-macosx_10_11_x86_64.whl", hash = "sha256:163aaba23c2de3b50f5ce03d0708c87ec6f0ad89e938cee7ae587a89b5ddabaa"},
     {file = "tokenizers-0.11.3-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:23052ab2c1722c49d184f8a83d4a76b917cdfac89e1e1227b6efa43c523ff92b"},
+    {file = "tokenizers-0.11.3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7c2ea52657e1c45f9f873f435b743ab03eec112d84751834c0b9455dc916a582"},
+    {file = "tokenizers-0.11.3-cp37-cp37m-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:6d5053e16325a2cdab979c58edaca5f285fb0c5bae8e8839e66b7895025024c8"},
+    {file = "tokenizers-0.11.3-cp37-cp37m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:d29ffbb8b5e78e4e75e6b6d94d67cdb75620f96c625f5b18a9a8d13d081dbdf2"},
     {file = "tokenizers-0.11.3-cp37-cp37m-win32.whl", hash = "sha256:4bf856e5e31575aca74a3c80cce6d4762832f04ea57098c3b0de409b6f51c801"},
     {file = "tokenizers-0.11.3-cp37-cp37m-win_amd64.whl", hash = "sha256:d23f6ed4fa0772ae29618cce5d70f4f14c21dc86f0e25e5febe65e18a8a8633f"},
     {file = "tokenizers-0.11.3-cp38-cp38-macosx_10_11_x86_64.whl", hash = "sha256:b37aeb755e5e3ca9b4378609273bdf10622c985c4cd23f4e05ea4b216dbd0aea"},
     {file = "tokenizers-0.11.3-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:651e7f4da78682a74af04535618cf3d95c719ae0cea25253f80037c15b3ef54c"},
+    {file = "tokenizers-0.11.3-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:eedd2f25a7ab9492fbed9a7954305862737966c37b65770e08776c71a3bb6fa1"},
+    {file = "tokenizers-0.11.3-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:5499e5ee1d6e5ac99541f469f126c8b7379fb76cb4b2931baf9c2d507756edea"},
+    {file = "tokenizers-0.11.3-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:fbab7cd21ac59cbec73f854179e22dea42631239301f427c205b041ba5b6ea6c"},
     {file = "tokenizers-0.11.3-cp38-cp38-win32.whl", hash = "sha256:5511c03f4076d2a35cb7d110ed4aabe71ad05b480f4ec154ae5b411ac72f2e7d"},
     {file = "tokenizers-0.11.3-cp38-cp38-win_amd64.whl", hash = "sha256:ee4288960b98eef44d88843a47cd102dffc3ebd1d06e49ac0e798a7425a28cb1"},
     {file = "tokenizers-0.11.3-cp39-cp39-macosx_10_11_x86_64.whl", hash = "sha256:b5f63b3915314838ac3fa76bcbcc931edd04884d5e41c30c2d0ed95ea1505d49"},
     {file = "tokenizers-0.11.3-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:58c969c6d0be72fa7b3da1e90ea9f1adffe47faa90caf50be449ec0951c55e2f"},
+    {file = "tokenizers-0.11.3-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1e5b1ab3f6fbdf1687f247e7d2835e6f02b7b25278b82b5102013e23c746de28"},
+    {file = "tokenizers-0.11.3-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:8fb0cfaba16e9baf6cf6fb1e3c6e7afc59cf4691226579f5a473f53bf48d145f"},
+    {file = "tokenizers-0.11.3-cp39-cp39-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:785a8a16f8939fa438227458a2444d78c34cd4632934e266fb94dd5276ea1ece"},
     {file = "tokenizers-0.11.3-cp39-cp39-win32.whl", hash = "sha256:aa7be1619ed67f9368d9a590d6ddd5571796f0a805f6a69b07cbbdd1b9fbc755"},
     {file = "tokenizers-0.11.3-cp39-cp39-win_amd64.whl", hash = "sha256:9d71265f7d8bb02360c4f44a86c9985a1798a0fd3002a03feba708e5f2d81c3d"},
     {file = "tokenizers-0.11.3.tar.gz", hash = "sha256:b24943a72385825595f9f6bd203c2b9bf8471d355631d58ac5efa2333250a2fa"},
