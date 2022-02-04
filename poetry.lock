@@ -1151,9 +1151,8 @@ onnxruntime-gpu = ">=1.6.0"
 protobuf = ">=3.7.0"
 
 [package.source]
-type = "legacy"
-url = "https://pypi.arachne.dev"
-reference = "arachne"
+type = "url"
+url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/onnx_simplifier-0.3.6-py3-none-any.whl"
 
 [[package]]
 name = "onnxoptimizer"
@@ -2389,7 +2388,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.3,<3.9"
-content-hash = "0549f8342c73f338615ec69d8649e03976bd316483ae6ed2d21dc4d627089dca"
+content-hash = "46a2fa57214c7b039e6638f0219736beecbb407fe54990dc377b9a19907553e4"
 
 [metadata.files]
 absl-py = [
@@ -3103,9 +3102,7 @@ onnx = [
     {file = "onnx-1.6.0-cp37-cp37m-win_amd64.whl", hash = "sha256:912264fedd3df4647b31a4b7cd167982d54b4641eaf91bc1a9982c5eb9ebcb5f"},
     {file = "onnx-1.6.0.tar.gz", hash = "sha256:3b88c3fe521151651a0403c4d131cb2e0311bd28b753ef692020a432a81ce345"},
 ]
-onnx-simplifier = [
-    {file = "onnx_simplifier-0.3.6+gpu-py3-none-any.whl", hash = "sha256:869afac72965ebd85c95a3f753e15d953669081720129195c3be0bd019812fab"},
-]
+onnx-simplifier = []
 onnxoptimizer = [
     {file = "onnxoptimizer-0.2.6-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:b12a06ce647d9827553bf07070327de236b1f8b547fe6896755ae775ddc11f94"},
     {file = "onnxoptimizer-0.2.6-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:cb751d8b44cef3099d5c2ccfadeb772ab9c56d300fd9dfa1fdaa3cf71e279b77"},
