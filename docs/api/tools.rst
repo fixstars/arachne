@@ -6,6 +6,15 @@ arachne.tools
     :undoc-members:
     :autosummary:
 
+.. _api-tools-onnx_simplifier:
+
+arachne.tools.onnx_simplifier
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: arachne.tools.onnx_simplifier
+    :members:
+    :undoc-members:
+
 .. _api-tools-openvino-mo:
 
 arachne.tools.openvino_mo
