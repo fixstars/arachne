@@ -5,6 +5,11 @@ description = "A library for accelerating deploying your DNN models to your edge
 authors = ["Takafumi Kubota <takafumi.kubota@fixstars.com>"]
 license = "Apache-2.0"
 
+[[tool.poetry.source]]
+name = "arachne"
+url = "https://pypi.arachne.dev/"
+secondary = true
+
 [tool.poetry.dependencies]
 python = ">=3.6.3,<3.9"
 numpy = "1.19.4"
@@ -22,7 +27,7 @@ onnx = "1.6.0"
 tensorflow = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.5.2-cp36-cp36m-linux_x86_64.whl"}
 tflite = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tflite-2.5.2-py3-none-any.whl"}
 pyparsing = "2.4.7"
-onnx-simplifier = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/onnx_simplifier-0.3.6-py3-none-any.whl"}
+onnx-simplifier = "0.3.6+gpu"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^4.3.2"
