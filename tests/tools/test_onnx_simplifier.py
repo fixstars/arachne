@@ -22,7 +22,7 @@ def test_onnx_simplifier():
 
         input_model = Model(path=onnx_model_file, spec=get_model_spec(onnx_model_file))
         check_n = 10  # number of check iteration
-        cfg = OnnxSimplifierConfig(cli_args=str(check_n))
+        cfg = OnnxSimplifierConfig(check_n=check_n)
         # The validation of the simplified model is performed in onnx-simplifier.
         run(input_model, cfg)
 
@@ -44,7 +44,7 @@ def test_cli():
                 "arachne.tools.onnx_simplifier",
                 f"input={onnx_model_file}",
                 "output=simplified.onnx",
-                f"tools.onnx_simplifier.cli_args={check_n}",
+                f"tools.onnx_simplifier.check_n={check_n}",
             ]
         )
 
