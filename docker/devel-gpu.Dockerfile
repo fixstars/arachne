@@ -1,4 +1,4 @@
-# Copyright 2021 Takafumi Kubota. All Rights Reserved.
+# Copyright 2022 Fixstars Corporation. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,86 +23,72 @@ ARG UBUNTU_VERSION=18.04
 
 ARG ARCH=
 ARG CUDA=10.2
-ARG CUDNN_MAJOR_VERSION=8
-
-# Stage 1: base image
-FROM nvidia/cuda${ARCH:+-$ARCH}:${CUDA}-cudnn${CUDNN_MAJOR_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS base
+FROM nvidia/cuda${ARCH:+-$ARCH}:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
 # ARCH and CUDA are specified again because the FROM directive resets ARGs
 # (but their default value is retained if set previously)
-ARG UBUNTU_VERSION
 ARG ARCH
 ARG CUDA
-ARG CUDNN_MAJOR_VERSION
-
-# Let us install tzdata painlessly
-ENV DEBIAN_FRONTEND=noninteractive
+ARG CUDNN=8.0.0.180-1
+ARG CUDNN_MAJOR_VERSION=8
+ARG LIB_DIR_PREFIX=x86_64
+ARG LIBNVINFER=7.1.3-1
+ARG LIBNVINFER_MAJOR_VERSION=7
 
 # Needed for string substitution
 SHELL ["/bin/bash", "-c"]
-
-# Install Cuda and other packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    cuda-command-line-tools-${CUDA} \
-    cuda-nvrtc-${CUDA/./-} \
-    cuda-nvrtc-dev-${CUDA/./-} \
-    curl \
-    libfreetype6-dev \
-    libhdf5-serial-dev \
-    libzmq3-dev \
-    pkg-config \
-    software-properties-common \
-    unzip
+        build-essential \
+        cuda-command-line-tools-${CUDA/./-} \
+        libcublas10 \
+        libcublas-dev\
+        cuda-cusolver-${CUDA/./-} \
+        cuda-cusolver-dev-${CUDA/./-} \
+        cuda-curand-${CUDA/./-} \
+        cuda-curand-dev-${CUDA/./-} \
+        cuda-cufft-${CUDA/./-} \
+        cuda-cufft-dev-${CUDA/./-} \
+        cuda-cusparse-${CUDA/./-} \
+        cuda-cusparse-dev-${CUDA/./-} \
+        cuda-nvprune-${CUDA/./-} \
+        cuda-nvrtc-${CUDA/./-} \
+        cuda-nvrtc-dev-${CUDA/./-} \
+        cuda-cudart-dev-${CUDA/./-} \
+        libcudnn8=${CUDNN}+cuda${CUDA} \
+        libcudnn8-dev=${CUDNN}+cuda${CUDA} \
+        libcurl3-dev \
+        libfreetype6-dev \
+        libhdf5-serial-dev \
+        libzmq3-dev \
+        pkg-config \
+        rsync \
+        software-properties-common \
+        unzip \
+        zip \
+        zlib1g-dev \
+        wget \
+        git \
+        && \
+    find /usr/local/cuda-${CUDA}/lib64/ -type f -name 'lib*_static.a' -not -name 'libcudart_static.a' -delete && \
+    rm /usr/lib/${LIB_DIR_PREFIX}-linux-gnu/libcudnn_static_v8.a
 
-RUN apt-get update && \
-    if [[ ${CUDA} == *"10."* ]]; then\
-    apt-get install -y --no-install-recommends --allow-change-held-packages\
-    libcublas10 \
-    libcublas-dev; \
-    else \
-    apt-get install -y --no-install-recommends --allow-change-held-packages\
-    libcublas-${CUDA/./-} \
-    libcufft-${CUDA/./-} \
-    libcurand-${CUDA/./-} \
-    libcusolver-${CUDA/./-} \
-    libcusparse-${CUDA/./-}; \
-    fi
-
-
-# Install TensorRT
-ARG LIBNVINFER=7.2.3-1
-ARG LIBNVINFER_MAJOR_VERSION=7
-ENV LIBNVINFER_APT_VER ${LIBNVINFER}+cuda${CUDA}
+# Install TensorRT if not building for PowerPC
 RUN [[ "${ARCH}" = "ppc64le" ]] || { apt-get update && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends libnvinfer${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-    libnvinfer-plugin${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-    libnvparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-    libnvonnxparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER_APT_VER} \
-    python3-libnvinfer=${LIBNVINFER_APT_VER} \
-    python3-libnvinfer-dev=${LIBNVINFER_APT_VER} \
-    libnvinfer-dev=${LIBNVINFER_APT_VER} \
-    libnvinfer-plugin-dev=${LIBNVINFER_APT_VER} \
-    libnvparsers-dev=${LIBNVINFER_APT_VER} \
-    libnvonnxparsers-dev=${LIBNVINFER_APT_VER} \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*; }
-
-## For tensorrt
-RUN curl -O https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
-
-RUN dpkg -i nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb \
-    && apt-key add /var/nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226/7fa2af80.pub \
-    && apt-get update \
-    && apt-get install -y tensorrt \
-    && rm nv-tensorrt-repo-ubuntu${UBUNTU_VERSION/./}-cuda${CUDA}-trt${LIBNVINFER/-1/}.4-ga-20210226_1-1_amd64.deb
+        apt-get install -y --no-install-recommends \
+        libnvinfer${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda${CUDA} \
+        libnvinfer-dev=${LIBNVINFER}+cuda${CUDA} \
+        libnvinfer-plugin-dev=${LIBNVINFER}+cuda${CUDA} \
+        libnvinfer-plugin${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda${CUDA} \
+        libnvparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda${CUDA} \
+        libnvparsers-dev=${LIBNVINFER}+cuda${CUDA} \
+        libnvonnxparsers${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda${CUDA} \
+        libnvonnxparsers-dev=${LIBNVINFER}+cuda${CUDA} \
+        python3-libnvinfer=${LIBNVINFER}+cuda${CUDA} \
+        python3-libnvinfer-dev=${LIBNVINFER}+cuda${CUDA} \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*; }
 
 
-# For CUDA profiling, TensorFlow requires CUPTI.
-ENV LD_LIBRARY_PATH /usr/local/cuda-${CUDA}/targets/x86_64-linux/lib:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/cuda/lib64:$LD_LIBRARY_PATH
-
-# Link the libcuda stub to the location where tensorflow is searching for it and reconfigure
-# dynamic linker run-time bindings
+ENV LD_LIBRARY_PATH /usr/local/cuda-${CUDA}/targets/x86_64-linux/lib:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/cuda/lib64:/usr/include/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH:/usr/local/cuda/lib64/stubs
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 \
     && echo "/usr/local/cuda/lib64/stubs" > /etc/ld.so.conf.d/z-cuda-stubs.conf \
     && ldconfig
@@ -110,25 +96,27 @@ RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/lib
 # See http://bugs.python.org/issue19846
 ENV LANG C.UTF-8
 
-# Install llvm-11
+
+# Install other packages for development
+
 RUN echo deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main >> /etc/apt/sources.list.d/llvm.list \
     && echo deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main >> /etc/apt/sources.list.d/llvm.list \
     && apt-key adv --fetch-keys http://apt.llvm.org/llvm-snapshot.gpg.key \
     && apt-get update && apt-get install -y llvm-11 clang-11
 
-RUN apt-get update && apt-get install -y libopenblas-dev
-
-# Install other packages for development
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-dev \
     python3-pip \
     python3-venv \
+    libopenblas-dev \
     sudo \
+    curl \
     git
 
 # python -> python3
 RUN ln -s $(which python3) /usr/local/bin/python
+RUN ln -s $(which pip3) /usr/local/bin/pip
 
 # Add a user that UID:GID will be updated by vscode
 ARG USERNAME=developer
@@ -147,12 +135,11 @@ ENV HOME /home/developer
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - --version 1.2.0a2
 ENV PATH $HOME/.local/bin:$PATH
 
-
 # Stage 2: including src image
 # Clone src
 FROM base AS src
 
-# You need a personal access token of GitLab for cloning from gitlab, 
+# You need a personal access token of GitLab for cloning from gitlab,
 ARG GITLAB_USERNAME=oauth2
 ARG GITLAB_ACCESS_TOKEN
 RUN if [[ -z "$GITLAB_ACCESS_TOKEN" ]] ; then \
