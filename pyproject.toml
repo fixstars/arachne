@@ -19,10 +19,10 @@ kedro = "^0.17.6"
 openvino2tensorflow = "^1.27.1"
 onnxruntime-gpu = "1.6.0"
 onnx = "1.6.0"
-tensorflow = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tensorflow-2.5.2-cp36-cp36m-linux_x86_64.whl"}
-tflite = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/tflite-2.5.2-py3-none-any.whl"}
+tensorflow = "2.5.3+jp45"
+tflite = "2.5.3"
 pyparsing = "2.4.7"
-onnx-simplifier = {url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/pypi/onnx_simplifier-0.3.6%2Bgpu-py3-none-any.whl"}
+onnx-simplifier = "0.3.6+gpu"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^4.3.2"
@@ -40,6 +40,10 @@ cmake = "^3.22.1"
 ninja = "^1.10.2"
 pytest-xdist = "^2.5.0"
 
+[[tool.poetry.source]]
+name = "arachne"
+url = "https://pypi.arachne.dev/"
+secondary = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
