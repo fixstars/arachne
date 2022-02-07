@@ -5,6 +5,7 @@
         "target": "base",
     },
     "context": "../docker",
+    "runArgs": ["--gpus", "all"],
     "remoteEnv": {
         "PYTHONPATH": "/workspaces/arachne/python",
         "TVM_LIBRARY_PATH": "/workspaces/arachne/build/tvm"
