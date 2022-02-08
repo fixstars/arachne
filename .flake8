@@ -12,3 +12,5 @@ exclude =
     dist,
     .venv,
     tmp,
+    3rdparty
+    python/arachne/runtime/rpc/protobuf/*
