@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from collections import OrderedDict
-from typing import Dict, Generic, List, Optional, Type, TypeVar
+from typing import Dict, List, Optional, Type
 
 import grpc
 
@@ -60,7 +60,9 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
             context.set_details("index should not be None")
             return MsgResponse()
 
-        byte_extract_func = lambda request: request.np_arr_chunk.buffer
+        def byte_extract_func(request):
+            return request.np_arr_chunk.buffer
+
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
         return MsgResponse(msg="SetInput")
