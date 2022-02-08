@@ -16,9 +16,10 @@ check-format-diff:
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
   script:
-    - python3 -m pip install black isort
+    - python3 -m pip install black isort flake8
     - isort python --diff --check
     - black python --diff --check
+    - flake8 --show-source --statistic
 
 
 build-image:

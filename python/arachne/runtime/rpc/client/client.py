@@ -42,7 +42,7 @@ class RuntimeClientBase(metaclass=ABCMeta):
         try:
             if not self.finalized:
                 self.finalize()
-        except:
+        except grpc.RpcError:
             # when server is already shutdown, fail to unlock server.
             warnings.warn(UserWarning("Failed to unlock server"))
 
@@ -78,7 +78,10 @@ class RuntimeClientBase(metaclass=ABCMeta):
         """
         req = runtime_message_pb2.GetOutputRequest(index=index)
         response_generator = self.stub.GetOutput(req)
-        byte_extract_func = lambda response: response.np_data
+
+        def byte_extract_func(response):
+            return response.np_data
+
         np_array = generator_to_np_array(response_generator, byte_extract_func)
         assert isinstance(np_array, np.ndarray)
         return np_array

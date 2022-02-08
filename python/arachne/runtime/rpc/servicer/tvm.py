@@ -74,7 +74,9 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
             context.set_details("index should not be None")
             return MsgResponse()
 
-        byte_extract_func = lambda request: request.np_arr_chunk.buffer
+        def byte_extract_func(request):
+            return request.np_arr_chunk.buffer
+
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
         return MsgResponse(msg="SetInput")

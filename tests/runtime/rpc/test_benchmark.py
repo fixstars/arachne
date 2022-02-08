@@ -1,6 +1,5 @@
 import tempfile
 
-import numpy as np
 from tvm.contrib.download import download
 
 import arachne.runtime

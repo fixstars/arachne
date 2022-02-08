@@ -52,7 +52,7 @@ class FileStubManager:
         """Request to delete temporary directory."""
         try:
             self.stub.delete_tmpdir(fileserver_pb2.DeleteTmpDirRequest(dirname=str(self.tmpdir)))
-        except:
+        except grpc.RpcError:
             pass
 
     def upload(self, src_file_path: Path):
