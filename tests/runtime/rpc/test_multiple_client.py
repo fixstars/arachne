@@ -23,7 +23,7 @@ def test_prohibit_multiple_client(rpc_port=5051):
         try:
             client1 = TfliteRuntimeClient(channel, model_path)
             # cannot create multiple clients
-            client2 = TfliteRuntimeClient(channel, model_path)  # noqa: F841
+            _ = TfliteRuntimeClient(channel, model_path)
         finally:
             if client1 is not None:
                 client1.finalize()
@@ -48,11 +48,11 @@ def test_conitnue_first_client(rpc_port=5051):
         try:
             client1.set_input(0, dummy_input)
             # cannot create multiple clients
-            client2 = TfliteRuntimeClient(channel, model_path)  # noqa: F841
+            _ = TfliteRuntimeClient(channel, model_path)
         except grpc.RpcError:
             # client1 can continue to be used
             client1.run()
-            rpc_output = client1.get_output(0)  # noqa: F841
+            _ = client1.get_output(0)
             client1.finalize()
         finally:
             channel.close()
