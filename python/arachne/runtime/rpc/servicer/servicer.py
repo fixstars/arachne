@@ -28,12 +28,6 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
         """
         pass
 
-    @staticmethod
-    @abstractmethod
-    def get_name() -> str:
-        """runtime name"""
-        pass
-
     def __init__(self):
         self.module: RuntimeModule  #: runtime module for inference
 
@@ -141,18 +135,3 @@ class RuntimeServicerRegistry:
 
     def list(self) -> List[str]:
         return list(self._registries.keys())
-
-
-_runtime_servicer_registry = RuntimeServicerRegistry()
-
-
-def get_runtime_servicer(key: str) -> Optional[Type[RuntimeServicerBase]]:
-    return _runtime_servicer_registry.get(key)
-
-
-def register_runtime_servicer(servicer: Type[RuntimeServicerBase]):
-    _runtime_servicer_registry.register(servicer.get_name(), servicer)
-
-
-def runtime_servicer_list() -> List[str]:
-    return _runtime_servicer_registry.list()

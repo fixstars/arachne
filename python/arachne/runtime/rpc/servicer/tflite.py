@@ -7,21 +7,19 @@ from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import tfliteruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 
-from .servicer import RuntimeServicerBase, register_runtime_servicer
+from .factory import RuntimeServicerBaseFactory
+from .servicer import RuntimeServicerBase
 
 logger = Logger.logger()
 
 
+@RuntimeServicerBaseFactory.register("tflite")
 class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRuntimeServicer):
     """Servicer for TfLiteRuntime"""
 
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
         tfliteruntime_pb2_grpc.add_TfLiteRuntimeServicer_to_server(TfLiteRuntimeServicer(), server)
-
-    @staticmethod
-    def get_name():
-        return "tflite"
 
     def __init__(self):
         pass
@@ -51,6 +49,3 @@ class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRu
         self.module = init(model_file=model_path)
         assert isinstance(self.module, TFLiteRuntimeModule)
         return MsgResponse(msg="Init")
-
-
-register_runtime_servicer(TfLiteRuntimeServicer)

@@ -6,12 +6,7 @@ import grpc
 from arachne.runtime.rpc.logger import Logger
 
 from .protobuf import fileserver_pb2_grpc, server_status_pb2_grpc
-from .servicer import (
-    FileServicer,
-    ServerStatusServicer,
-    get_runtime_servicer,
-    runtime_servicer_list,
-)
+from .servicer import FileServicer, RuntimeServicerBaseFactory, ServerStatusServicer
 
 logger = Logger.logger()
 
@@ -48,7 +43,7 @@ def create_server(runtime_name: str, port: int):
     server_status_pb2_grpc.add_ServerStatusServicer_to_server(ServerStatusServicer(), server)
     fileserver_pb2_grpc.add_FileServiceServicer_to_server(FileServicer(), server)
 
-    servicer_class = get_runtime_servicer(runtime_name)
+    servicer_class = RuntimeServicerBaseFactory.get(runtime_name)
     assert servicer_class is not None
     servicer_class.register_servicer_to_server(server)
 
@@ -66,7 +61,7 @@ def start_server(server: grpc.Server, port: int):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=5051)
-    parser.add_argument("--runtime", type=str, choices=runtime_servicer_list())
+    parser.add_argument("--runtime", type=str, choices=RuntimeServicerBaseFactory.list())
 
     args = parser.parse_args()
 
