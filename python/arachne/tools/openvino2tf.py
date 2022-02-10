@@ -1,13 +1,8 @@
 import itertools
 import os
 import subprocess
-from dataclasses import dataclass, field
-from typing import Any, List, Optional
-
-import hydra
-from hydra.core.config_store import ConfigStore
-from hydra.utils import to_absolute_path
-from omegaconf import MISSING, DictConfig, OmegaConf
+from dataclasses import dataclass
+from typing import Optional
 
 from arachne.tools.factory import (
     ToolBase,
@@ -15,7 +10,7 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
+from arachne.utils.model_utils import get_model_spec
 
 from ..data import Model
 
@@ -26,17 +21,6 @@ _FACTORY_KEY = "openvino2tf"
 @dataclass
 class OpenVINO2TFConfig(ToolConfigBase):
     cli_args: Optional[str] = None
-
-
-def register_openvino2tf_config() -> None:
-    cs = ConfigStore.instance()
-    group_name = "tools"
-    cs.store(
-        group=group_name,
-        name="openvino2tf",
-        package="tools.openvino2tf",
-        node=OpenVINO2TFConfig,
-    )
 
 
 def _find_openvino_xml_file(dir: str) -> Optional[str]:
@@ -78,38 +62,3 @@ class OpenVINO2TF(ToolBase):
         ret = subprocess.run(cmd)
         assert ret.returncode == 0
         return Model(path=output_dir, spec=get_model_spec(output_dir))
-
-
-@hydra.main(config_path="../config", config_name="config")
-def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
-
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
-
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
-
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
-
-    assert input_model.spec is not None
-    output_model = OpenVINO2TF.run(input=input_model, cfg=cfg.tools.openvino2tf)
-    save_model(model=output_model, output_path=output_path)
-
-
-if __name__ == "__main__":
-    register_openvino2tf_config()
-
-    from ..config.base import BaseConfig
-
-    defaults = [{"tools": "openvino2tf"}, "_self_"]
-
-    @dataclass
-    class Config(BaseConfig):
-        defaults: List[Any] = field(default_factory=lambda: defaults)
-        tools: Any = MISSING
-
-    cs = ConfigStore.instance()
-    cs.store(name="config", node=Config)
-    main()

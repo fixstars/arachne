@@ -2,16 +2,13 @@ import itertools
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import List, Optional
 
-import hydra
 import tvm
 import tvm.autotvm
 import tvm.target
 import tvm.target.tag
-from hydra.core.config_store import ConfigStore
-from hydra.utils import to_absolute_path
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import OmegaConf
 from tvm import relay
 from tvm.driver.tvmc.common import convert_graph_layout, target_from_cli
 from tvm.driver.tvmc.composite_target import get_codegen_by_target
@@ -25,7 +22,6 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model
 
@@ -70,17 +66,6 @@ class TVMConfig(ToolConfigBase):
     export_format: str = "tar"
     cross_compiler: Optional[str] = None
     cross_compiler_options: Optional[str] = None
-
-
-def register_tvm_config() -> None:
-    cs = ConfigStore.instance()
-    group_name = "tools"
-    cs.store(
-        group=group_name,
-        name="tvm",
-        package="tools.tvm",
-        node=TVMConfig,
-    )
 
 
 def get_predefined_config(target: str) -> TVMConfig:
@@ -267,38 +252,3 @@ class TVM(ToolBase):
         _save_relay(graph_module=graph_module, module=module, module_path=package_path)
 
         return Model(path=package_path, spec=input.spec)
-
-
-@hydra.main(config_path="../config", config_name="config")
-def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
-
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
-
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
-
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
-
-    assert input_model.spec is not None
-    output_model = TVM.run(input=input_model, cfg=cfg.tools.tvm)
-    save_model(model=output_model, output_path=output_path, tvm_cfg=cfg.tools.tvm)
-
-
-if __name__ == "__main__":
-    register_tvm_config()
-
-    from ..config.base import BaseConfig
-
-    defaults = [{"tools": "tvm"}, "_self_"]
-
-    @dataclass
-    class Config(BaseConfig):
-        defaults: List[Any] = field(default_factory=lambda: defaults)
-        tools: Any = MISSING
-
-    cs = ConfigStore.instance()
-    cs.store(name="config", node=Config)
-    main()

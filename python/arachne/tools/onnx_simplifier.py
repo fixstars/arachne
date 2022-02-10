@@ -1,13 +1,9 @@
 import itertools
-from dataclasses import dataclass, field
-from typing import Any, List, Optional
+from dataclasses import dataclass
+from typing import List, Optional
 
-import hydra
 import numpy as np
 import onnx
-from hydra.core.config_store import ConfigStore
-from hydra.utils import to_absolute_path
-from omegaconf import MISSING, DictConfig, OmegaConf
 from onnxsim.onnx_simplifier import simplify
 
 from arachne.tools.factory import (
@@ -16,7 +12,7 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
+from arachne.utils.model_utils import get_model_spec
 
 from ..data import Model
 
@@ -35,17 +31,6 @@ class ONNXSimplifierConfig(ToolConfigBase):
     dynamic_input_shape: bool = False
     input_data_path: Optional[List[str]] = None
     custom_lib: Optional[str] = None
-
-
-def register_onnx_simplifier_config() -> None:
-    cs = ConfigStore.instance()
-    group_name = "tools"
-    cs.store(
-        group=group_name,
-        name="onnx_simplifier",
-        package="tools.onnx_simplifier",
-        node=ONNXSimplifierConfig,
-    )
 
 
 def get_input_shapes_and_tensors_from_args(input_shape, input_data_path):
@@ -105,37 +90,3 @@ class ONNXSimplifier(ToolBase):
         onnx.save(model_opt, filename)
 
         return Model(filename, spec=get_model_spec(filename))
-
-
-@hydra.main(config_path="../config", config_name="config")
-def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
-
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
-
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
-
-    assert input_model.spec is not None
-    output_model = ONNXSimplifier.run(input=input_model, cfg=cfg.tools.onnx_simplifier)
-    save_model(model=output_model, output_path=output_path)
-
-
-if __name__ == "__main__":
-    register_onnx_simplifier_config()
-
-    from ..config.base import BaseConfig
-
-    defaults = [{"tools": "onnx_simplifier"}, "_self_"]
-
-    @dataclass
-    class Config(BaseConfig):
-        defaults: List[Any] = field(default_factory=lambda: defaults)
-        tools: Any = MISSING
-
-    cs = ConfigStore.instance()
-    cs.store(name="config", node=Config)
-    main()

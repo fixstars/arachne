@@ -73,7 +73,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.tftrt",
+                "arachne.driver.cli",
+                "+tools=tftrt",
                 "input=saved_model",
                 "output=output.tar",
             ]

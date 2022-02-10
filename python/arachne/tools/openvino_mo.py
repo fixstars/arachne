@@ -1,12 +1,7 @@
 import itertools
 import subprocess
-from dataclasses import dataclass, field
-from typing import Any, List, Optional
-
-import hydra
-from hydra.core.config_store import ConfigStore
-from hydra.utils import to_absolute_path
-from omegaconf import MISSING, DictConfig, OmegaConf
+from dataclasses import dataclass
+from typing import Optional
 
 from arachne.tools.factory import (
     ToolBase,
@@ -14,7 +9,6 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model
 
@@ -25,17 +19,6 @@ _FACTORY_KEY = "openvino_mo"
 @dataclass
 class OpenVINOModelOptConfig(ToolConfigBase):
     cli_args: Optional[str] = None
-
-
-def register_openvino_mo_config() -> None:
-    cs = ConfigStore.instance()
-    group_name = "tools"
-    cs.store(
-        group=group_name,
-        name="openvino_mo",
-        package="tools.openvino_mo",
-        node=OpenVINOModelOptConfig,
-    )
 
 
 @ToolFactory.register(_FACTORY_KEY)
@@ -65,38 +48,3 @@ class OpenVINOModelOptimizer(ToolBase):
         ret = subprocess.run(cmd)
         assert ret.returncode == 0
         return Model(path=output_dir, spec=input.spec)
-
-
-@hydra.main(config_path="../config", config_name="config")
-def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
-
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
-
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
-
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
-
-    assert input_model.spec is not None
-    output_model = OpenVINOModelOptimizer.run(input=input_model, cfg=cfg.tools.openvino_mo)
-    save_model(model=output_model, output_path=output_path)
-
-
-if __name__ == "__main__":
-    register_openvino_mo_config()
-
-    from ..config.base import BaseConfig
-
-    defaults = [{"tools": "openvino_mo"}, "_self_"]
-
-    @dataclass
-    class Config(BaseConfig):
-        defaults: List[Any] = field(default_factory=lambda: defaults)
-        tools: Any = MISSING
-
-    cs = ConfigStore.instance()
-    cs.store(name="config", node=Config)
-    main()

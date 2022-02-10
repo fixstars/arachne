@@ -1,13 +1,10 @@
 import itertools
-from dataclasses import dataclass, field
-from typing import Any, List, Optional
+from dataclasses import dataclass
+from typing import List, Optional
 
-import hydra
 import numpy as np
 import tensorflow as tf
-from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
-from omegaconf import MISSING, DictConfig, OmegaConf
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
 from arachne.tools.factory import (
@@ -16,7 +13,6 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model, TensorSpec
 
@@ -35,17 +31,6 @@ class TFTRTConfig(ToolConfigBase):
     max_batch_size: int = 1
     allow_build_at_runtime: bool = True
     representative_dataset: Optional[str] = None
-
-
-def register_tftrt_config() -> None:
-    cs = ConfigStore.instance()
-    group_name = "tools"
-    cs.store(
-        group=group_name,
-        name="tftrt",
-        package="tools.tftrt",
-        node=TFTRTConfig,
-    )
 
 
 @ToolFactory.register(_FACTORY_KEY)
@@ -97,38 +82,3 @@ class TFTRT(ToolBase):
         output_saved_model_dir = f"tftrt-{idx}-saved_model"
         converter.save(output_saved_model_dir)
         return Model(path=output_saved_model_dir, spec=input.spec)
-
-
-@hydra.main(config_path="../config", config_name="config")
-def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
-
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
-
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
-
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
-
-    assert input_model.spec is not None
-    output_model = TFTRT.run(input=input_model, cfg=cfg.tools.tftrt)
-    save_model(model=output_model, output_path=output_path)
-
-
-if __name__ == "__main__":
-    register_tftrt_config()
-
-    from ..config.base import BaseConfig
-
-    defaults = [{"tools": "tftrt"}, "_self_"]
-
-    @dataclass
-    class Config(BaseConfig):
-        defaults: List[Any] = field(default_factory=lambda: defaults)
-        tools: Any = MISSING
-
-    cs = ConfigStore.instance()
-    cs.store(name="config", node=Config)
-    main()

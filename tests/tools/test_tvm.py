@@ -219,7 +219,7 @@ def test_cli():
         model_path = "resnet18.onnx"
         download(url, model_path)
         ret = subprocess.run(
-            [sys.executable, "-m", "arachne.tools.tvm", "input=resnet18.onnx", "output=output.tar"]
+            [sys.executable, "-m", "arachne.driver.cli", "+tools=tvm", "input=resnet18.onnx", "output=output.tar"]
         )
 
         assert ret.returncode == 0

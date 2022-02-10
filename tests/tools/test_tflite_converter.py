@@ -137,7 +137,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.tflite_converter",
+                "arachne.driver.cli",
+                "+tools=tflite_converter",
                 "input=saved_model",
                 "output=output.tar",
             ]

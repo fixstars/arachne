@@ -73,7 +73,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.openvino_mo",
+                "arachne.driver.cli",
+                "+tools=openvino_mo",
                 "input=resnet18.onnx",
                 "output=output.tar",
             ]
@@ -102,7 +103,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.openvino2tf",
+                "arachne.driver.cli",
+                "+tools=openvino2tf",
                 f"input={model_path}",
                 "input_spec=spec.yaml",
                 "output=output2.tar",

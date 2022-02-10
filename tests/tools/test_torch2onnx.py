@@ -64,7 +64,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.torch2onnx",
+                "arachne.driver.cli",
+                "+tools=torch2onnx",
                 f"input={model_path}",
                 "input_spec=spec.yaml",
                 "output=output.tar",

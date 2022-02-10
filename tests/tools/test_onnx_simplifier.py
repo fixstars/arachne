@@ -42,7 +42,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.onnx_simplifier",
+                "arachne.driver.cli",
+                "+tools=onnx_simplifier",
                 f"input={onnx_model_file}",
                 "output=simplified.onnx",
                 f"tools.onnx_simplifier.check_n={check_n}",
