@@ -12,7 +12,7 @@ import torchvision
 import yaml
 
 from arachne.data import Model, ModelSpec, TensorSpec
-from arachne.tools.torch2onnx import Torch2ONNXConfig, run
+from arachne.tools.torch2onnx import Torch2ONNX, Torch2ONNXConfig
 
 
 def check_torch2onnx_output(torch_model, input_shape, onnx_model_path):
@@ -39,7 +39,7 @@ def test_torch2onnx():
         )
         input_model = Model(path="resnet18.pt", spec=spec)
         cfg = Torch2ONNXConfig()
-        output = run(input_model, cfg)
+        output = Torch2ONNX.run(input_model, cfg)
         check_torch2onnx_output(resnet18, [1, 3, 224, 224], output.path)
 
 

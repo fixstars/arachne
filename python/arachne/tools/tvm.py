@@ -19,14 +19,22 @@ from tvm.driver.tvmc.frontends import load_model
 from tvm.driver.tvmc.model import TVMCModel
 from tvm.relay.backend.executor_factory import GraphExecutorFactoryModule
 
-from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.tools.factory import (
+    ToolBase,
+    ToolConfigBase,
+    ToolConfigFactory,
+    ToolFactory,
+)
 from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
 from ..data import Model
 
+_FACTORY_KEY = "tvm"
 
+
+@ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
-class TVMConfig:
+class TVMConfig(ToolConfigBase):
     """This is a class for configuring a build process of the tvm.
 
     Attributes:
@@ -189,71 +197,76 @@ def _save_relay(graph_module, module, module_path):
                 f.write(dumps[dump_format])
 
 
-def run(input: Model, cfg: TVMConfig) -> Model:
-    idx = itertools.count().__next__()
+@ToolFactory.register(_FACTORY_KEY)
+class TVM(ToolBase):
+    @staticmethod
+    def run(input: Model, cfg: TVMConfig) -> Model:
+        idx = itertools.count().__next__()
 
-    # Load as a TVMC model
-    tvmc_model = _load_as_tvmc_model(input)
+        # Load as a TVMC model
+        tvmc_model = _load_as_tvmc_model(input)
 
-    _process_composite_targets(cfg)
+        _process_composite_targets(cfg)
 
-    # Check target consistency
-    tvm_target, extra_targets = target_from_cli(cfg.target)
-    tvm_target, target_host = tvm.target.Target.check_and_update_host_consist(
-        target=tvm_target, host=cfg.target_host
-    )
+        # Check target consistency
+        tvm_target, extra_targets = target_from_cli(cfg.target)
+        tvm_target, target_host = tvm.target.Target.check_and_update_host_consist(
+            target=tvm_target, host=cfg.target_host
+        )
 
-    module = tvmc_model.mod
-    params = tvmc_model.params
+        module = tvmc_model.mod
+        params = tvmc_model.params
 
-    assert isinstance(tvm_target, tvm.target.Target)
-    if tvm_target.kind.name == "cuda" and "arch" in tvm_target.attrs:
-        tvm.autotvm.measure.measure_methods.set_cuda_target_arch(tvm_target.attrs["arch"])
+        assert isinstance(tvm_target, tvm.target.Target)
+        if tvm_target.kind.name == "cuda" and "arch" in tvm_target.attrs:
+            tvm.autotvm.measure.measure_methods.set_cuda_target_arch(tvm_target.attrs["arch"])
 
-    # Convert graph layout if needed
-    if cfg.desired_layout:
-        module = convert_graph_layout(module, cfg.desired_layout)
+        # Convert graph layout if needed
+        if cfg.desired_layout:
+            module = convert_graph_layout(module, cfg.desired_layout)
 
-    # Partitioning depends on extra targets
-    tvm_config = {}
-    for extra in extra_targets:
-        codegen = get_codegen_by_target(extra["name"])
-        partition_function = codegen["pass_pipeline"]
-        module, codegen_config = partition_function(module, params, **extra["opts"])
-        if codegen["config_key"] is not None:
-            tvm_config[codegen["config_key"]] = codegen_config if codegen_config else extra["opts"]
+        # Partitioning depends on extra targets
+        tvm_config = {}
+        for extra in extra_targets:
+            codegen = get_codegen_by_target(extra["name"])
+            partition_function = codegen["pass_pipeline"]
+            module, codegen_config = partition_function(module, params, **extra["opts"])
+            if codegen["config_key"] is not None:
+                tvm_config[codegen["config_key"]] = (
+                    codegen_config if codegen_config else extra["opts"]
+                )
 
-    with tvm.transform.PassContext(
-        opt_level=cfg.opt_level, config=tvm_config, disabled_pass=cfg.disabled_pass
-    ):
-        graph_module = relay.build(module, target=tvm_target, params=params)
+        with tvm.transform.PassContext(
+            opt_level=cfg.opt_level, config=tvm_config, disabled_pass=cfg.disabled_pass
+        ):
+            graph_module = relay.build(module, target=tvm_target, params=params)
 
-    # Export as a tvm package
-    filename = f"tvm_package_{idx}.tar"
-    output_path = os.getcwd() + "/" + filename
+        # Export as a tvm package
+        filename = f"tvm_package_{idx}.tar"
+        output_path = os.getcwd() + "/" + filename
 
-    assert isinstance(graph_module, GraphExecutorFactoryModule)
+        assert isinstance(graph_module, GraphExecutorFactoryModule)
 
-    cc = None
-    cc_opts = None
-    if cfg.export_format == "so":
-        assert cfg.cross_compiler is not None
-        cc = cfg.cross_compiler
-        cc_opts = cfg.cross_compiler_options
+        cc = None
+        cc_opts = None
+        if cfg.export_format == "so":
+            assert cfg.cross_compiler is not None
+            cc = cfg.cross_compiler
+            cc_opts = cfg.cross_compiler_options
 
-    package_path = tvmc_model.export_package(
-        graph_module,
-        output_path,
-        cross=cc,
-        cross_options=cc_opts,
-        output_format=cfg.export_format,
-    )
+        package_path = tvmc_model.export_package(
+            graph_module,
+            output_path,
+            cross=cc,
+            cross_options=cc_opts,
+            output_format=cfg.export_format,
+        )
 
-    assert package_path is not None
+        assert package_path is not None
 
-    _save_relay(graph_module=graph_module, module=module, module_path=package_path)
+        _save_relay(graph_module=graph_module, module=module, module_path=package_path)
 
-    return Model(path=package_path, spec=input.spec)
+        return Model(path=package_path, spec=input.spec)
 
 
 @hydra.main(config_path="../config", config_name="config")
@@ -270,7 +283,7 @@ def main(cfg: DictConfig) -> None:
         input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
 
     assert input_model.spec is not None
-    output_model = run(input=input_model, cfg=cfg.tools.tvm)
+    output_model = TVM.run(input=input_model, cfg=cfg.tools.tvm)
     save_model(model=output_model, output_path=output_path, tvm_cfg=cfg.tools.tvm)
 
 
@@ -289,7 +302,3 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
-
-
-get_tool_config_objects()["tvm"] = TVMConfig
-get_tool_run_objects()["tvm"] = run

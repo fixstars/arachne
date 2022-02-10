@@ -20,7 +20,7 @@ from tvm.contrib.graph_executor import GraphModule
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.runtime.module.tvm import _open_module_file
-from arachne.tools.tvm import TVMConfig, get_predefined_config, run
+from arachne.tools.tvm import TVM, TVMConfig, get_predefined_config
 from arachne.utils.model_utils import get_model_spec
 from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
@@ -106,7 +106,7 @@ def test_tvm(model_format, composite_target):
             input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
             input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
             input.spec.outputs[0].shape = [1, 1000]  # type: ignore
-            output = run(input=input, cfg=cfg)
+            output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
@@ -116,7 +116,7 @@ def test_tvm(model_format, composite_target):
             model_path = "mobilenet.tflite"
             download(url, model_path)
             input = Model(model_path, spec=get_model_spec(model_path))
-            output = run(input=input, cfg=cfg)
+            output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output(
                 "mobilenet.tflite", model_format, [1, 224, 224, 3], output.path, device_type
@@ -158,7 +158,7 @@ def test_tvm(model_format, composite_target):
             spec = ModelSpec(inputs=inputs, outputs=outputs)
 
             input = Model("frozen_graph.pb", spec=spec)
-            output = run(input=input, cfg=cfg)
+            output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
 
@@ -168,7 +168,7 @@ def test_tvm(model_format, composite_target):
             model_path = "resnet18.onnx"
             download(url, model_path)
             input = Model(model_path, spec=get_model_spec(model_path))
-            output = run(input=input, cfg=cfg)
+            output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output(
                 "resnet18.onnx", model_format, [1, 3, 224, 224], output.path, device_type
@@ -185,7 +185,7 @@ def test_tvm(model_format, composite_target):
                 outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
             )
             input = Model("./model.pth", spec=spec)
-            output = run(input=input, cfg=cfg)
+            output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output("model.pth", model_format, [1, 3, 224, 224], output.path, device_type)
 
@@ -204,7 +204,7 @@ def test_predefined_config(target):
         input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
         input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
         input.spec.outputs[0].shape = [1, 1000]  # type: ignore
-        run(input=input, cfg=cfg)
+        TVM.run(input=input, cfg=cfg)
 
 
 def test_cli():

@@ -14,7 +14,7 @@ import yaml
 from torch2trt import TRTModule
 
 from arachne.data import Model, ModelSpec, TensorSpec
-from arachne.tools.torch2trt import Torch2TRTConfig, run
+from arachne.tools.torch2trt import Torch2TRT, Torch2TRTConfig
 
 
 def create_dummy_representative_dataset():
@@ -62,7 +62,7 @@ def test_torch2trt(precision):
         cfg = Torch2TRTConfig()
         if precision == "FP16":
             cfg.fp16_mode = True
-        output = run(input_model, cfg)
+        output = Torch2TRT.run(input_model, cfg)
         check_torch2trt_output(resnet18, [1, 3, 224, 224], precision, output.path)
 
 
@@ -85,7 +85,7 @@ def test_torch2trt_int8(calib_algo):
         cfg.int8_calib_algorithm = calib_algo
         create_dummy_representative_dataset()
         cfg.int8_calib_dataset = "dummy.npy"
-        run(input_model, cfg)
+        Torch2TRT.run(input_model, cfg)
 
 
 def test_cli():

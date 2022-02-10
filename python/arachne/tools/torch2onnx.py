@@ -10,15 +10,23 @@ from hydra.core.config_store import ConfigStore
 from hydra.utils import to_absolute_path
 from omegaconf import MISSING, DictConfig, OmegaConf
 
-from arachne.utils.global_utils import get_tool_config_objects, get_tool_run_objects
+from arachne.tools.factory import (
+    ToolBase,
+    ToolConfigBase,
+    ToolConfigFactory,
+    ToolFactory,
+)
 from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 from arachne.utils.torch_utils import get_torch_dtype_from_string
 
 from ..data import Model
 
+_FACTORY_KEY = "torch2onnx"
 
+
+@ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
-class Torch2ONNXConfig:
+class Torch2ONNXConfig(ToolConfigBase):
     export_params: bool = True
     verbose: bool = False
     training: int = torch.onnx.TrainingMode.EVAL.value
@@ -41,34 +49,37 @@ def register_torch2onnx_config() -> None:
     )
 
 
-def run(input: Model, cfg: Torch2ONNXConfig) -> Model:
-    idx = itertools.count().__next__()
-    filename = f"model_{idx}.onnx"
+@ToolFactory.register(_FACTORY_KEY)
+class Torch2ONNX(ToolBase):
+    @staticmethod
+    def run(input: Model, cfg: Torch2ONNXConfig) -> Model:
+        idx = itertools.count().__next__()
+        filename = f"model_{idx}.onnx"
 
-    assert input.spec is not None
+        assert input.spec is not None
 
-    model = torch.load(input.path)
+        model = torch.load(input.path)
 
-    args = []
-    for inp in list(input.spec.inputs):
-        x = torch.randn(*inp.shape, dtype=get_torch_dtype_from_string(inp.dtype))
-        args.append(x)
-    args = tuple(args)
+        args = []
+        for inp in list(input.spec.inputs):
+            x = torch.randn(*inp.shape, dtype=get_torch_dtype_from_string(inp.dtype))
+            args.append(x)
+        args = tuple(args)
 
-    torch.onnx.export(
-        model=model,
-        args=args,
-        f=filename,
-        export_params=cfg.export_params,
-        verbose=cfg.verbose,
-        training=cfg.training,
-        operator_export_type=cfg.operator_export_type,
-        opset_version=cfg.opset_version,
-        do_constant_folding=cfg.do_constant_folding,
-        dynamic_axes=cfg.dynamic_axes,
-        custom_opsets=cfg.custom_opsets,
-    )
-    return Model(filename, spec=get_model_spec(filename))
+        torch.onnx.export(
+            model=model,
+            args=args,
+            f=filename,
+            export_params=cfg.export_params,
+            verbose=cfg.verbose,
+            training=cfg.training,
+            operator_export_type=cfg.operator_export_type,
+            opset_version=cfg.opset_version,
+            do_constant_folding=cfg.do_constant_folding,
+            dynamic_axes=cfg.dynamic_axes,
+            custom_opsets=cfg.custom_opsets,
+        )
+        return Model(filename, spec=get_model_spec(filename))
 
 
 @hydra.main(config_path="../config", config_name="config")
@@ -85,7 +96,7 @@ def main(cfg: DictConfig) -> None:
         input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
 
     assert input_model.spec is not None
-    output_model = run(input=input_model, cfg=cfg.tools.torch2onnx)
+    output_model = Torch2ONNX.run(input=input_model, cfg=cfg.tools.torch2onnx)
     save_model(model=output_model, output_path=output_path)
 
 
@@ -104,7 +115,3 @@ if __name__ == "__main__":
     cs = ConfigStore.instance()
     cs.store(name="config", node=Config)
     main()
-
-
-get_tool_config_objects()["torch2onnx"] = Torch2ONNXConfig
-get_tool_run_objects()["torch2onnx"] = run

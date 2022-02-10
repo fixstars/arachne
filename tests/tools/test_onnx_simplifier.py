@@ -5,10 +5,11 @@ import tempfile
 
 import torch
 import torch.cuda
+import torch.onnx
 import torchvision
 
 from arachne.data import Model
-from arachne.tools.onnx_simplifier import OnnxSimplifierConfig, run
+from arachne.tools.onnx_simplifier import ONNXSimplifier, ONNXSimplifierConfig
 from arachne.utils.model_utils import get_model_spec
 
 
@@ -22,9 +23,9 @@ def test_onnx_simplifier():
 
         input_model = Model(path=onnx_model_file, spec=get_model_spec(onnx_model_file))
         check_n = 10  # number of check iteration
-        cfg = OnnxSimplifierConfig(check_n=check_n)
+        cfg = ONNXSimplifierConfig(check_n=check_n)
         # The validation of the simplified model is performed in onnx-simplifier.
-        run(input_model, cfg)
+        ONNXSimplifier.run(input_model, cfg)
 
 
 def test_cli():

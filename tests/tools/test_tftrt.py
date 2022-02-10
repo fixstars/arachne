@@ -9,7 +9,7 @@ import pytest
 import tensorflow as tf
 
 from arachne.data import Model
-from arachne.tools.tftrt import TFTRTConfig, run
+from arachne.tools.tftrt import TFTRT, TFTRTConfig
 from arachne.utils.model_utils import get_model_spec
 from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
@@ -56,7 +56,7 @@ def test_tftrt(precision):
             create_dummy_representative_dataset()
             cfg.representative_dataset = "dummy.npy"
 
-        output = run(input_model, cfg)
+        output = TFTRT.run(input_model, cfg)
         check_tftrt_output(model, [1, 224, 224, 3], precision, output.path)
 
 
