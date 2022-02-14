@@ -8,21 +8,19 @@ from arachne.runtime.rpc.protobuf import tvmruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 from arachne.runtime.rpc.utils.nparray import generator_to_np_array
 
-from .servicer import RuntimeServicerBase, register_runtime_servicer
+from .factory import RuntimeServicerBaseFactory
+from .servicer import RuntimeServicerBase
 
 logger = Logger.logger()
 
 
+@RuntimeServicerBaseFactory.register("tvm")
 class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServicer):
     """Servicer for TVMRuntime"""
 
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
         tvmruntime_pb2_grpc.add_TVMRuntimeServicer_to_server(TVMRuntimeServicer(), server)
-
-    @staticmethod
-    def get_name():
-        return "tvm"
 
     def __init__(self):
         pass
@@ -80,6 +78,3 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         np_arr = generator_to_np_array(request_iterator, byte_extract_func)
         self.module.set_input(index, np_arr)
         return MsgResponse(msg="SetInput")
-
-
-register_runtime_servicer(TVMRuntimeServicer)
