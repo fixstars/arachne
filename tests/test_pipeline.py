@@ -5,7 +5,6 @@ import pytest
 import tensorflow as tf
 import torch
 import torchvision
-from omegaconf import OmegaConf
 
 from arachne.data import Model, ModelSpec, TensorSpec
 from arachne.driver.pipeline import PipelineConfig, get_default_tool_configs, run
@@ -45,5 +44,4 @@ def test_pipeline_from_torch(pipeline):
         cfg = PipelineConfig()
         cfg.pipeline = pipeline
         cfg.tools = get_default_tool_configs(pipeline)
-        cfg = OmegaConf.structured(cfg)
         run(input, cfg)
