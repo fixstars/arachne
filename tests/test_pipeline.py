@@ -8,7 +8,7 @@ import torchvision
 from omegaconf import OmegaConf
 
 from arachne.data import Model, ModelSpec, TensorSpec
-from arachne.pipeline import PipelineConfig, get_default_tool_configs, run
+from arachne.driver.pipeline import PipelineConfig, get_default_tool_configs, run
 from arachne.utils.model_utils import get_model_spec
 
 

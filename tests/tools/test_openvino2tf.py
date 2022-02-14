@@ -12,10 +12,8 @@ import yaml
 from tvm.contrib.download import download
 
 from arachne.data import Model, ModelSpec, TensorSpec
-from arachne.tools.openvino2tf import OpenVINO2TFConfig
-from arachne.tools.openvino2tf import run as run_openvino2tf
-from arachne.tools.openvino_mo import OpenVINOModelOptConfig
-from arachne.tools.openvino_mo import run as run_openvino_mo
+from arachne.tools.openvino2tf import OpenVINO2TF, OpenVINO2TFConfig
+from arachne.tools.openvino_mo import OpenVINOModelOptConfig, OpenVINOModelOptimizer
 from arachne.utils.model_utils import get_model_spec
 from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
@@ -51,8 +49,8 @@ def test_openvino2tf():
         download(url, onnx_model_path)
 
         input_model = Model(path=onnx_model_path, spec=get_model_spec(onnx_model_path))
-        m = run_openvino_mo(input_model, OpenVINOModelOptConfig())
-        m = run_openvino2tf(m, OpenVINO2TFConfig())
+        m = OpenVINOModelOptimizer.run(input_model, OpenVINOModelOptConfig())
+        m = OpenVINO2TF.run(m, OpenVINO2TFConfig())
 
         check_openvino2tf_output(onnx_model_path, m.path)
 
@@ -75,7 +73,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.openvino_mo",
+                "arachne.driver.cli",
+                "+tools=openvino_mo",
                 "input=resnet18.onnx",
                 "output=output.tar",
             ]
@@ -104,7 +103,8 @@ def test_cli():
             [
                 sys.executable,
                 "-m",
-                "arachne.tools.openvino2tf",
+                "arachne.driver.cli",
+                "+tools=openvino2tf",
                 f"input={model_path}",
                 "input_spec=spec.yaml",
                 "output=output2.tar",
