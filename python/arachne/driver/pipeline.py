@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from logging import getLogger
 from typing import Any, Dict, List
 
 import hydra
@@ -9,11 +10,12 @@ from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
 from omegaconf import MISSING, DictConfig, OmegaConf
 
+from arachne.config.base import BaseConfig
+from arachne.data import Model
 from arachne.tools import ToolConfigFactory, ToolFactory
+from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
 
-from .config.base import BaseConfig
-from .data import Model
-from .utils.model_utils import get_model_spec, load_model_spec, save_model
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -71,7 +73,7 @@ def run(input: Model, cfg: PipelineConfig) -> Model:
 
 @hydra.main(config_path="config", config_name="config")
 def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
+    logger.info(OmegaConf.to_yaml(cfg))
 
     input_model_path = to_absolute_path(cfg.input)
     output_path = to_absolute_path(cfg.output)
