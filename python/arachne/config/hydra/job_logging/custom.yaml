@@ -1,0 +1,20 @@
+version: 1
+formatters:
+  simple:
+    format: '[%(asctime)s][%(name)s][%(levelname)s] - %(message)s'
+handlers:
+  console:
+    level: WARN
+    class: logging.StreamHandler
+    formatter: simple
+    stream: ext://sys.stdout
+  file:
+    level: INFO
+    class: logging.FileHandler
+    formatter: simple
+    filename: ${hydra.job.name}.log
+root:
+  handlers:
+  - console
+  - file
+disable_existing_loggers: false

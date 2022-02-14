@@ -27,7 +27,7 @@ class ToolConfigFactory:
     def register(cls, name: str) -> Callable:
         def inner_wrapper(wrapped_class: ToolConfigBase) -> ToolConfigBase:
             if name in cls.registry:
-                logger.warning("Executor %s already exists. Will replace it", name)
+                logger.warning("ToolConfig for %s already exists. Will replace it", name)
             cls.registry[name] = wrapped_class
 
             # Register the config into hydra as well
@@ -60,7 +60,7 @@ class ToolFactory:
     def register(cls, name: str) -> Callable:
         def inner_wrapper(wrapped_class: ToolBase) -> ToolBase:
             if name in cls.registry:
-                logger.warning("Executor %s already exists. Will replace it", name)
+                logger.warning("Tool for %s already exists. Will replace it", name)
             cls.registry[name] = wrapped_class
             return wrapped_class
 

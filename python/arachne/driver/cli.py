@@ -41,7 +41,7 @@ def main(cfg: DictConfig) -> None:
 if __name__ == "__main__":
     from ..config.base import BaseConfig
 
-    defaults = ["_self_"]
+    defaults = [{"override hydra/job_logging": "custom"}, "_self_"]
 
     @dataclass
     class Config(BaseConfig):

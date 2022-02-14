@@ -71,7 +71,7 @@ def run(input: Model, cfg: PipelineConfig) -> Model:
     return data_catalog.load(prev_output)
 
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
     logger.info(OmegaConf.to_yaml(cfg))
 
@@ -92,7 +92,7 @@ def main(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    defaults = [{"tools": ToolFactory.list()}, "_self_"]
+    defaults = [{"tools": ToolFactory.list()}, {"override hydra/job_logging": "custom"}, "_self_"]
 
     @dataclass
     class PipelineCLIConfig(PipelineConfig):
