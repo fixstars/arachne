@@ -73,6 +73,13 @@ def run(input: Model, cfg: PipelineConfig) -> Model:
 
 @hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
+
+    try:
+        assert len(list(cfg.pipeline)) > 0
+    except AssertionError as err:
+        logger.exception("You must specify one tool at least")
+        raise err
+
     logger.info(OmegaConf.to_yaml(cfg))
 
     input_model_path = to_absolute_path(cfg.input)

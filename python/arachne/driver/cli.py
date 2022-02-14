@@ -18,7 +18,13 @@ logger = getLogger(__name__)
 def main(cfg: DictConfig) -> None:
 
     tools = list(cfg.tools.keys())
-    assert len(tools) == 1, "Error: you must specify only one tool"
+
+    try:
+        assert len(tools) == 1
+    except AssertionError as err:
+        logger.exception("You must specify only one tool")
+        raise err
+
     tool = tools[0]
 
     logger.info(OmegaConf.to_yaml(cfg))
