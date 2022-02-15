@@ -9,5 +9,5 @@
 ## For JetPack 4.6
 
 + cuda: 10.2
-+ cudnn: 8.2.3
++ cudnn: 8.2.1
 + tensorrt: 8.0.1
