@@ -28,11 +28,11 @@ FROM nvidia/cuda${ARCH:+-$ARCH}:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
 # (but their default value is retained if set previously)
 ARG ARCH
 ARG CUDA
-ARG CUDNN=8.0.0.180-1
+ARG CUDNN=8.2.1.32-1
 ARG CUDNN_MAJOR_VERSION=8
 ARG LIB_DIR_PREFIX=x86_64
-ARG LIBNVINFER=7.1.3-1
-ARG LIBNVINFER_MAJOR_VERSION=7
+ARG LIBNVINFER=8.0.1-1
+ARG LIBNVINFER_MAJOR_VERSION=8
 
 # Needed for string substitution
 SHELL ["/bin/bash", "-c"]
@@ -92,45 +92,3 @@ ENV LD_LIBRARY_PATH /usr/local/cuda-${CUDA}/targets/x86_64-linux/lib:/usr/local/
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 \
     && echo "/usr/local/cuda/lib64/stubs" > /etc/ld.so.conf.d/z-cuda-stubs.conf \
     && ldconfig
-
-# See http://bugs.python.org/issue19846
-ENV LANG C.UTF-8
-
-
-# Install other packages for development
-
-RUN echo deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main >> /etc/apt/sources.list.d/llvm.list \
-    && echo deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main >> /etc/apt/sources.list.d/llvm.list \
-    && apt-key adv --fetch-keys http://apt.llvm.org/llvm-snapshot.gpg.key \
-    && apt-get update && apt-get install -y llvm-11 clang-11
-
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
-    libopenblas-dev \
-    sudo \
-    curl \
-    git
-
-# python -> python3
-RUN ln -s $(which python3) /usr/local/bin/python
-RUN ln -s $(which pip3) /usr/local/bin/pip
-
-# Add a user that UID:GID will be updated by vscode
-ARG USERNAME=developer
-ARG GROUPNAME=developer
-ARG UID=1000
-ARG GID=1000
-ARG PASSWORD=developer
-RUN groupadd -g $GID $GROUPNAME && \
-    useradd -m -s /bin/bash -u $UID -g $GID -G sudo $USERNAME && \
-    echo $USERNAME:$PASSWORD | chpasswd && \
-    echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-USER $USERNAME
-ENV HOME /home/developer
-
-# install poetry
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - --version 1.2.0a2
-ENV PATH $HOME/.local/bin:$PATH
