@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 from tvm.contrib.download import download
@@ -15,6 +16,7 @@ from arachne.runtime.rpc import (
 
 def test_tvm_runtime_rpc_benchmark(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/tvm_mobilenet.tar"
         tvm_package_path = tmp_dir + "/tvm_mobilenet.tar"
         download(url, tvm_package_path)
@@ -33,6 +35,7 @@ def test_tvm_runtime_rpc_benchmark(rpc_port=5051):
 
 def test_tflite_runtime_rpc_benchmark(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         model_path = tmp_dir + "/model.tflite"
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
         download(url, model_path)
@@ -51,6 +54,7 @@ def test_tflite_runtime_rpc_benchmark(rpc_port=5051):
 
 def test_onnx_runtime_rpc_benchmark(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         url = (
             "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
         )

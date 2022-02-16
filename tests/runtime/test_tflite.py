@@ -1,4 +1,5 @@
 # import os
+import os
 import tempfile
 
 import numpy as np
@@ -10,6 +11,7 @@ import arachne.runtime
 
 def test_tflite_runtime():
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
 
         model_path = tmp_dir + "/mobilenet.tflite"

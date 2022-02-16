@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import grpc
@@ -11,6 +12,7 @@ from arachne.runtime.rpc import TfliteRuntimeClient, create_channel, create_serv
 @pytest.mark.xfail
 def test_prohibit_multiple_client(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         model_path = tmp_dir + "/model.tflite"
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
         download(url, model_path)
@@ -33,6 +35,7 @@ def test_prohibit_multiple_client(rpc_port=5051):
 
 def test_conitnue_first_client(rpc_port=5051):
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         model_path = tmp_dir + "/model.tflite"
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
         download(url, model_path)
