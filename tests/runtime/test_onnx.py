@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import numpy as np
@@ -9,6 +10,7 @@ import arachne.runtime
 
 def test_onnx_runtime():
     with tempfile.TemporaryDirectory() as tmp_dir:
+        os.chdir(tmp_dir)
         url = (
             "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/resnet18.onnx"
         )
