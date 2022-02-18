@@ -1,4 +1,5 @@
 import time
+from typing import List
 
 import numpy as np
 import onnxruntime as ort
@@ -16,7 +17,9 @@ def onnx_tensor_type_to_np_dtype(ottype: str):
 
 
 class ONNXRuntimeModule(RuntimeModule):
-    def __init__(self, model: str, **kwargs):
+    def __init__(
+        self, model: str, provider_options: List[str] = ["CPUExecutionProvider"], **kwargs
+    ):
         self.module: ort.InferenceSession = ort.InferenceSession(model, **kwargs)
         self._inputs = {}
         self._outputs = {}
