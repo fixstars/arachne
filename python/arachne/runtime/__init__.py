@@ -1,8 +1,10 @@
 import importlib
 import tarfile
+from logging import getLogger
 from typing import Optional
 
 import yaml
+from packaging.version import Version
 
 from ..utils.version_utils import (
     get_cuda_version,
@@ -14,28 +16,49 @@ from .module.onnx import ONNXRuntimeModule
 from .module.tflite import TFLiteRuntimeModule
 from .module.tvm import TVMRuntimeModule
 
+logger = getLogger(__name__)
+
 
 def validate_environment(env: dict) -> bool:
+    valid = True
     for dep in env["dependencies"]:
         if "cuda" in dep:
             cuda_version = get_cuda_version()
             if cuda_version != dep["cuda"]:
-                return False
+                logger.warning(
+                    f"The CUDA version:{cuda_version} is not the same as the version specified in env.yaml:{dep['cuda']}"
+                )
+                valid = False
         if "cudnn" in dep:
             cudnn_version = get_cudnn_version()
             if cudnn_version != dep["cudnn"]:
-                return False
+                logger.warning(
+                    f"The cudnn version:{cudnn_version} is not the same as the version specified in env.yaml:{dep['cudnn']}"
+                )
+                valid = False
         if "tensorrt" in dep:
             tensorrt_version = get_tensorrt_version()
             if tensorrt_version != dep["tensorrt"]:
-                return False
+                logger.warning(
+                    f"The tensorrt version:{tensorrt_version} is not the same as the version specified in env.yaml:{dep['tensorrt']}"
+                )
+                valid = False
         if "pip" in dep:
             for pkg in dep["pip"]:
                 for name in pkg.keys():
                     mod = importlib.import_module(name)
-                    if mod.__version__ != pkg[name]:
-                        return False
-    return True
+                    runtime_version = Version(mod.__version__)
+                    dep_version = Version(pkg[name])
+                    if (
+                        runtime_version.major != dep_version.major
+                        or runtime_version.minor != dep_version.minor
+                        or runtime_version.micro != dep_version.micro
+                    ):
+                        logger.warning(
+                            f"A python package:{name} version is not the same as the version specified in env.yaml"
+                        )
+                        valid = False
+    return valid
 
 
 def init(
@@ -64,7 +87,8 @@ def init(
         with open(env_file) as file:
             env = yaml.safe_load(file)
 
-        assert validate_environment(env), "invalid runtime environment"
+        if not validate_environment(env):
+            logger.warning("Some environment dependencies are not satisfied")
 
     if model_file.endswith(".tar"):
         return TVMRuntimeModule(
