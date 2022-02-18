@@ -1147,7 +1147,7 @@ mypy = ["mypy (==0.600)"]
 
 [[package]]
 name = "onnx-simplifier"
-version = "0.3.6+gpu"
+version = "0.3.6+jp46"
 description = "Simplify your ONNX model"
 category = "main"
 optional = false
@@ -2401,7 +2401,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.3,<3.9"
-content-hash = "c8268b469252b39175805570b1c402506b9331d349b1a97af1ad5d6ee0e49309"
+content-hash = "88c3aa49fa4066f19e987b48ca291df9169f5f60be5256e96fc314b4c581081f"
 
 [metadata.files]
 absl-py = [
@@ -3118,7 +3118,7 @@ onnx = [
     {file = "onnx-1.6.0.tar.gz", hash = "sha256:3b88c3fe521151651a0403c4d131cb2e0311bd28b753ef692020a432a81ce345"},
 ]
 onnx-simplifier = [
-    {file = "onnx_simplifier-0.3.6+gpu-py3-none-any.whl", hash = "sha256:869afac72965ebd85c95a3f753e15d953669081720129195c3be0bd019812fab"},
+    {file = "onnx_simplifier-0.3.6+jp46-py3-none-any.whl", hash = "sha256:0d7eb59b9a8b7e1519de716770562e6f2515809848e8ad63700359d30febaad5"},
 ]
 onnxoptimizer = [
     {file = "onnxoptimizer-0.2.6-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:b12a06ce647d9827553bf07070327de236b1f8b547fe6896755ae775ddc11f94"},
