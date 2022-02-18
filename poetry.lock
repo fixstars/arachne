@@ -1180,15 +1180,21 @@ mypy = ["mypy (==0.600)"]
 
 [[package]]
 name = "onnxruntime-gpu"
-version = "1.6.0"
-description = "ONNX Runtime Python bindings"
+version = "1.10.0+jp46"
+description = "ONNX Runtime is a runtime accelerator for Machine Learning models"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
+flatbuffers = "*"
 numpy = ">=1.16.6"
 protobuf = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.arachne.dev"
+reference = "arachne"
 
 [[package]]
 name = "opencv-python"
@@ -2401,7 +2407,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.3,<3.9"
-content-hash = "88c3aa49fa4066f19e987b48ca291df9169f5f60be5256e96fc314b4c581081f"
+content-hash = "4329a5bb136d43363d68f3b3b4eeb2737b54f2e8a231d1ae90ea758d0df32fa5"
 
 [metadata.files]
 absl-py = [
@@ -3135,13 +3141,7 @@ onnxoptimizer = [
     {file = "onnxoptimizer-0.2.6-cp39-cp39-win_amd64.whl", hash = "sha256:7557b4a22b656c46956a21ac806ac18b5889a2b0447fbaf65e37881dac1ff97c"},
 ]
 onnxruntime-gpu = [
-    {file = "onnxruntime_gpu-1.6.0-cp35-cp35m-manylinux2014_x86_64.whl", hash = "sha256:e329dceb3506d7da202e3f490dd75db6d465be368ee8a6f62fada282a2d565a9"},
-    {file = "onnxruntime_gpu-1.6.0-cp35-cp35m-win_amd64.whl", hash = "sha256:b5bde8e71059c328a0b25e8352df350c4847aaf0c51012f283872335376a78db"},
-    {file = "onnxruntime_gpu-1.6.0-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:65e4d70aad1ef4b3c6829d47f9eab9c169cd753c4156485aaa94b675135fb33c"},
-    {file = "onnxruntime_gpu-1.6.0-cp36-cp36m-win_amd64.whl", hash = "sha256:3df7c569d55feae94f934eb968e40fa6511a60d96b7f2e8b1477236869710590"},
-    {file = "onnxruntime_gpu-1.6.0-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:50b5583db7b82b18d3790b526a000ef925453caee892cb3da7cf38a80c3fd518"},
-    {file = "onnxruntime_gpu-1.6.0-cp37-cp37m-win_amd64.whl", hash = "sha256:2f03145f348acc6160a10f90f7f247205ae3dcd3d3b2e6b69f1b3a0ff163475e"},
-    {file = "onnxruntime_gpu-1.6.0-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:6e0915d8c305cc6d434769ddd0b518dfe99c37011621a1f71c40d00e1839bf8f"},
+    {file = "onnxruntime_gpu-1.10.0+jp46-cp36-cp36m-linux_x86_64.whl", hash = "sha256:24bd6e5eaed38a5d65f42bb226c2f11e2c42eeb69d732431c143ced3074d1a3b"},
 ]
 opencv-python = [
     {file = "opencv_python-4.5.2.54-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:4e6c2d8320168a4f76822fbb76df3b18688ac5e068d49ac38a4ce39af0f8e1a6"},
