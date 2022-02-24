@@ -21,7 +21,7 @@ def check_torch2onnx_output(torch_model, input_shape, onnx_model_path):
     torch_input = torch.from_numpy(input_data).clone()
     dout = torch_model(torch_input).to("cpu").detach().numpy().copy()
 
-    sess = ort.InferenceSession(onnx_model_path)
+    sess = ort.InferenceSession(onnx_model_path, providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     aout = sess.run(output_names=None, input_feed={input_name: input_data})[0]
     np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)

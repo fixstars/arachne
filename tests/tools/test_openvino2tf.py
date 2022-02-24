@@ -25,7 +25,7 @@ def check_openvino2tf_output(onnx_model_path, tf_model_path):
     input = np.random.rand(1, 3, 224, 224).astype(np.float32)  # type: ignore
 
     # onnx runtime
-    sess = ort.InferenceSession(onnx_model_path)
+    sess = ort.InferenceSession(onnx_model_path, providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     dout = sess.run(output_names=None, input_feed={input_name: input})[0]
 

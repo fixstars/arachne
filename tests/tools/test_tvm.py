@@ -64,7 +64,7 @@ def check_tvm_output(
         interpreter.invoke()
         dout = interpreter.get_tensor(output_details[0]["index"])
     elif input_fmt == "onnx":
-        sess = ort.InferenceSession(input_model)
+        sess = ort.InferenceSession(input_model, providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         dout = sess.run(output_names=None, input_feed={input_name: input_data})[0]
     elif input_fmt == "pth":
@@ -219,7 +219,14 @@ def test_cli():
         model_path = "resnet18.onnx"
         download(url, model_path)
         ret = subprocess.run(
-            [sys.executable, "-m", "arachne.driver.cli", "+tools=tvm", "input=resnet18.onnx", "output=output.tar"]
+            [
+                sys.executable,
+                "-m",
+                "arachne.driver.cli",
+                "+tools=tvm",
+                "input=resnet18.onnx",
+                "output=output.tar",
+            ]
         )
 
         assert ret.returncode == 0
