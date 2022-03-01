@@ -18,6 +18,8 @@ cd ${RUNTIME_ENV_DIR}
 poetry config virtualenvs.in-project true
 poetry install
 source ${RUNTIME_ENV_DIR}/.venv/bin/activate
+## install tensorflow
+pip install https://developer.download.nvidia.com/compute/redist/jp/v45/tensorflow/tensorflow-2.5.0+nv21.6-cp36-cp36m-linux_aarch64.whl
 
 # build tvm
 source ${common_dir}/install_tvm.sh ${script_dir}/../tvm_config/jetson_config.cmake

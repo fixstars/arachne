@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "arachne-runtime"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+onnxruntime-gpu = {path = "wheel/onnxruntime_gpu-1.6.0-cp36-cp36m-linux_aarch64.whl"}
+numpy = "1.19.4"
+grpcio = "^1.43.0"
+scipy = "^1.5.4"
+Cython = "^0.29.28"
+PyYAML = "^6.0"
+packaging = "^21.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
