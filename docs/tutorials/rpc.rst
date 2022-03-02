@@ -2,59 +2,83 @@
 RPC: Run Your Model on Remote devices
 =====================================
 
-`arachne.runtime.rpc` provides remote execution on a device using RPC (remote procedure call).
+:code:`arachne.runtime.rpc` provides remote execution on a device using RPC (remote procedure call).
 
-Edge Setup
-----------
-Install arachne and build tvm on your edge device.
+Start RPC server
+----------------
 
-.. attention:: TODO: prepare edge setup step
+| Please refer to the :doc:`setup_device` for device environment setup.
+| Start the rpc server using the created venv and arachne: :code:`./setup.sh <env_dirname> <runtime_name> <port>`.
+| You can specify either :code:`tvm, tflite, onnx` to :code:`<runtime_name>`.
 
-.. code:: shell
-
-    git clone
-
-
-Specify the runtime and port number, and start the RPC server on the edge device.
+The following example shows the TVM runtime server running on JetPack 4.6 on port 5051.
 
 .. code:: shell
 
-    python -m arachne.runtime.rpc.server --port 5051 --runtime tflite
+    cd arachne/device
+    ./setup.sh jp46 tvm 5051
+
+Or, you can also start server as the following:
+
+.. code:: shell
+
+    cd arachne/device
+    source jp46/.venv/bin/activate
+    python -m arachne.runtime.rpc.server --port 5051 --runtime tvm
 
 Run model using RPC
 -------------------
 
-| The following example assumes that you are running the RPC server on localhost.
-| You can get a runtime client with :code:`arachne.runtime.rpc.init` in the same way
-| that you create a runtime module :code:`arachne.runtime.init`` for local execution.
+| You can get a runtime client with :code:`arachne.runtime.rpc.init` in the same way that you create a runtime module :code:`arachne.runtime.init` for local execution.
+
 
 .. code:: python
 
-    import tempfile
+    client = arachne.runtime.rpc.init(
+        model_file="resnet18.onnx",
+        rpc_host="192.168.xx.xx",
+        rpc_port=5051
+    )
+    assert isinstance(client, ONNXRuntimeClient)
+    client.set_input(0, input_data)
+    client.run()
+    rpc_output = client.get_output(0)
 
-    import numpy as np
-    from tvm.contrib.download import download
+:code:`tests/runtime/rpc/device/test_edge.py` is test script that the results of the local execution and the RPC execution are correct.
+Before running test, start rpc server on the edge device with :code:`./setup.sh [env dirname] [tvm|tflite|onnx] 5051`
 
-    import arachne.runtime.rpc
-    import arachne.tools.tvm
-    from arachne.runtime.rpc import TVMRuntimeClient
+TVM runtime test
+~~~~~~~~~~~~~~~~
+| You must specify device name to :code:`--tvm_target_device` for tvm model compile.
+| The device name is the name of the TVMConfig yaml file in the :code:`python/arachne/config/tvm_target` directory.
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
+.. code:: shell
 
-        url = (
-            "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/tvm_mobilenet.tar"
-        )
-        tvm_package_path = tmp_dir + "/tvm_mobilenet.tar"
-        download(url, tvm_package_path)
+    pytest tests/runtime/rpc/device/test_edge.py::test_tvm_runtime_rpc \
+    --edgetest \
+    --tvm_target_device jetson-xavier-nx \
+    --rpc_host 192.168.xx.xx \
+    --rpc_port 5051
 
-        dummy_input = np.array(np.random.random_sample([1, 224, 224, 3]), dtype=np.float32)  # type: ignore
+TfLite runtime test
+~~~~~~~~~~~~~~~~
 
-        client = arachne.runtime.rpc.init(package_tar=tvm_package_path, rpc_host="localhost", rpc_port=5051)
-        assert isinstance(client, TVMRuntimeClient)
-        client.set_input(0, dummy_input)
-        client.run()
-        rpc_output = client.get_output(0)
-        client.finalize()
+.. code:: shell
+
+    pytest tests/runtime/rpc/device/test_edge.py::test_tflite_runtime_rpc \
+    --edgetest \
+    --rpc_host 192.168.xx.xx \
+    --rpc_port 5051
+
+ONNX runtime test
+~~~~~~~~~~~~~~~~
+
+.. code:: shell
+
+    pytest tests/runtime/rpc/device/test_edge.py::test_onnx_runtime_rpc \
+    --edgetest \
+    --rpc_host 192.168.xx.xx \
+    --rpc_port 5051
 
 .. attention::
     Only one client can be connected to one Server at the same time.
