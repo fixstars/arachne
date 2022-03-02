@@ -6,7 +6,7 @@ sudo apt install -y gfortran libopenblas-dev liblapack-dev
 
 # install poetry
 source ${common_dir}/install_poetry.sh
-sudo apt-get install libhdf5-dev
+sudo apt-get install -y libhdf5-dev
 # create virtual env
 RUNTIME_ENV_DIR=${script_dir}
 ## download onnxruntime-gpu wheel
@@ -18,7 +18,7 @@ cd ${RUNTIME_ENV_DIR}
 poetry config virtualenvs.in-project true
 poetry install
 source ${RUNTIME_ENV_DIR}/.venv/bin/activate
-## install tensorflow
+## install tensorflow (Avoid the problem that h5py fails to install when using poetry)
 pip install https://developer.download.nvidia.com/compute/redist/jp/v45/tensorflow/tensorflow-2.5.0+nv21.6-cp36-cp36m-linux_aarch64.whl
 
 # build tvm

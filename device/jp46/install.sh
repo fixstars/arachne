@@ -6,7 +6,7 @@ sudo apt install -y python3-pip gfortran libopenblas-dev liblapack-dev
 
 # install poetry
 source ${common_dir}/install_poetry.sh
-sudo apt-get install libhdf5-dev
+sudo apt-get install -y libhdf5-dev
 
 # create virtual env
 RUNTIME_ENV_DIR=${script_dir}
