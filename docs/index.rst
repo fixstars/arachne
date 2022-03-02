@@ -3,13 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to arachne's documentation!
-===================================
+Arachne Documentation
+=====================
 
 .. attention:: This documentation is under construction.
 
-Welcome to the documentation for Arachne, a tool that accelerates DNN model conversion and compilation for your edge devices.
-This tool also provides runtime functionality to test your models on remote devices.
+
+.. raw:: html
+
+   <img alt="License is Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue" />
+   <img alt="Python version: 3.6" src="https://img.shields.io/badge/python-3.6-blue"/>
+
+
+Arachne is an open-source Python project for helping DNN model conversion and compilation for your edge devices (e.g., Nvidia Jetson Devices).
+It also provides runtime functionality to test your models on remote devices.
 
 .. toctree::
    :maxdepth: 1
