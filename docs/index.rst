@@ -11,7 +11,7 @@ Arachne Documentation
 
 .. raw:: html
 
-   <img alt="License is Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue" />
+   <img alt="License is MIT" src="https://img.shields.io/badge/license-MIT-blue" />
    <img alt="Python version: 3.6" src="https://img.shields.io/badge/python-3.6-blue"/>
 
 
