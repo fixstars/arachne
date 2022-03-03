@@ -1,9 +1,8 @@
 [tool.poetry]
 name = "arachne-runtime"
-version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
-readme = "README.md"
+version = "0.0.0"
+description = "arachne runtime environment for JetPack 4.6"
+authors = ["Yasuhiro Nitta <yasuhiro.nitta@fixstars.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
