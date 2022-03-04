@@ -1,5 +1,9 @@
 Tensorflow Lite Converter
 =========================
+
+The `TensorFlow Lite Converter <https://www.tensorflow.org/lite/convert>`_ takes a TensorFlow model and generates a TensorFlow Lite model.
+In Arachne, we support it by providing interfaces wrapping `TFLiteConverter`` python API.
+We also support the Post-training quantization.
 The details are described in :ref:`arachne.tools.tflite_converter <api-tools-tflite-converter>`.
 
 Using from CLI
@@ -20,16 +24,19 @@ Using from your code
 
     from arachne.data import Model
     from aracune.utils import get_model_spec
-    import arachne.tools.tflite_converter
+    from arachne.tools.tflite_converter import TFLiteConverter, TFLiteConverterConfig
 
     # Setup an input model
     model_file = "mobilenet.h5"
     input_model = Model(model_file, spec=get_model_spec(model_file))
 
     # Run the tflite converter
-    cfg = arachne.tools.tflite_converter.TFLiteConverterConfig()
+    cfg =TFLiteConverterConfig()
     cfg.ptq.method = "dynamic_range"
-    output = arachne.tools.tflite_converter.run(input_model, cfg)
+    output = TFLiteConverter.run(input_model, cfg)
+
+    # Save the result
+    save_model(model=output_model, output_path="output.tar")
 
 
 Use representative datasets for PTQ

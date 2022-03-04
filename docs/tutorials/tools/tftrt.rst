@@ -1,5 +1,8 @@
 TF-TRT
 ======
+
+TensorFlow with TensorRT (TF-TRT) is a Tensorflow integration for optimizing Tensorflow models to execute them with TensorRT.
+We also support the Post-training quantization like Tensorflow Lite Converter.
 The details are described in :ref:`arachne.tools.tftrt <api-tools-tftrt>`.
 
 Using from CLI
@@ -20,13 +23,13 @@ Using from your code
 
     from arachne.data import Model
     from aracune.utils import get_model_spec
-    import arachne.tools.tftrt
+    from arachne.tools.tftrt import TFTRT, TFTRTConfig
 
     # Setup an input model
     model_path = "saved_model"
     input_model = Model(model_path, spec=get_model_spec(model_path))
 
     # Run the TF-TRT
-    cfg = arachne.tools.tftrt.TFTRTConfig()
+    cfg = TFTRTConfig()
     cfg.precision_mode = "FP16"
-    output = arachne.tools.tftrt.run(input_model, cfg)
+    output = TFTRT.run(input_model, cfg)

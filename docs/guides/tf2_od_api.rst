@@ -81,7 +81,7 @@ Step 2: apply a pipeline/tool to the tflite-friendly model
 
     # An example: compile a model after converting it into a tflite model.
 
-    python -m arachne.pipeline \
+    python -m arachne.driver.pipeline \
         input=/path/to/output_dir/saved_model \
         output=/path/to/arachne_output.tar \
         pipeline=[tflite_converter,tvm] \

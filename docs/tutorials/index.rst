@@ -6,7 +6,7 @@ User Tutorial
    :maxdepth: 1
 
    intro
-   tools/index
-   pipeline
+   run_tool
+   run_pipeline
    runtime
    rpc
