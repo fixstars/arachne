@@ -21,7 +21,7 @@ Clone YOLOX repository and open the directory in vscode and run :code:`Remote-Co
 
 .. code:: bash
 
-    git clone ssh://git@gitlab.fixstars.com:8022/arachne/models/YOLOX.git
+    git clone -b compile_with_arachne ssh://git@gitlab.fixstars.com:8022/arachne/models/YOLOX.git
     code ./YOLOX
 
 | The following steps are done inside the docker container.
@@ -49,8 +49,8 @@ Export :code:`yolox_s.pth` in onnx format.
     wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.pth
     python tools/export_onnx.py --output-name yolox_s.onnx -n yolox-s -c yolox_s.pth
 
-Compile yolox-s with :code:`arachne.tools`.
-You can select :code:`cpu, cuda, or tensorrt` for :code:`tools.tvm.composite_target`.
+Compile yolox-s with :code:`arachne.tools.tvm`.
+You can set :code:`cpu, cuda, or tensorrt` for :code:`tools.tvm.composite_target`.
 Model spec is defined in :code:`yaml/yolox-s.yml`:
 
 .. code:: yaml
@@ -73,11 +73,12 @@ Model spec is defined in :code:`yaml/yolox-s.yml`:
 
 .. code:: bash
 
-    python -m arachne.tools.tvm \
-        input=./yolox_s.onnx \
-        input_spec=./yaml/yolox_s.yml \
-        output=./yolox_s.tar \
-        tools.tvm.composite_target=[tensorrt,cpu]
+    python -m arachne.driver.cli \
+    +tools=tvm  \
+    input=./yolox_s.onnx \
+    input_spec=./yaml/yolox_s.yml \
+    output=./yolox_s.tar \
+    tools.tvm.composite_target=[tensorrt,cpu]
 
 Run compiled model
 ##################
@@ -174,4 +175,4 @@ Evaluation results are the following:
     Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.724
 
 | :code:`ArachneCOCOEvaluator` is an implementation of inference execution by arachne.
-| See also `arachne_example.ipyenb <https://gitlab.fixstars.com/arachne/models/YOLOX/-/blob/issue/2_compile_arachne_v2/arachne_example.ipynb>`_ in YOLOX repository.
+| See also `arachne_example.ipyenb <https://gitlab.fixstars.com/arachne/models/YOLOX/-/blob/compile_with_arachne/arachne_example.ipynb>`_ in YOLOX repository.
