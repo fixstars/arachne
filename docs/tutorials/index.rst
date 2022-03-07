@@ -9,4 +9,5 @@ User Tutorial
    tools/index
    pipeline
    runtime
+   setup_device
    rpc
