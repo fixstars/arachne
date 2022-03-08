@@ -10,4 +10,3 @@ User tutorial
    pipeline
    runtime
    setup_device
-   rpc
