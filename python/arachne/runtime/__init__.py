@@ -20,6 +20,14 @@ logger = getLogger(__name__)
 
 
 def validate_environment(env: dict) -> bool:
+    """Validate library versions by comparing current execution environment and input environment.
+
+    Args:
+        env (dict): environment info to validate
+
+    Returns:
+        bool: whether the validation is success or not.
+    """
     valid = True
     for dep in env["dependencies"]:
         if "cuda" in dep:
@@ -67,6 +75,21 @@ def init(
     env_file: Optional[str] = None,
     **kwargs,
 ) -> RuntimeModule:
+    """Initialize RuntimeModule.
+
+    The arguments to be passed as model file are different for runtime:
+
+    - ONNX/TfLite:   set :code:`model_file`
+    - TVM: set :code:`package_tar` or set both :code:`model_file` and :code:`env_file`
+
+    Args:
+        package_tar (Optional[str], optional): TVM package filepath archived by arachne.tools.tvm. Defaults to None.
+        model_file (Optional[str], optional): ONNX/TfLite/TVM model filepath. Defaults to None.
+        env_file (Optional[str], optional): environment file :code:`env.yaml`. Defaults to None.
+
+    Returns:
+        RuntimeModule: ONNX/TfLite/TVM RuntimeModule
+    """
     assert (
         package_tar is not None or model_file is not None
     ), "package_tar or model_file should not be None"

@@ -17,9 +17,23 @@ class TFLiteRuntimeModule(RuntimeModule):
         self.module.invoke()
 
     def set_input(self, idx, value, **kwargs):
+        """Set input data.
+
+        Args:
+            idx (int): layer index to set data
+            np_arr (np.ndarray): input data
+        """
         self.module.set_tensor(self.input_details[idx]["index"], value)
 
     def get_output(self, idx):
+        """Get inference output.
+
+        Args:
+            index (int): layer index to get output
+
+        Returns:
+            np.ndarray: output data
+        """
         return self.module.get_tensor(self.output_details[idx]["index"])
 
     def get_input_details(self):

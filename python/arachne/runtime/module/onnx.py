@@ -20,7 +20,9 @@ class ONNXRuntimeModule(RuntimeModule):
     def __init__(
         self, model: str, provider_options: List[str] = ["CPUExecutionProvider"], **kwargs
     ):
-        self.module: ort.InferenceSession = ort.InferenceSession(model, **kwargs)
+        self.module: ort.InferenceSession = ort.InferenceSession(
+            model, provider_options=provider_options, **kwargs
+        )
         self._inputs = {}
         self._outputs = {}
         self.input_details = self.module.get_inputs()
@@ -31,9 +33,23 @@ class ONNXRuntimeModule(RuntimeModule):
         self._outputs = self.module.run(output_names=None, input_feed=self._inputs)
 
     def set_input(self, idx, value, **kwargs):
+        """Set input data.
+
+        Args:
+            idx (int): layer index to set data
+            value (np.ndarray): input data
+        """
         self._inputs[self.input_details[idx].name] = value
 
     def get_output(self, idx):
+        """Get inference output.
+
+        Args:
+            index (int): layer index to get output
+
+        Returns:
+            np.ndarray: output data
+        """
         return self._outputs[idx]
 
     def get_input_details(self):
