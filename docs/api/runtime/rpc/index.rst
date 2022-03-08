@@ -2,8 +2,8 @@ arachne.runtime.rpc
 ===================
 
 .. toctree::
-
     :maxdepth: 3
+
     client/index
     servicer
     protobuf
