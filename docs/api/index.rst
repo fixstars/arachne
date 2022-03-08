@@ -6,7 +6,7 @@ API Reference
 
     config
     data
-    pipeline
+    driver
     runtime/index
     tools
     utils
