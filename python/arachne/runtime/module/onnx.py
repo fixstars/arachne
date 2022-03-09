@@ -17,11 +17,9 @@ def onnx_tensor_type_to_np_dtype(ottype: str):
 
 
 class ONNXRuntimeModule(RuntimeModule):
-    def __init__(
-        self, model: str, provider_options: List[str] = ["CPUExecutionProvider"], **kwargs
-    ):
+    def __init__(self, model: str, providers: List[str] = ["CPUExecutionProvider"], **kwargs):
         self.module: ort.InferenceSession = ort.InferenceSession(
-            model, provider_options=provider_options, **kwargs
+            model, providers=providers, **kwargs
         )
         self._inputs = {}
         self._outputs = {}
