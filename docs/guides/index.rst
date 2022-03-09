@@ -7,3 +7,4 @@ How to guide
 
    tf2_od_api
    yolox
+   yolov4

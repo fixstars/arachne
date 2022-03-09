@@ -31,9 +31,23 @@ class ONNXRuntimeModule(RuntimeModule):
         self._outputs = self.module.run(output_names=None, input_feed=self._inputs)
 
     def set_input(self, idx, value, **kwargs):
+        """Set input data.
+
+        Args:
+            idx (int): layer index to set data
+            value (np.ndarray): input data
+        """
         self._inputs[self.input_details[idx].name] = value
 
     def get_output(self, idx):
+        """Get inference output.
+
+        Args:
+            index (int): layer index to get output
+
+        Returns:
+            np.ndarray: output data
+        """
         return self._outputs[idx]
 
     def get_input_details(self):

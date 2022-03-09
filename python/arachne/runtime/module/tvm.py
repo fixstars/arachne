@@ -60,9 +60,23 @@ class TVMRuntimeModule(RuntimeModule):
         self.module.run()
 
     def set_input(self, idx, value, **kwargs):
+        """Set input data.
+
+        Args:
+            idx (Union[int, str]): layer index or layer name to set data
+            value (np.ndarray): input data
+        """
         self.module.set_input(idx, value, **kwargs)
 
     def get_output(self, idx):
+        """Get inference output.
+
+        Args:
+            index (int): layer index to get output
+
+        Returns:
+            np.ndarray: output data
+        """
         return self.module.get_output(idx).numpy()
 
     def get_input_details(self):
