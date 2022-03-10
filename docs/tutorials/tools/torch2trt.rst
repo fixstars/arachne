@@ -1,5 +1,7 @@
 torch2trt
 =========
+The `torch2trt <https://github.com/NVIDIA-AI-IOT/torch2trt>`_ is a PyTorch to TensorRT converter.
+In Arachne, we support this tool by providing interfaces that wrap `torch2trt`.
 The details are described in :ref:`arachne.tools.torch2trt <api-tools-torch2trt>`.
 
 Using from CLI
@@ -21,7 +23,7 @@ Using from your code
 
     from arachne.data import Model
     from aracune.utils import get_model_spec
-    import arachne.tools.torch2trt
+    from arachne.tools.torch2trt import Torch2TRT, Torch2TRTConfig
 
     # Setup an input model
     model_path = "resnet18.pt"
@@ -32,6 +34,6 @@ Using from your code
     input_model = Model(path=model_path, spec=spec)
 
     # Run the torch2trt
-    cfg = arachne.tools.torch2trt.Torch2TRTConfig()
+    cfg = Torch2TRTConfig()
     cfg.precision = "FP16"
-    output = arachne.tools.torch2trt.run(input_model, cfg)
+    output = Torch2TRT.run(input_model, cfg)

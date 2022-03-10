@@ -1,5 +1,8 @@
 OpenVINO2Tensorflow
 ===================
+
+The `openvino2tensorflow <https://github.com/PINTO0309/openvino2tensorflow>`_ is a script that converts the ONNX/OpenVINO IR model to Tensorflow model.
+In Arachne, we expect to use this tool to convert a OpenVINO IR derived from a Pytorch/ONNX model (NCHW) to a Tensorflow model (NHWC).
 The details are described in :ref:`arachne.tools.openvino2tf <api-tools-openvino2tf>`.
 
 Using from CLI
@@ -19,7 +22,7 @@ Using from your code
 .. code:: python
 
     from arachne.data import Model, ModelSpec, TensorSpec
-    import arachne.tools.openvino2tf
+    from arachne.tools.openvino2tf import OpenVINO2TF, OpenVINO2TFConfig
 
     # Setup an input model
     model_path = "resnet18.xml"  # or /path/to/openvino_mo_output_dir
@@ -30,5 +33,5 @@ Using from your code
     input_model = Model(path=model_path, spec=spec)
 
     # Run the openvino2tensorflow
-    cfg = arachne.tools.openvino2tf.OpenVINO2TFConfig()
-    output = arachne.tools.openvino2tf.run(input_model, cfg)
+    cfg = OpenVINO2TFConfig()
+    output = OpenVINO2TF.run(input_model, cfg)

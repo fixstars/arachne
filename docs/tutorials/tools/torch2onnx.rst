@@ -1,5 +1,7 @@
 torch2onnx
 ==========
+
+The torch2onnx  is a tool of Arachne that wraps `torch.onnx.export <https://pytorch.org/docs/stable/onnx.html>`_ .
 The details are described in :ref:`arachne.tools.torch2onnx <api-tools-torch2onnx>`.
 
 Using from CLI
@@ -20,7 +22,7 @@ Using from your code
 
     from arachne.data import Model
     from aracune.utils import get_model_spec
-    import arachne.tools.torch2onnx
+    from arachne.tools.torch2onnx import Torch2ONNX, Torch2ONNXConfig
 
     # Setup an input model
     model_path = "resnet18.pt"
@@ -31,5 +33,5 @@ Using from your code
     input_model = Model(path=model_path, spec=spec)
 
     # Run the torch2onnx
-    cfg = arachne.tools.torch2onnx.Torch2ONNXConfig()
-    output = arachne.tools.torch2onnx.run(input_model, cfg)
+    cfg = Torch2ONNXConfig()
+    output = Torch2ONNX.run(input_model, cfg)
