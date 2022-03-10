@@ -42,7 +42,7 @@ arachne
 ## Get Source from Git
 
 ```sh
-git clone --recursive -b feature/v0.2 ssh://git@gitlab.fixstars.com:8022/arachne/arachne.git arachne
+git clone --recursive ssh://git@gitlab.fixstars.com:8022/arachne/arachne.git arachne
 ```
 
 ## Setup for Development Container
