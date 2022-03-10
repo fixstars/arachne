@@ -85,7 +85,7 @@ pages:
     paths:
       - public
   only:
-  - feature/v0.2
+  - main
 
 cleanup-image:
   stage: .post
