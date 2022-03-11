@@ -46,6 +46,7 @@ test-arachne:
     - dgx1
   before_script:
     - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
+    - git clone --recursive https://github.com/fixstars/tvm 3rdparty/tvm
     - poetry install
     - poetry run ./scripts/install_tvm.sh
     - poetry run ./scripts/install_torch2trt.sh
@@ -61,6 +62,7 @@ test-doc-build:
     - dgx1
   before_script:
     - export PYTHONPATH=${ARACHNE_PYTHONPATH}:$PYTHONPATH
+    - git clone --recursive https://github.com/fixstars/tvm 3rdparty/tvm
     - poetry install
     - poetry run ./scripts/install_tvm.sh
     - poetry run ./scripts/install_torch2trt.sh
