@@ -16,6 +16,9 @@ logger = getLogger(__name__)
 
 @hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
+    """
+    This is a main function for `arachne.driver.cli`.
+    """
 
     tools = list(cfg.tools.keys())
 

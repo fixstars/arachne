@@ -22,11 +22,33 @@ _FACTORY_KEY = "onnx_simplifier"
 @ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
 class ONNXSimplifierConfig(ToolConfigBase):
+    """This is a class for configuring the behavior of the onnx-simplifier.
+    This wraps the original arguments for onnx_simplifier.simplify().
+
+    Attributes:
+        check_n (int): The number of check times for simplified models. Default value is 3.
+
+        skip_fuse_bn (bool): Whether to skip fuse_bn_into_conv onnx optimizer. Default value is False.
+
+        perform_optimiation (bool): Whether to apply onnx optimizer to the model. Defalut value is True.
+
+        input_shapes (:obj:`List[str]`, optional): To handle dynamic input shapes, user must specify a fixed input shape. Default value is None.
+
+        skipped_optimizers (:obj:`List[str]`, optional): Specifies onnx optimizers to be skipped. Default value is None.
+
+        skip_shape_inference (bool): Skips shape inference. Default value is False.
+
+        dynamic_input_shape (bool): Indicates whether the input shape should be dynamic. Default value is False.
+
+        input_data_path (:obj:`List[str]`, optional): A path to custome input data (*.npy). Default value is None.
+
+        custom_lib (:obj:`List[str]`, optional): Specfies onnxruntime custom ops's shared library. Default value is None.
+    """
     check_n: int = 3
     skip_fuse_bn: bool = False
-    skip_optimization: bool = False
+    perform_optimization: bool = True
     input_shape: Optional[List[str]] = None
-    skip_optimizer: Optional[List[str]] = None
+    skipped_optimizers: Optional[List[str]] = None
     skip_shape_inference: bool = False
     dynamic_input_shape: bool = False
     input_data_path: Optional[List[str]] = None
@@ -64,8 +86,19 @@ def get_input_shapes_and_tensors_from_args(input_shape, input_data_path):
 
 @ToolFactory.register(_FACTORY_KEY)
 class ONNXSimplifier(ToolBase):
+    """This is a runner class for executing the onnx-simplifier.
+    """
     @staticmethod
     def run(input: Model, cfg: ONNXSimplifierConfig) -> Model:
+        """
+        The run method is a static method that executes onnx-simplifier for an input model.
+
+        Args:
+            input (Model): An input model.
+            cfg (ONNXSimplifierConfig): A config object.
+        Returns:
+            Model: A simplified ONNX model.
+        """
         idx = itertools.count().__next__()
         filename = f"model_{idx}_simplified.onnx"
 
@@ -77,10 +110,10 @@ class ONNXSimplifier(ToolBase):
         model_opt, check_ok = simplify(
             input.path,
             check_n=cfg.check_n,
-            perform_optimization=not cfg.skip_optimization,
+            perform_optimization=cfg.perform_optimization,
             skip_fuse_bn=cfg.skip_fuse_bn,
             input_shapes=input_shapes,
-            skipped_optimizers=cfg.skip_optimizer,
+            skipped_optimizers=cfg.skipped_optimizers,
             skip_shape_inference=cfg.skip_shape_inference,
             input_data=input_tensors,
             dynamic_input_shape=cfg.dynamic_input_shape,

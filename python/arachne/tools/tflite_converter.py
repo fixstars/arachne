@@ -22,7 +22,15 @@ _FACTORY_KEY = "tflite_converter"
 
 @dataclass
 class TFLiteConverterPTQConfg:
-    # We cannot use Literal['none', 'dynamic_range', 'fp16', 'int8'] due to the limitation of omegaconfig
+    """This class controls the behavior of the Post-training quantization (PTQ).
+    For more details, please refer to the TFLite documentation.
+    https://www.tensorflow.org/lite/performance/post_training_quantization
+
+    Attributes:
+        method  (str): Specifies the PTQ method. Possible variables are "none", "dynamic_range", "fp16", or "int8".
+
+        representative_dataset: A path to calibration dataset (*.npy). Default value is None.
+    """
     method: str = "none"
     representative_dataset: Optional[str] = None
 
@@ -30,6 +38,17 @@ class TFLiteConverterPTQConfg:
 @ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
 class TFLiteConverterConfig(ToolConfigBase):
+    """This class configures the behavior of the TFLite converter.
+    For more details, please refer to the TFLite documentation.
+    https://www.tensorflow.org/lite/convert
+
+    Attributes:
+        enable_tf_ops (bool): Whether to allow Tensorflow Operations in the output model. Default value is False.
+
+        allow_custom_ops (bool): Whether to allow custom operators. Default value is True.
+
+        ptq (TFLiteConverterPTQConfg): Controls the behavior of the post-training quantization.
+    """
     enable_tf_ops: bool = False
     allow_custom_ops: bool = True
     ptq: TFLiteConverterPTQConfg = TFLiteConverterPTQConfg()
@@ -68,8 +87,19 @@ def _init_tflite_converter(input: Model):
 
 @ToolFactory.register(_FACTORY_KEY)
 class TFLiteConverter(ToolBase):
+    """This is a runner class for executing the TFLite Converter.
+    """
     @staticmethod
     def run(input: Model, cfg: TFLiteConverterConfig) -> Model:
+        """
+        The run method is a static method that executes the TFLite Converter for an input model.
+
+        Args:
+            input (Model): An input model.
+            cfg (TFLiteConverterConfig): A config object.
+        Returns:
+            Model: A TFLite Model.
+        """
         idx = itertools.count().__next__()
         converter = _init_tflite_converter(input)
         assert converter is not None

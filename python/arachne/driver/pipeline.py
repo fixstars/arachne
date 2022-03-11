@@ -20,6 +20,13 @@ logger = getLogger(__name__)
 
 @dataclass
 class PipelineConfig(BaseConfig):
+    """
+    This is a configuration class for pipeline.
+
+    Attributes:
+        tools (Any): Tool specific configurations. This will be overwritten by the value of the pipeline option.
+        pipeline (List[str]): Specifies tools to be applied in series.
+    """
     tools: Any = MISSING
     pipeline: List[str] = MISSING
 
@@ -36,6 +43,15 @@ def get_default_tool_configs(tools: List[str]) -> Dict:
 
 
 def run(input: Model, cfg: PipelineConfig) -> Model:
+    """
+    This function constructs and applies a pipeline defined by the config object to an input model.
+
+    Args:
+        input (Model): An input model.
+        cfg (PipelineConfig): A config object.
+    Returns:
+        Model: An output model.
+    """
 
     # Preprare DataCatalog
     data_catalog = DataCatalog()
@@ -73,6 +89,9 @@ def run(input: Model, cfg: PipelineConfig) -> Model:
 
 @hydra.main(config_path="../config", config_name="config")
 def main(cfg: DictConfig) -> None:
+    """
+    This is a main function for `arachne.driver.pipeline`.
+    """
 
     try:
         assert len(list(cfg.pipeline)) > 0

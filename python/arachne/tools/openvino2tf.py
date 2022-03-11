@@ -20,6 +20,9 @@ _FACTORY_KEY = "openvino2tf"
 @ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
 class OpenVINO2TFConfig(ToolConfigBase):
+    """The openvino2tensorflow has many options, so that we decided to provide only one string parameter that will be passed to the tool.
+    To understand what options are available, run `openvino2tensorflow --help`.
+    """
     cli_args: Optional[str] = None
 
 
@@ -32,8 +35,19 @@ def _find_openvino_xml_file(dir: str) -> Optional[str]:
 
 @ToolFactory.register(_FACTORY_KEY)
 class OpenVINO2TF(ToolBase):
+    """This is a runner class for executing the openvino2tensorflow.
+    """
     @staticmethod
     def run(input: Model, cfg: OpenVINO2TFConfig) -> Model:
+        """
+        The run method is a static method that executes openvino2tensorflow for an input model.
+
+        Args:
+            input (Model): An input model.
+            cfg (OpenVINO2TFConfig): A config object.
+        Returns:
+            Model: A Tensorflow Model.
+        """
         idx = itertools.count().__next__()
         assert input.spec is not None
         input_shapes = []

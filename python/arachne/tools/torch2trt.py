@@ -25,6 +25,29 @@ _FACTORY_KEY = "torch2trt"
 @ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
 class Torch2TRTConfig(ToolConfigBase):
+    """This is a class for configuring the behavior of the torch2trt.
+
+    Attributes:
+        max_batch_size  (int): This is the max size for the input batch. Default value is 1.
+
+        fp16_mode (bool): To convert a model with fp16_mode=True allows the TensorRT optimizer to select layers with fp16 precision. Default value is False.
+
+        max_workspace_size (int): The maximum GPU temporary memory which the TensorRT engine can use at execution time
+
+        strict_type_constraints (bool): Enables strict type constraints. But, this flag is deprecated. Default value is False.
+
+        keep_network (bool): Whether to hold the optimized network. Default value is True.
+
+        int8_mode (bool): Enables INT8 precision. Default value is False.
+
+        int8_calib_dataset (:obj:`str`, optional): A path to calibration dataset (*.npy). Default value is None.
+
+        int8_calib_algorithm (str): To override the default calibration algorithm. Possible values are "DEFAULT", "ENTROPY_CALIBRATION", "ENTROPY_CALIBRATION_2", or "MINMAX_CALIBRATION". Default value is "DEFAULT".
+
+        int8_calib_batch_size (int): To set the calibration batch size, you can set the this parameter. Default value is 1.
+
+        use_onnx (bool): If you set use_onnx=True, this will perform conversion on the module by exporting the model using PyTorch's JIT tracer, and parsing with TensorRT's ONNX parser. Default value is False.
+    """
     max_batch_size: int = 1
     fp16_mode: bool = False
     max_workspace_size: int = 1 << 25
@@ -39,8 +62,20 @@ class Torch2TRTConfig(ToolConfigBase):
 
 @ToolFactory.register(_FACTORY_KEY)
 class Torch2TRT(ToolBase):
+    """This is a runner class for executing torch2trt.
+    """
+
     @staticmethod
     def run(input: Model, cfg: Torch2TRTConfig) -> Model:
+        """
+        The run method is a static method that executes torch2trt() for an input model.
+
+        Args:
+            input (Model): An input model.
+            cfg (Torch2TRTConfig): A config object.
+        Returns:
+            Model: An optimized model.
+        """
         idx = itertools.count().__next__()
         filename = f"model_{idx}_trt.pth"
 

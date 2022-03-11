@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 import numpy as np
-import tensorflow as tf
 from hydra.utils import to_absolute_path
 from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
@@ -22,21 +21,48 @@ _FACTORY_KEY = "tftrt"
 @ToolConfigFactory.register(_FACTORY_KEY)
 @dataclass
 class TFTRTConfig(ToolConfigBase):
+    """This is a class for configuring the behavior of the TF-TRT.
+
+    Attributes:
+        max_workspace_size_bytes (int): The maximum GPU temporary memory which the TensorRT engine can use at execution time. Default value is 1GB.
+
+        precision_mode (str):  This is one of "FP32", "FP16", or "INT8". Default value is False.
+
+        minimum_segment_size (int): This is the minimum number of nodes required for a subgraph to be replaced by the TRT operator. Default value is 3.
+
+        maximum_cached_engines (int): This is the maximum number of cached TensorRT engines in TensorFlow for each TensorRT subgraph. Default value is 1.
+
+        use_calibration (bool): Whether to use calibration. This argument is ignored if precision_mode is not "INT8". Default value is True.
+
+        allow_build_at_runtime (bool): Whether to allow building TensorRT engines during runtime. Default value is True.
+
+        representative_dataset (:obj:`str`, optional): A path to calibration dataset (*.npy). Default value is None.
+
+    """
     max_workspace_size_bytes: int = 1 << 30
     precision_mode: str = "FP32"
     minimum_segment_size: int = 3
     maximum_cached_engines: int = 1
     use_calibration: bool = True
-    is_dynamic_op: bool = True
-    max_batch_size: int = 1
     allow_build_at_runtime: bool = True
     representative_dataset: Optional[str] = None
 
 
 @ToolFactory.register(_FACTORY_KEY)
 class TFTRT(ToolBase):
+    """This is a runner class for executing the TF-TRT.
+    """
     @staticmethod
     def run(input: Model, cfg: TFTRTConfig) -> Model:
+        """
+        The run method is a static method that executes TF-TRT for an input model.
+
+        Args:
+            input (Model): An input model.
+            cfg (TFTRTConfig): A config object.
+        Returns:
+            Model: A Tensorflow Model optimized for TensorRT.
+        """
         idx = itertools.count().__next__()
         params = trt.DEFAULT_TRT_CONVERSION_PARAMS
         params = params._replace(max_workspace_size_bytes=cfg.max_workspace_size_bytes)
@@ -45,13 +71,6 @@ class TFTRT(ToolBase):
         params = params._replace(maximum_cached_engines=cfg.maximum_cached_engines)
         params = params._replace(use_calibration=cfg.use_calibration)
         params = params._replace(allow_build_at_runtime=cfg.allow_build_at_runtime)
-
-        tf_version = tf.__version__.split(".")
-        tf_major_version = int(tf_version[0])
-        tf_minor_version = int(tf_version[1])
-        if tf_major_version == 2 and tf_minor_version < 4:
-            params = params._replace(is_dynamic_op=cfg.is_dynamic_op)
-            params = params._replace(max_batch_size=cfg.max_batch_size)
 
         converter = trt.TrtGraphConverterV2(
             input_saved_model_dir=input.path, conversion_params=params

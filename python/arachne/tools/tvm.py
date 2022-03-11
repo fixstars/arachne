@@ -69,6 +69,14 @@ class TVMConfig(ToolConfigBase):
 
 
 def get_predefined_config(target: str) -> TVMConfig:
+    """This is a function for retrieving a pre-defined config for some targets.
+
+    Args:
+        target (int): A target name.
+
+    Returns:
+        TVMConfig: A pre-defined config object.
+    """
     config_path = str(Path(__file__).parents[1]) + "/config/tvm_target/" + target + ".yaml"
     pre_defined_conf = OmegaConf.load(config_path)
     override_args = dict()
@@ -184,8 +192,20 @@ def _save_relay(graph_module, module, module_path):
 
 @ToolFactory.register(_FACTORY_KEY)
 class TVM(ToolBase):
+    """This is a runner class for executing tvm.relay.build.
+    """
+
     @staticmethod
     def run(input: Model, cfg: TVMConfig) -> Model:
+        """
+        The run method is a static method that executes tvm.relay.build() for an input model.
+
+        Args:
+            input (Model): An input model.
+            cfg (TVMConfig): A config object.
+        Returns:
+            Model: A compiled model.
+        """
         idx = itertools.count().__next__()
 
         # Load as a TVMC model
