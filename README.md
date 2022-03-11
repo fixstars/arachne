@@ -42,7 +42,8 @@ arachne
 ## Get Source from Git
 
 ```sh
-git clone --recursive ssh://git@gitlab.fixstars.com:8022/arachne/arachne.git arachne
+git clone git@github.com:fixstars/arachne.git arachne
+git clone --recursive git@github.com:fixstars/tvm.git arachne/3rdparty/tvm
 ```
 
 ## Setup for Development Container

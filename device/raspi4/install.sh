@@ -4,6 +4,10 @@ script_dir=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)
 common_dir=${script_dir}/../common/
 sudo apt install -y python3-pip gfortran libopenblas-dev liblapack-dev
 
+# clone tvm
+arachne_home=${script_dir}/../../
+git clone --recursive https://github.com/fixstars/tvm ${arachne_home}/3rdparty/tvm
+
 # install poetry
 source ${common_dir}/install_poetry.sh
 sudo apt-get -y install libhdf5-dev

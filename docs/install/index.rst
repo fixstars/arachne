@@ -7,7 +7,8 @@ Getting the Source Code
 
 .. code:: bash
 
-    $ git clone --recursive ssh://git@gitlab.fixstars.com:8022/arachne/arachne.git arachne
+    $ git clone git@github.com:fixstars/arachne.git arachne
+    $ git clone --recursive git@github.com:fixstars/tvm.git arachne/3rdparty/tvm
 
 
 Expected Environment

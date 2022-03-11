@@ -12,7 +12,8 @@ Build arachne container image.
 
 .. code:: bash
 
-    git clone ssh://git@gitlab.fixstars.com:8022/arachne/arachne.git
+    git clone git@github.com:fixstars/arachne.git arachne
+    git clone --recursive git@github.com:fixstars/tvm.git arachne/3rdparty/tvm
     cd arachne
     docker build -f docker/devel-gpu.Dockerfile -t arachne  --build-arg GITLAB_ACCESS_TOKEN=XXXXXXXXXXXX .
     cd ..
