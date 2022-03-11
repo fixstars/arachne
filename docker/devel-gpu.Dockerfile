@@ -73,4 +73,5 @@ RUN if [[ -z "$GITLAB_ACCESS_TOKEN" ]] ; then \
     printf "\nERROR: This Dockerfile needs the personal access token of gitlab.fixstars.com, please specify by:\ndocker build --build-arg GITLAB_ACCESS_TOKEN=<your_personal_access_token>\n" && \
     exit 1; fi
 
-RUN git clone --recursive https://${GITLAB_USERNAME}:${GITLAB_ACCESS_TOKEN}@gitlab.fixstars.com/arachne/arachne.git $HOME/arachne_src
+RUN git clone https://${GITLAB_USERNAME}:${GITLAB_ACCESS_TOKEN}@gitlab.fixstars.com/arachne/arachne.git $HOME/arachne_src
+RUN git clone --recursive https://github.com/fixstars/tvm $HOME/arachne_src/3rdparty/tvm
