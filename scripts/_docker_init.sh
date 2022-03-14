@@ -6,6 +6,7 @@ groupmod -g $HOST_GID developer
 
 # keep some environments
 echo "export PYTHONPATH=${PYTHONPATH}" >> /home/developer/.bashrc
+echo "export PYTHONIOENCODING=utf-8" >> /home/developer/.bashrc
 echo "export TVM_LIBRARY_PATH=${TVM_LIBRARY_PATH}" >> /home/developer/.bashrc
 echo "export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> /home/developer/.bashrc
 echo "export PATH=${PATH}" >> /home/developer/.bashrc
