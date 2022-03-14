@@ -22,6 +22,7 @@
 FROM arachnednn/arachne:base-gpu-jp46 as base
 
 ENV LANG C.UTF-8
+ENV PYTHONIOENCODING=utf-8
 
 # Install other packages for development
 
@@ -45,6 +46,9 @@ RUN apt-get update && apt-get install -y \
 RUN ln -s $(which python3) /usr/local/bin/python
 RUN ln -s $(which pip3) /usr/local/bin/pip
 
+# install poetry
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | POETRY_HOME=/usr/local/poetry python - --version 1.2.0a2
+
 # Add a user that UID:GID will be updated by vscode
 ARG USERNAME=developer
 ARG GROUPNAME=developer
@@ -57,10 +61,7 @@ RUN groupadd -g $GID $GROUPNAME && \
     echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER $USERNAME
 ENV HOME /home/developer
-
-# install poetry
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - --version 1.2.0a2
-ENV PATH $HOME/.local/bin:$PATH
+ENV PATH $HOME/.local/bin:/usr/local/poetry/bin:$PATH
 
 # Stage 2: including src image
 # Clone src
