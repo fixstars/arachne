@@ -13,6 +13,7 @@ class BaseConfig:
         input_spec (:obj:`str`, optional): A path for a YAML file showing the tensor specification of the input model. Default value is None.
         output (str): A path for output model.
     """
+
     input: str = MISSING
     input_spec: Optional[str] = None
     output: str = MISSING

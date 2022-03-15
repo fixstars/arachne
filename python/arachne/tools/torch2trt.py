@@ -48,6 +48,7 @@ class Torch2TRTConfig(ToolConfigBase):
 
         use_onnx (bool): If you set use_onnx=True, this will perform conversion on the module by exporting the model using PyTorch's JIT tracer, and parsing with TensorRT's ONNX parser. Default value is False.
     """
+
     max_batch_size: int = 1
     fp16_mode: bool = False
     max_workspace_size: int = 1 << 25
@@ -62,8 +63,7 @@ class Torch2TRTConfig(ToolConfigBase):
 
 @ToolFactory.register(_FACTORY_KEY)
 class Torch2TRT(ToolBase):
-    """This is a runner class for executing torch2trt.
-    """
+    """This is a runner class for executing torch2trt."""
 
     @staticmethod
     def run(input: Model, cfg: Torch2TRTConfig) -> Model:

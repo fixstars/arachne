@@ -47,6 +47,7 @@ class Torch2ONNXConfig(ToolConfigBase):
 
         custom_opsets (:obj:`Any`, optional): A dictionary to indicate custom opset domain and version at export.
     """
+
     export_params: bool = True
     verbose: bool = False
     training = torch.onnx.TrainingMode.EVAL
@@ -60,8 +61,8 @@ class Torch2ONNXConfig(ToolConfigBase):
 
 @ToolFactory.register(_FACTORY_KEY)
 class Torch2ONNX(ToolBase):
-    """This is a runner class for executing torch.onnx.export().
-    """
+    """This is a runner class for executing torch.onnx.export()."""
+
     @staticmethod
     def run(input: Model, cfg: Torch2ONNXConfig) -> Model:
         """

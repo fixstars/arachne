@@ -39,6 +39,7 @@ class TFTRTConfig(ToolConfigBase):
         representative_dataset (:obj:`str`, optional): A path to calibration dataset (*.npy). Default value is None.
 
     """
+
     max_workspace_size_bytes: int = 1 << 30
     precision_mode: str = "FP32"
     minimum_segment_size: int = 3
@@ -50,8 +51,8 @@ class TFTRTConfig(ToolConfigBase):
 
 @ToolFactory.register(_FACTORY_KEY)
 class TFTRT(ToolBase):
-    """This is a runner class for executing the TF-TRT.
-    """
+    """This is a runner class for executing the TF-TRT."""
+
     @staticmethod
     def run(input: Model, cfg: TFTRTConfig) -> Model:
         """

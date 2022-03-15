@@ -23,6 +23,7 @@ class OpenVINO2TFConfig(ToolConfigBase):
     """The openvino2tensorflow has many options, so that we decided to provide only one string parameter that will be passed to the tool.
     To understand what options are available, run `openvino2tensorflow --help`.
     """
+
     cli_args: Optional[str] = None
 
 
@@ -35,8 +36,8 @@ def _find_openvino_xml_file(dir: str) -> Optional[str]:
 
 @ToolFactory.register(_FACTORY_KEY)
 class OpenVINO2TF(ToolBase):
-    """This is a runner class for executing the openvino2tensorflow.
-    """
+    """This is a runner class for executing the openvino2tensorflow."""
+
     @staticmethod
     def run(input: Model, cfg: OpenVINO2TFConfig) -> Model:
         """

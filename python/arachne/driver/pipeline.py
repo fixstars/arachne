@@ -27,6 +27,7 @@ class PipelineConfig(BaseConfig):
         tools (Any): Tool specific configurations. This will be overwritten by the value of the pipeline option.
         pipeline (List[str]): Specifies tools to be applied in series.
     """
+
     tools: Any = MISSING
     pipeline: List[str] = MISSING
 

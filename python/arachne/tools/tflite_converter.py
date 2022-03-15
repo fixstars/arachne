@@ -31,6 +31,7 @@ class TFLiteConverterPTQConfg:
 
         representative_dataset: A path to calibration dataset (*.npy). Default value is None.
     """
+
     method: str = "none"
     representative_dataset: Optional[str] = None
 
@@ -49,6 +50,7 @@ class TFLiteConverterConfig(ToolConfigBase):
 
         ptq (TFLiteConverterPTQConfg): Controls the behavior of the post-training quantization.
     """
+
     enable_tf_ops: bool = False
     allow_custom_ops: bool = True
     ptq: TFLiteConverterPTQConfg = TFLiteConverterPTQConfg()
@@ -87,8 +89,8 @@ def _init_tflite_converter(input: Model):
 
 @ToolFactory.register(_FACTORY_KEY)
 class TFLiteConverter(ToolBase):
-    """This is a runner class for executing the TFLite Converter.
-    """
+    """This is a runner class for executing the TFLite Converter."""
+
     @staticmethod
     def run(input: Model, cfg: TFLiteConverterConfig) -> Model:
         """

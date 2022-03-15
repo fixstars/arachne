@@ -21,13 +21,13 @@ class OpenVINOModelOptConfig(ToolConfigBase):
     """The OpenVINO Model Optimizer has many options, so that we decided to provide only one string parameter that will be passed to the optimizer.
     To understand what options are available, run `mo --help`.
     """
+
     cli_args: Optional[str] = None
 
 
 @ToolFactory.register(_FACTORY_KEY)
 class OpenVINOModelOptimizer(ToolBase):
-    """This is a runner class for executing the OpenVINO Model Optmizier.
-    """
+    """This is a runner class for executing the OpenVINO Model Optmizier."""
 
     @staticmethod
     def run(input: Model, cfg: OpenVINOModelOptConfig) -> Model:

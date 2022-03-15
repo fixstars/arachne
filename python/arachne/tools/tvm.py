@@ -192,8 +192,7 @@ def _save_relay(graph_module, module, module_path):
 
 @ToolFactory.register(_FACTORY_KEY)
 class TVM(ToolBase):
-    """This is a runner class for executing tvm.relay.build.
-    """
+    """This is a runner class for executing tvm.relay.build."""
 
     @staticmethod
     def run(input: Model, cfg: TVMConfig) -> Model:

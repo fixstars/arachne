@@ -44,6 +44,7 @@ class ONNXSimplifierConfig(ToolConfigBase):
 
         custom_lib (:obj:`List[str]`, optional): Specfies onnxruntime custom ops's shared library. Default value is None.
     """
+
     check_n: int = 3
     skip_fuse_bn: bool = False
     perform_optimization: bool = True
@@ -86,8 +87,8 @@ def get_input_shapes_and_tensors_from_args(input_shape, input_data_path):
 
 @ToolFactory.register(_FACTORY_KEY)
 class ONNXSimplifier(ToolBase):
-    """This is a runner class for executing the onnx-simplifier.
-    """
+    """This is a runner class for executing the onnx-simplifier."""
+
     @staticmethod
     def run(input: Model, cfg: ONNXSimplifierConfig) -> Model:
         """
