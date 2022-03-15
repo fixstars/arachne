@@ -29,7 +29,7 @@ It also provides runtime functionality to test your models on remote devices.
    :caption: User Guide
 
    tutorials/index
-   guides/index
+   .. guides/index
 
 
 .. toctree::
