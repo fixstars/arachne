@@ -50,7 +50,7 @@ class Torch2ONNXConfig(ToolConfigBase):
 
     export_params: bool = True
     verbose: bool = False
-    training = torch.onnx.TrainingMode.EVAL
+    training: int = torch.onnx.TrainingMode.EVAL.value
     operator_export_type: Optional[int] = None
     opset_version: int = torch.onnx.symbolic_helper._default_onnx_opset_version
     do_constant_folding: bool = False
@@ -93,7 +93,7 @@ class Torch2ONNX(ToolBase):
             f=filename,
             export_params=cfg.export_params,
             verbose=cfg.verbose,
-            training=cfg.training,
+            training=cfg.training,  # type: ignore
             operator_export_type=cfg.operator_export_type,
             opset_version=cfg.opset_version,
             do_constant_folding=cfg.do_constant_folding,
