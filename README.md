@@ -31,9 +31,9 @@ arachne
 ## Expected Environment
 * OS: Ubuntu 18.04
 * CUDA: 10.2
-* cuDNN: 8
-* TensorRT: 7.2.3
-* TensorFlow: 2.4.1
+* cuDNN: 8.2.1
+* TensorRT: 8.0.1
+* TensorFlow: 2.6.3
 * PyTorch: 1.8.0
 * ONNX: 1.8.0
 * onnxruntime: 1.10.0
