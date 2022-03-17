@@ -14,6 +14,12 @@ arachne.tools.onnx_simplifier
 .. automodule:: arachne.tools.onnx_simplifier
     :members:
 
+arachne.tools.onnx_tf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: arachne.tools.onnx_tf
+    :members:
+
 .. _api-tools-openvino-mo:
 
 arachne.tools.openvino_mo
