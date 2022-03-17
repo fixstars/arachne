@@ -35,7 +35,7 @@ arachne
 * TensorRT: 7.2.3
 * TensorFlow: 2.4.1
 * PyTorch: 1.8.0
-* ONNX: 1.6.0
+* ONNX: 1.8.0
 * onnxruntime: 1.10.0
 
 
