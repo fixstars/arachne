@@ -41,7 +41,7 @@ Activate virtual environment.
 
 
 Compile models using arachne
-#########################
+############################
 
 Export :code:`yolox_s.pth` in onnx format.
 
