@@ -27,7 +27,8 @@ Or you can create such environment by using a docker image and a virtual environ
 
   * TensorFlow: 2.6.3
   * PyTorch: 1.8.0
-  * ONNX and ONNX Runtime: 1.10.0
+  * ONNX: 1.8.0
+  * ONNX Runtime: 1.10.0
   * and so on.
 
 
