@@ -36,7 +36,7 @@ class TFTRTConfig(ToolConfigBase):
 
         allow_build_at_runtime (bool): Whether to allow building TensorRT engines during runtime. Default value is True.
 
-        representative_dataset (:obj:`str`, optional): A path to calibration dataset (*.npy). Default value is None.
+        representative_dataset (:obj:`str`, optional): A path to calibration dataset (a npy file). Default value is None.
 
     """
 

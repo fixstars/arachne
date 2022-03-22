@@ -40,7 +40,7 @@ class ONNXSimplifierConfig(ToolConfigBase):
 
         dynamic_input_shape (bool): Indicates whether the input shape should be dynamic. Default value is False.
 
-        input_data_path (:obj:`List[str]`, optional): A path to custome input data (*.npy). Default value is None.
+        input_data_path (:obj:`List[str]`, optional): A path to custome input data (a npy file). Default value is None.
 
         custom_lib (:obj:`List[str]`, optional): Specfies onnxruntime custom ops's shared library. Default value is None.
     """

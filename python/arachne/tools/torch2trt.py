@@ -40,7 +40,7 @@ class Torch2TRTConfig(ToolConfigBase):
 
         int8_mode (bool): Enables INT8 precision. Default value is False.
 
-        int8_calib_dataset (:obj:`str`, optional): A path to calibration dataset (*.npy). Default value is None.
+        int8_calib_dataset (:obj:`str`, optional): A path to calibration dataset (a npy file). Default value is None.
 
         int8_calib_algorithm (str): To override the default calibration algorithm. Possible values are "DEFAULT", "ENTROPY_CALIBRATION", "ENTROPY_CALIBRATION_2", or "MINMAX_CALIBRATION". Default value is "DEFAULT".
 
