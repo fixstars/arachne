@@ -133,21 +133,4 @@ The file contains a converted or compiled DNN model and a YAML file that describ
       shape:
       - 1
       - 1000
-  tvm_device: cpu
-
-
-Available Tools
----------------
-
-For detailed information of each tools, please refer to the following pages.
-
-.. toctree::
-  :maxdepth: 1
-
-  tools/tvm
-  tools/tflite_converter
-  tools/tftrt
-  tools/torch2onnx
-  tools/torch2trt
-  tools/openvino_mo
-  tools/openvino2tf
+  tvm_device: cuda
