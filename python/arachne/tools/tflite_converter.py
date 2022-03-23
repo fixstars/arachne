@@ -29,7 +29,7 @@ class TFLiteConverterPTQConfg:
     Attributes:
         method  (str): Specifies the PTQ method. Possible variables are "none", "dynamic_range", "fp16", or "int8".
 
-        representative_dataset: A path to calibration dataset (*.npy). Default value is None.
+        representative_dataset: A path to calibration dataset (a npy file). Default value is None.
     """
 
     method: str = "none"
