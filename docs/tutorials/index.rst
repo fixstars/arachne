@@ -12,8 +12,8 @@ User Tutorial
    runtime
    setup_device
 
-Available Tools
----------------
+Tool Tutorials
+--------------
 
 For detailed information of each tools, please refer to the following pages.
 
