@@ -46,12 +46,5 @@ ENV PATH $HOME/.local/bin:/usr/local/poetry/bin:$PATH
 # Clone src
 FROM base AS src
 
-# You need a personal access token of GitLab for cloning from gitlab,
-ARG GITLAB_USERNAME=oauth2
-ARG GITLAB_ACCESS_TOKEN
-RUN if [[ -z "$GITLAB_ACCESS_TOKEN" ]] ; then \
-    printf "\nERROR: This Dockerfile needs the personal access token of gitlab.fixstars.com, please specify by:\ndocker build --build-arg GITLAB_ACCESS_TOKEN=<your_personal_access_token>\n" && \
-    exit 1; fi
-
-RUN git clone https://${GITLAB_USERNAME}:${GITLAB_ACCESS_TOKEN}@gitlab.fixstars.com/arachne/arachne.git $HOME/arachne_src
+RUN git clone https://github.com/fixstars/arachne.git $HOME/arachne_src
 RUN git clone --recursive https://github.com/fixstars/tvm $HOME/arachne_src/3rdparty/tvm

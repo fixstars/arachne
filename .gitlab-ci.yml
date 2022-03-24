@@ -34,7 +34,7 @@ build-image:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
   script:
     - docker build --target base -t ${DOCKER_CI_BASE_IMAGE} -f docker/devel-gpu.Dockerfile docker
-    - docker build -t ${DOCKER_CI_SRC_IMAGE} -f docker/devel-gpu.Dockerfile --build-arg GITLAB_USERNAME=gitlab-ci-token --build-arg GITLAB_ACCESS_TOKEN=${CI_JOB_TOKEN} docker
+    - docker build -t ${DOCKER_CI_SRC_IMAGE} -f docker/devel-gpu.Dockerfile docker
     - docker push ${DOCKER_CI_BASE_IMAGE}
 
 test-arachne:
