@@ -55,6 +55,7 @@ def get_saved_model_spec(model_path: str) -> ModelSpec:
         model = tf.saved_model.load(model_path)
     except AttributeError:
         import tensorflow.keras as keras
+
         model = keras.models.load_model(model_path)
 
     model_inputs = [
