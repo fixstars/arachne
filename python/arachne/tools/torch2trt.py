@@ -106,24 +106,22 @@ class Torch2TRT(ToolBase):
                 def __getitem__(self, idx):
                     image = self.dataset[idx]
                     x = torch.from_numpy(image).clone()  # type: ignore
-                    x = x.to("cuda")
                     return [x[0]]
 
             dataset = CalibDataset(datasets)
 
-        if cfg.int8_mode and cfg.int8_calib_algorithm != "DEFAULT":
-            if cfg.int8_calib_algorithm == "ENTROPY_CALIBRATION_2":
-                algo = trt.CalibrationAlgoType.ENTROPY_CALIBRATION_2  # type: ignore
-            elif cfg.int8_calib_algorithm == "ENTROPY_CALIBRATION":
-                algo = trt.CalibrationAlgoType.ENTROPY_CALIBRATION  # type: ignore
-            elif cfg.int8_calib_algorithm == "LEGACY_CALIBRATION":
-                assert (
-                    False
-                ), "LEGACY_CALIBRATION caused a SEGV for resnet-18, so we restricted this algo"
-            elif cfg.int8_calib_algorithm == "MINMAX_CALIBRATION":
-                algo = trt.CalibrationAlgoType.MINMAX_CALIBRATION  # type: ignore
-            else:
-                algo = DEFAULT_CALIBRATION_ALGORITHM
+        if cfg.int8_calib_algorithm == "ENTROPY_CALIBRATION_2":
+            algo = trt.CalibrationAlgoType.ENTROPY_CALIBRATION_2  # type: ignore
+        elif cfg.int8_calib_algorithm == "ENTROPY_CALIBRATION":
+            algo = trt.CalibrationAlgoType.ENTROPY_CALIBRATION  # type: ignore
+        elif cfg.int8_calib_algorithm == "LEGACY_CALIBRATION":
+            assert (
+                False
+            ), "LEGACY_CALIBRATION caused a SEGV for resnet-18, so we restricted this algo"
+        elif cfg.int8_calib_algorithm == "MINMAX_CALIBRATION":
+            algo = trt.CalibrationAlgoType.MINMAX_CALIBRATION  # type: ignore
+        else:
+            algo = DEFAULT_CALIBRATION_ALGORITHM
 
         model_trt = run_torch2trt(
             model,
