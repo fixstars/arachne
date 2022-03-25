@@ -1,37 +1,85 @@
-torch2onnx
-==========
+Run Torch2ONNX from Arachne
+===========================
 
-The torch2onnx  is a tool of Arachne that wraps `torch.onnx.export <https://pytorch.org/docs/stable/onnx.html>`_ .
-The details are described in :ref:`arachne.tools.torch2onnx <api-tools-torch2onnx>`.
-
-Using from CLI
---------------
-
-.. code:: bash
-
-    python -m arachne.tools.tflite_converter \
-        input=/path/to/model \
-        input_spec=/path/to/model.yaml \
-        output=output.tar
+Here, we explain how to use the Torch2ONNX tool from Arachne.
 
 
-Using from your code
-----------------------
+Prepare a Model
+---------------
+
+First, we have to prepare a model to be used in this tutorial.
+Here, we will use a pre-trained model of the ResNet-18 from `torchvision.models`.
 
 .. code:: python
 
-    from arachne.data import Model
-    from aracune.utils import get_model_spec
+    import torch
+    import torchvision
+
+    resnet18 = torchvision.models.resnet18(pretrained=True)
+    torch.save(resnet18, f="/tmp/resnet18.pt")
+
+
+Run Torch2ONNX from Arachne
+---------------------------
+
+Now, let's convert the model into an ONNX model by Arachne.
+To use the tool, we have to specify `+tools=torch2onnx` to `arachne.driver.cli`.
+Available options can be seen by adding `--help`.
+
+.. code:: bash
+
+    python -m arachne.driver.cli +tools=torch2onnx --help
+
+
+Passing the Pytorch model and it's tensor specification, the tool will covert the model into an ONNX model by the following command.
+
+.. code:: bash
+
+    cat /tmp/resnet18.yaml
+
+    inputs:
+    - dtype: float32
+        name: input0
+        shape:
+        - 1
+        - 3
+        - 224
+        - 224
+    outputs:
+    - dtype: float32
+        name: output0
+        shape:
+        - 1
+        - 1000
+
+
+
+.. code:: bash
+
+    python -m arachne.driver.cli +tools=torch2onn input=/tmp/resnet18.pt input_spec=/tmp/resnet18.yaml output=/tmp/output.tar
+
+
+Run Torch2ONNX from Arachne Python Interface
+--------------------------------------------
+
+The following code shows an example of using the tool from Arachne Python interface.
+The details are described in :ref:`arachne.tools.torch2onnx <api-tools-torch2onnx>`.
+
+.. code:: python
+
+    from arachne.data import Model, ModelSpec, TensorSpec
+    from arachne.utils.model_utils import save_model
     from arachne.tools.torch2onnx import Torch2ONNX, Torch2ONNXConfig
 
-    # Setup an input model
-    model_path = "resnet18.pt"
+    model_file_path = "/tmp/resnet18.pt"
     spec = ModelSpec(
         inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
         outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
     )
-    input_model = Model(path=model_path, spec=spec)
+    input = Model(path=model_file_path, spec=spec)
 
-    # Run the torch2onnx
     cfg = Torch2ONNXConfig()
-    output = Torch2ONNX.run(input_model, cfg)
+
+    output = Torch2ONNX.run(input, cfg)
+
+    save_model(model=output, output_path="/tmp/output.tar")

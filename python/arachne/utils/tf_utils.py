@@ -51,7 +51,13 @@ def get_keras_model_spec(model_path: str) -> ModelSpec:
 def get_saved_model_spec(model_path: str) -> ModelSpec:
     inputs = []
     outputs = []
-    model = tf.saved_model.load(model_path)
+    try:
+        model = tf.saved_model.load(model_path)
+    except AttributeError:
+        import tensorflow.keras as keras
+
+        model = keras.models.load_model(model_path)
+
     model_inputs = [
         inp for inp in model.signatures["serving_default"].inputs if "unknown" not in inp.name  # type: ignore
     ]
