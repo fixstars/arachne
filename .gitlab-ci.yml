@@ -22,7 +22,7 @@ check-format-diff:
     - flake8 --show-source --statistic
 
 
-build-image:
+build-image-gitlab:
   stage: build
   image: docker:19.03.14
   tags:
@@ -37,10 +37,28 @@ build-image:
     - docker build -t ${DOCKER_CI_SRC_IMAGE} -f docker/devel-gpu.Dockerfile docker
     - docker push ${DOCKER_CI_BASE_IMAGE}
 
+build-image-dockerhub:
+  stage: build
+  image: docker:19.03.14
+  tags:
+    - docker
+    - dgx1
+  before_script:
+    - docker login -u lp6m -p ${DOCKERHUB_TOKEN}
+  script:
+    - docker build --target base -t arachnednn/arachne:devel-gpu -f docker/devel-gpu.Dockerfile docker
+    - docker build -t arachnednn/arachne:base-gpu-jp46 -f docker/base-gpu-jp4x.Dockerfile docker
+    - docker build -t arachnednn/arachne:base-gpu-jp45 -f docker/base-gpu-jp4x.Dockerfile --build-arg CUDNN=8.0.0.180-1 --build-arg LIBNVINFER=7.1.3-1 --build-arg LIBNVINFER_MAJOR_VERSION=7 docker
+    - docker push arachnednn/arachne:devel-gpu
+    - docker push arachnednn/arachne:base-gpu-jp46
+    - docker push arachnednn/arachne:base-gpu-jp45
+  only:
+    - main
+
 test-arachne:
   stage: test
   image: ${DOCKER_CI_BASE_IMAGE}
-  needs: ['build-image']
+  needs: ['build-image-gitlab']
   tags:
     - docker
     - dgx1
@@ -56,7 +74,7 @@ test-arachne:
 test-doc-build:
   stage: test
   image: ${DOCKER_CI_BASE_IMAGE}
-  needs: ['build-image']
+  needs: ['build-image-gitlab']
   tags:
     - docker
     - dgx1
