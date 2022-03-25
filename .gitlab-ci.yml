@@ -43,8 +43,6 @@ build-image-dockerhub:
   tags:
     - docker
     - dgx1
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
   before_script:
     - docker login -u lp6m -p ${DOCKERHUB_TOKEN}
   script:
@@ -54,8 +52,8 @@ build-image-dockerhub:
     - docker push arachnednn/arachne:devel-gpu
     - docker push arachnednn/arachne:base-gpu-jp46
     - docker push arachnednn/arachne:base-gpu-jp45
-  # only:
-  #   - main
+  only:
+    - main
 
 test-arachne:
   stage: test
