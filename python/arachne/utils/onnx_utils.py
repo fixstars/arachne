@@ -4,6 +4,14 @@ from ..data import ModelSpec, TensorSpec
 
 
 def get_onnx_model_spec(model_path: str) -> ModelSpec:
+    """The function to get the onnx-model information about the tensor specification
+
+    Args:
+        model_path (str):  path to the onnx model file
+
+    Returns:
+        ModelSpec: the tensor information of the model
+    """
     inputs = []
     outputs = []
 
