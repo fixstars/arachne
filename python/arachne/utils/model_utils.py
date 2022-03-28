@@ -24,6 +24,14 @@ from .version_utils import (
 
 
 def get_model_spec(model_path: str) -> Optional[ModelSpec]:
+    """The function to get the model information about the tensor specification
+
+    Args:
+        model_path (str):  path to a model file
+
+    Returns:
+        (:obj:`ModelSpec`, optional): the tensor information of the model or None
+    """
     if model_path.endswith(".tflite"):
         return get_tflite_model_spec(model_path)
     elif model_path.endswith(".h5"):
@@ -40,6 +48,14 @@ def get_model_spec(model_path: str) -> Optional[ModelSpec]:
 
 
 def load_model_spec(spec_file_path: str) -> ModelSpec:
+    """The function to load the model specification from a YAML file
+
+    Args:
+        spec_file_path (str):  path to a YAML file that describes the model specification
+
+    Returns:
+        ModelSpec: the tensor information of the model or None
+    """
     tmp = OmegaConf.load(spec_file_path)
     tmp = OmegaConf.to_container(tmp)
     assert isinstance(tmp, dict)
@@ -53,6 +69,14 @@ def load_model_spec(spec_file_path: str) -> ModelSpec:
 
 
 def save_model(model: Model, output_path: str, tvm_cfg: Optional[DictConfig] = None):
+    """The function to save the model that is a tool output as a TAR file
+
+    Args:
+        model (Model):  a tool output model
+        output_path (str): an output path
+        tvm_cfg (:obj:`DictConfig`, optional): pass to the TVM config if the model depends on the TVM
+
+    """
     if dataclasses.is_dataclass(model.spec):
         spec = asdict(model.spec)
     else:

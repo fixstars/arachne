@@ -2,6 +2,16 @@ import torch
 
 
 def get_torch_dtype_from_string(dtype_str: str) -> torch.dtype:
+    """
+    The function for retrieving the TensorRT version
+
+    Args:
+        dtype_str (str):  the string of the numpy.dtype
+
+    Returns:
+        torch.dtype: the dtype of Pytorch
+    """
+
     dtype_str_to_torch_dtype_dict = {
         "bool": torch.bool,
         "uint8": torch.uint8,
