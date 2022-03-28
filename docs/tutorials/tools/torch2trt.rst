@@ -1,5 +1,5 @@
-Run Torch2TRT from Arachne
-==========================
+Torch2TRT
+=========
 
 The `torch2trt <https://github.com/NVIDIA-AI-IOT/torch2trt>`_ is a PyTorch to TensorRT converter.
 
@@ -130,3 +130,7 @@ The details of the API are described in :ref:`arachne.tools.torch2trt <api-tools
     output = Torch2TRT.run(input, cfg)
 
     save_model(model=output, output_path="/tmp/output.tar")
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/tools/run_torch2trt.ipynb>`_.

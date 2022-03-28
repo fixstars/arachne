@@ -96,3 +96,8 @@ To use pre-defined configs for some TVM target, you can use `arachne.tools.tvm.g
 
   conf = get_predefined_config("dgx-1")
   print(conf)
+
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/run_api.ipynb>`_.

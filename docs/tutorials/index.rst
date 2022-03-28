@@ -9,7 +9,7 @@ User Tutorial
    run_tool_cli
    run_tool_api
    run_pipeline
-   runtime
+   run_runtime
    setup_device
 
 Tool Tutorials

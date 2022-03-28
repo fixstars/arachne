@@ -154,3 +154,7 @@ The details of the API are described in :ref:`arachne.tools.tflite_converter <ap
 
     save_model(model=output, output_path="/tmp/output.tar")
 
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/tools/run_tflite_converter.ipynb>`_.

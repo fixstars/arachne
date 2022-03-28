@@ -78,3 +78,7 @@ Last, `arachne.driver.pipeline.run` is used for executing the pipeline.
     output = run(input, cfg)
 
     save_model(model=output, output_path="/tmp/output.tar", tvm_cfg=cfg.tools['tvm'])
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/run_pipeline.ipynb>`_.

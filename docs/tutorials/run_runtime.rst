@@ -117,3 +117,8 @@ ONNX runtime test
     --edgetest \
     --rpc_host 192.168.xx.xx \
     --rpc_port 5051
+
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/run_runtime.ipynb>`_.

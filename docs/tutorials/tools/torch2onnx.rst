@@ -1,5 +1,5 @@
-Run Torch2ONNX from Arachne
-===========================
+Torch2ONNX
+==========
 
 Here, we explain how to use the Torch2ONNX tool from Arachne.
 
@@ -83,3 +83,7 @@ The details are described in :ref:`arachne.tools.torch2onnx <api-tools-torch2onn
     output = Torch2ONNX.run(input, cfg)
 
     save_model(model=output, output_path="/tmp/output.tar")
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/tools/run_torch2onnx.ipynb>`_.
