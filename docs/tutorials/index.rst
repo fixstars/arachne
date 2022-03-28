@@ -25,5 +25,6 @@ For detailed information of each tools, please refer to the following pages.
   tools/tftrt
   tools/torch2onnx
   tools/torch2trt
+  tools/onnx_tf
   tools/openvino_mo
   tools/openvino2tf
