@@ -4,6 +4,7 @@ from ..data import ModelSpec, TensorSpec
 
 
 def make_tf_gpu_usage_growth():
+    """The function to turn on memory growth by calling tf.config.experimental.set_memory_growth()"""
     gpus = tf.config.experimental.list_physical_devices("GPU")
     if gpus:
         try:
@@ -14,6 +15,14 @@ def make_tf_gpu_usage_growth():
 
 
 def get_tflite_model_spec(model_path: str) -> ModelSpec:
+    """The function to get the tflite-model information about the tensor specification
+
+    Args:
+        model_path (str):  path to the tflite model file
+
+    Returns:
+        ModelSpec: the tensor information of the model
+    """
     inputs = []
     outputs = []
     interpreter = tf.lite.Interpreter(model_path=model_path)
@@ -35,6 +44,14 @@ def get_tflite_model_spec(model_path: str) -> ModelSpec:
 
 
 def get_keras_model_spec(model_path: str) -> ModelSpec:
+    """The function to get the keras-model information about the tensor specification
+
+    Args:
+        model_path (str):  path to the keras model file
+
+    Returns:
+        ModelSpec: the tensor information of the model
+    """
     inputs = []
     outputs = []
     model = tf.keras.models.load_model(model_path)
@@ -49,6 +66,14 @@ def get_keras_model_spec(model_path: str) -> ModelSpec:
 
 
 def get_saved_model_spec(model_path: str) -> ModelSpec:
+    """The function to get the saved-model information about the tensor specification
+
+    Args:
+        model_path (str):  path to the saved model directory
+
+    Returns:
+        ModelSpec: the tensor information of the model
+    """
     inputs = []
     outputs = []
     try:
