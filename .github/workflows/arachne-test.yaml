@@ -1,0 +1,26 @@
+name: Test Arachne
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-ci-image:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the CI Docker image
+      run: |
+        docker build --target base --tag arachne:github-actions-ci --file docker/ci-gpu.Dockerfile .
+
+  run-tests:
+    runs-on: self-hosted
+    needs: build-ci-image
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run Arachne tests
+      run: |
+        docker run --gpus all --env CUDA_VISIBLE_DEVICES=3 arachne:github-actions-ci

@@ -1,0 +1,5 @@
+.venv
+**/outputs
+tmp
+docs/_build
+build
