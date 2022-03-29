@@ -4,6 +4,9 @@ version = "0.0.0"
 description = "A library for accelerating deploying your DNN models to your edge devices."
 authors = ["Takafumi Kubota <takafumi.kubota@fixstars.com>"]
 license = "Apache-2.0"
+packages = [
+  { include="python", from="." },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.6.3,<3.9"
@@ -50,7 +53,7 @@ url = "https://pypi.arachne.dev/"
 secondary = true
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.1.0a6"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
