@@ -153,3 +153,7 @@ You can visualize model structure in netron: :code:`netron ./pipeline2/model_0.t
     Layer Name: StatefulPartitionedCall:0
 
 We have confirmed that the transpose layer is NOT included.
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/tools/run_openvino2tf.ipynb>`_.

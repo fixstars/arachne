@@ -134,3 +134,8 @@ The file contains a converted or compiled DNN model and a YAML file that describ
       - 1
       - 1000
   tvm_device: cuda
+
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/run_cli.ipynb>`_.

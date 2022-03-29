@@ -1,5 +1,5 @@
-Run TF-TRT from Arachne
-=======================
+TF-TRT
+======
 
 TensorFlow with TensorRT (TF-TRT) is a Tensorflow integration for optimizing Tensorflow models to execute them with TensorRT.
 
@@ -135,3 +135,7 @@ The details are described in :ref:`arachne.tools.tftrt <api-tools-tftrt>`.
     output = TFTRT.run(input, cfg)
 
     save_model(model=output, output_path="/tmp/output.tar")
+
+Jupyter Notebook Link
+---------------------
+You can see a notebook for this tutorial `here <https://github.com/fixstars/arachne/blob/main/examples/tools/run_tftrt.ipynb>`_.

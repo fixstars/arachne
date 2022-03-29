@@ -36,10 +36,3 @@ It also provides runtime functionality to test your models on remote devices.
    :caption: Python API
 
    api/index
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
