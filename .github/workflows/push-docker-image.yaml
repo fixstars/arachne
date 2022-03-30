@@ -1,0 +1,29 @@
+name: Build & Push New Docker Images
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.Dockerfile'
+
+jobs:
+  build-and-push-latest-images:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build and push Docker images
+      env:
+        DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+        DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+      run: |
+        docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN
+        docker pull arachnednn/arachne:devel-gpu
+        docker pull arachnednn/arachne:base-gpu-jp46
+        docker pull arachnednn/arachne:base-gpu-jp45
+        docker build --target base -t arachnednn/arachne:devel-gpu -f docker/devel-gpu.Dockerfile docker
+        docker build -t arachnednn/arachne:base-gpu-jp46 -f docker/base-gpu-jp4x.Dockerfile docker
+        docker build -t arachnednn/arachne:base-gpu-jp45 -f docker/base-gpu-jp4x.Dockerfile --build-arg CUDNN=8.0.0.180-1 --build-arg LIBNVINFER=7.1.3-1 --build-arg LIBNVINFER_MAJOR_VERSION=7 docker
+        docker push arachnednn/arachne:devel-gpu
+        docker push arachnednn/arachne:base-gpu-jp46
+        docker push arachnednn/arachne:base-gpu-jp45
