@@ -1,0 +1,86 @@
+[tool.poetry]
+name = "arachne"
+version = "0.0.0"
+description = "A library for accelerating deploying your DNN models to your edge devices."
+authors = ["Takafumi Kubota <takafumi.kubota@fixstars.com>"]
+license = "Apache-2.0"
+packages = [
+  { include="python", from="." },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6.3,<3.9"
+numpy = "1.19.4"
+torch = "1.8.0"
+torchvision = "0.9.0"
+tensorflow-datasets = "^4.4.0"
+hydra-core = "^1.1.1"
+packaging = "^21.3"
+openvino-dev = "^2021.4.2"
+rawpy = "0.16.0"
+kedro = "^0.17.6"
+openvino2tensorflow = "^1.27.1"
+onnxruntime-gpu = "1.10.0+jp46"
+onnx = "1.8.0"
+tensorflow = "2.6.3+jp46"
+tflite = "2.6.3"
+pyparsing = "2.4.7"
+onnx-simplifier = "0.3.6+jp46"
+jupyter = "^1.0.0"
+isort = "^5.10.1"
+onnx-tf = "1.8.0"
+tensorflow-addons = "0.14.0"
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^4.3.2"
+sphinx-rtd-theme = "^1.0.0"
+myst-parser = "^0.16.1"
+sphinx-autobuild = "^2021.3.14"
+autodocsumm = "^0.2.7"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=6.2.0"
+flake8 = "^3.9.2"
+black = "~20.8b1"
+isort = "^5.10.1"
+cmake = "^3.22.1"
+ninja = "^1.10.2"
+pytest-xdist = "^2.5.0"
+
+[[tool.poetry.source]]
+name = "arachne"
+url = "https://pypi.arachne.dev/"
+secondary = true
+
+[build-system]
+requires = ["poetry-core>=1.1.0a6"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py36']
+include = '(\.pyi?$)'
+exclude = '''
+
+(
+  /(
+      \.github
+    | \.git
+    | \.vscode
+    | 3rdparty
+    | docker\/
+    | python\/arachne\/runtime\/rpc\/protobuf\/*
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["python/arachne"]
+filter_files = true
+skip_glob = "python/arachne/runtime/rpc/protobuf/*, */3rdparty/**/*,*/docker/**/*,*/.vscode/**/*,*/.git/**/*,*/.github/**/*,"
+
+[tool.pyright]
+exclude = ["python/arachne/runtime/rpc/protobuf/*", "./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]
+ignore = ["python/arachne/runtime/rpc/protobuf/*", "./3rdparty/**/*", "./.venv/**/*", "./.git/**/*", "./build/**/*", "./tmp/**/*"]

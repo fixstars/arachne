@@ -1,0 +1,28 @@
+name: Format check for PRs
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.6"]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install black isort flake8
+    - name: Checking the format of the code under the python directory
+      run: |
+        isort python --diff --check
+        black python --diff --check
+        flake8 --show-source --statistic

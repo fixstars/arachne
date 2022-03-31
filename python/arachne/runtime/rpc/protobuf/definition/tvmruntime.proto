@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+import "msg_response.proto";
+import "runtime_message.proto";
+import "stream_data.proto";
+
+package tvmruntime;
+
+message TVMInitRequest{
+    string package_path = 1;
+}
+
+message Index {
+    oneof index{
+        int32 index_i = 1;
+        string index_s = 2;
+    }
+}
+
+message TVMSetInputRequest{
+    oneof data{
+        Index index = 1;
+        Chunk np_arr_chunk = 2;
+    }
+}
+
+
+service TVMRuntime{
+    rpc Init(TVMInitRequest) returns (MsgResponse) {}
+    rpc SetInput (stream TVMSetInputRequest) returns (MsgResponse) {}
+    rpc Run (RunRequest) returns (MsgResponse) {}
+    rpc Benchmark (BenchmarkRequest) returns (BenchmarkResponse) {}
+    rpc GetOutput (GetOutputRequest) returns (stream GetOutputResponse) {}
+}

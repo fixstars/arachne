@@ -1,0 +1,8 @@
+# @package tools.tvm
+defaults:
+  - /tools/tvm
+
+cpu_target: aarch64
+cpu_attr:
+- +neon
+cpu_name: cortex-a72

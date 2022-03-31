@@ -1,0 +1,37 @@
+.cache/
+.artifacts/
+.dataset/
+.models/
+.keras/
+build*/
+__pycache__
+dist/
+examples/out
+*.egg-info/
+
+.sudo_as_admin_successful
+
+.bash_history
+.python_history
+
+# Python
+arachne-*-py*.whl
+arachne-*.tar.gz
+__pycache__
+
+# VSCode
+.vscode-server
+
+*.tsv
+
+# Poetry
+.venv/
+
+# Hydra
+outputs/
+
+# Temporary data
+tmp/
+
+# Local docs build
+docs/_build

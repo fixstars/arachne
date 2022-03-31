@@ -1,0 +1,11 @@
+# @package tools.tvm
+defaults:
+  - /tools/tvm
+
+cpu_target: aarch64
+cpu_attr:
+- +neon
+cuda_target_device: nvidia/jetson-xavier-nx
+composite_target:
+- tensorrt
+- cuda

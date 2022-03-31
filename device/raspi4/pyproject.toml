@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "arachne-runtime"
+version = "0.0.0"
+description = "arachne runtime environment for RaspberryPi 4"
+authors = ["Yasuhiro Nitta <yasuhiro.nitta@fixstars.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+numpy = "1.19.4"
+grpcio = "^1.43.0"
+onnxruntime = "1.10.0"
+tensorflow = {url = "https://pypi.arachne.dev/tensorflow/tensorflow-2.6.3-cp38-none-linux_aarch64.whl"}
+scipy = "^1.5.4"
+Cython = "^0.29.28"
+PyYAML = "^6.0"
+packaging = "^21.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

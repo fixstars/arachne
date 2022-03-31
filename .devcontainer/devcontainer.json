@@ -1,0 +1,40 @@
+{
+    "name": "arachne",
+    "build": {
+        "dockerfile": "../docker/devel-gpu.Dockerfile",
+        "target": "base",
+    },
+    "context": "../docker",
+    "runArgs": [
+        "--gpus",
+        "all"
+    ],
+    "remoteEnv": {
+        "PYTHONPATH": "/workspaces/arachne/python",
+        "TVM_LIBRARY_PATH": "/workspaces/arachne/build/tvm"
+    },
+    "workspaceFolder": "/workspaces/arachne",
+    "remoteUser": "developer",
+    "mounts": [
+        "source=/raid/datasets,target=/datasets,type=bind,consistency=cached"
+    ],
+    "forwardPorts": [
+        8888
+    ],
+    "extensions": [
+        "GitLab.gitlab-workflow",
+        "ms-azuretools.vscode-docker",
+        "MS-CEINTL.vscode-language-pack-ja",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        // "tqchen.ffi-navigator",
+        "twxs.cmake",
+        "yzhang.markdown-all-in-one",
+        "bungcip.better-toml",
+        "trond-snekvik.simple-rst",
+        "njpwerner.autodocstring"
+    ],
+}

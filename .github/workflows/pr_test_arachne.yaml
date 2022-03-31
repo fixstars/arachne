@@ -1,0 +1,21 @@
+name: Run Arachne's tests for approved PRs
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-arachne-tests:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the CI Docker image
+      run: |
+        docker build --target base --tag arachne:github-actions-ci-${GITHUB_RUN_ID} --file docker/ci-gpu.Dockerfile .
+    - name: Run Arachne tests
+      run: |
+        docker run --gpus all --env CUDA_VISIBLE_DEVICES=3 arachne:github-actions-ci-${GITHUB_RUN_ID}
+    - name: Run Arachne doc-build tests
+      run: |
+        docker run --entrypoint="" arachne:github-actions-ci-${GITHUB_RUN_ID} poetry run sphinx-build docs docs/_build
