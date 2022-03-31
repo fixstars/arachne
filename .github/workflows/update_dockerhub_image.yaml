@@ -1,4 +1,4 @@
-name: Build & Push New Docker Images
+name: Update DockerHub images
 
 on:
   workflow_dispatch:
