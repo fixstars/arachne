@@ -6,26 +6,16 @@ on:
     branches: [ main ]
 
 jobs:
-  runs-on: self-hosted
-  build-ci-image:
+  run-arachne-tests:
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
     - name: Build the CI Docker image
       run: |
         docker build --target base --tag arachne:github-actions-ci-${GITHUB_RUN_ID} --file docker/ci-gpu.Dockerfile .
-
-  run-arache-tests:
-    needs: build-ci-image
-    steps:
-    - uses: actions/checkout@v3
     - name: Run Arachne tests
       run: |
         docker run --gpus all --env CUDA_VISIBLE_DEVICES=3 arachne:github-actions-ci-${GITHUB_RUN_ID}
-
-  run-doc-build:
-    needs: build-ci-image
-    steps:
-    - uses: actions/checkout@v3
-    - name: Check the document will be built successfully
+    - name: Run Arachne doc-build tests
       run: |
         docker run --entrypoint="" arachne:github-actions-ci-${GITHUB_RUN_ID} poetry run sphinx-build docs docs/_build
