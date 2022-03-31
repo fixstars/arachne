@@ -5,11 +5,16 @@ on:
 
 jobs:
 
-  build:
-
+  run1:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Test CI
-      run: echo 'Hello World!'
+      run: echo $GITHUB_RUN_ID
+
+  run2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Test CI2
+      run: echo $GITHUB_RUN_ID
