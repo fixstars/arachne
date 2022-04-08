@@ -34,7 +34,7 @@ def check_openvino2tf_output(onnx_model_path, tf_model_path):
     tf_result = resnet18_tf(tf_input)
     aout = tf_result["tf.identity"].numpy()
 
-    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
 
 
 def test_openvino2tf():

@@ -84,7 +84,7 @@ def check_tvm_output(
     aout = module.get_output(0).numpy()
     del module
 
-    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
 
 
 @pytest.mark.parametrize(

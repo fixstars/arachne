@@ -34,9 +34,9 @@ def check_tftrt_output(tf_model, input_shape, precision, tftrt_model_path):
     aout = infer(tf.constant(input_data))["predictions"].numpy()
 
     if precision == "FP32":
-        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
     elif precision == "FP16":
-        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)  # type: ignore
     elif precision == "INT8":
         # skip dummy int8
         pass

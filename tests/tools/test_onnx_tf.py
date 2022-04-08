@@ -27,7 +27,7 @@ def check_onnx_tf_output(onnx_model_path, input_shape, tf_file_path):
     result_dic = infer(tf.constant(input_data))
     aout = list(result_dic.values())[0]
 
-    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
 
 
 def test_onnx_tf():

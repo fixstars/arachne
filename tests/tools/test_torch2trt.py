@@ -42,9 +42,9 @@ def check_torch2trt_output(torch_model, input_shape, precision, torch_trt_model_
     aout = aout.to("cpu").detach().numpy().copy()
 
     if precision == "FP32":
-        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
     elif precision == "FP16":
-        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)  # type: ignore
 
 
 @pytest.mark.parametrize("precision", ["FP32", "FP16"])

@@ -52,11 +52,11 @@ def check_tflite_output(tf_model, input_shape, ptq_method, tflite_model_path):
     aout = interpreter.get_tensor(output_details[0]["index"])
 
     if ptq_method == "none":
-        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
     elif ptq_method == "fp16":
-        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)  # type: ignore
     elif ptq_method == "dynamic_range":
-        np.testing.assert_allclose(aout, dout, atol=0.2, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.2, rtol=0)  # type: ignore
     else:
         # skip dummy int8
         pass
