@@ -32,8 +32,8 @@ class ModelSpec:
 
 
 class ModelFormat(Enum):
-    """This contains DNN model formats supported in arachne.
-    """
+    """This contains DNN model formats supported in arachne."""
+
     TVM = 0
     TF_PB = 1
     KERAS_H5 = 2

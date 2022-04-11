@@ -125,7 +125,9 @@ def main(cfg: DictConfig) -> None:
         input_model.spec = load_model_spec(to_absolute_path(cfg.model_spec_file))
 
     output_model = run(input_model, cfg)  # type: ignore
-    save_model(model=output_model, output_path=to_absolute_path(cfg.output_path), tvm_cfg=cfg.tools.tvm)
+    save_model(
+        model=output_model, output_path=to_absolute_path(cfg.output_path), tvm_cfg=cfg.tools.tvm
+    )
 
 
 if __name__ == "__main__":
