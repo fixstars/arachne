@@ -29,8 +29,8 @@ Construct and Run a Pipeline by `arachne.driver.pipeline`
 .. code:: bash
 
     python -m arachne.driver.pipeline \
-        input=/tmp/resnet50-v2.h5 \
-        output=/tmp/output.tar \
+        model_file=/tmp/resnet50-v2.h5 \
+        output_path=/tmp/output.tar \
         pipeline=[tflite_converter,tvm] \
         tools.tflite_converter.ptq.method=fp16 \
         tools.tvm.cpu_attr=[+fma,+avx2] \
@@ -54,13 +54,12 @@ Last, `arachne.driver.pipeline.run` is used for executing the pipeline.
 
 .. code:: python
 
-    from arachne.data import Model
-    from arachne.utils.model_utils import get_model_spec, save_model
+    from arachne.utils.model_utils import init_from_file, save_model
     from arachne.driver.pipeline import PipelineConfig, get_default_tool_configs, run
 
     # Prepare an input model
     model_path = "/tmp/resnet50-v2.h5"
-    input = Model(path=model_path, spec=get_model_spec(model_path))
+    input = init_from_file(model_path)
 
     # Construct a pipeline
     cfg = PipelineConfig()

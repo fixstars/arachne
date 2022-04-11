@@ -8,9 +8,8 @@ import torch.cuda
 import torch.onnx
 import torchvision
 
-from arachne.data import Model
 from arachne.tools.onnx_simplifier import ONNXSimplifier, ONNXSimplifierConfig
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_file
 
 
 def test_onnx_simplifier():
@@ -21,7 +20,7 @@ def test_onnx_simplifier():
         onnx_model_file = "resnet18.onnx"
         torch.onnx.export(model, dummy_input, onnx_model_file)
 
-        input_model = Model(path=onnx_model_file, spec=get_model_spec(onnx_model_file))
+        input_model = init_from_file(onnx_model_file)
         check_n = 10  # number of check iteration
         cfg = ONNXSimplifierConfig(check_n=check_n)
         # The validation of the simplified model is performed in onnx-simplifier.
@@ -44,8 +43,8 @@ def test_cli():
                 "-m",
                 "arachne.driver.cli",
                 "+tools=onnx_simplifier",
-                f"input={onnx_model_file}",
-                "output=simplified.onnx",
+                f"model_file={onnx_model_file}",
+                "output_path=simplified.onnx",
                 f"tools.onnx_simplifier.check_n={check_n}",
             ]
         )

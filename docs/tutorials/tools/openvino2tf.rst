@@ -68,9 +68,9 @@ PyTorch -> (torch2onnx) -> ONNX -> (onnx-simplifier) -> ONNX -> (onnx-tf) -> Ten
 
     python -m arachne.driver.pipeline \
     +pipeline=[torch2onnx,onnx_simplifier,onnx_tf,tflite_converter] \
-    input=./sample.pth \
-    output=./pipeline1.tar \
-    input_spec=./sample.yml
+    model_file=./sample.pth \
+    output_path=./pipeline1.tar \
+    model_spec_file=./sample.yml
 
 Extract tarfile and see network structure of the converted tflite model.
 You can visualize model structure in netron: :code:`netron ./pipeline1/model_0.tflite`.
@@ -124,9 +124,9 @@ PyTorch -> (torch2onnx) -> ONNX -> (onnx-simplifier) -> ONNX -> (openvino_mo) ->
 
     python -m arachne.driver.pipeline \
     +pipeline=[torch2onnx,onnx_simplifier,openvino_mo,openvino2tf,tflite_converter] \
-    input=./sample.pth \
-    output=./pipeline2.tar \
-    input_spec=./sample.yml
+    model_file=./sample.pth \
+    output_path=./pipeline2.tar \
+    model_spec_file=./sample.yml
 
 Extract tarfile and see network structure of the converted tflite model.
 You can visualize model structure in netron: :code:`netron ./pipeline2/model_0.tflite`.

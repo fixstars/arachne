@@ -31,7 +31,7 @@ Typically, you can start with the following command.
 
 .. code:: bash
 
-  python -m arachne.driver.cli +tools=tvm input=/tmp/resnet50-v2.h5 output=/tmp/output.tar
+  python -m arachne.driver.cli +tools=tvm model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output.tar
 
 
 Deals with the Dynamic Shape
@@ -66,7 +66,7 @@ Finally, you can compile it.
 
 .. code:: bash
 
-  python -m arachne.driver.cli +tools=tvm input=/tmp/resnet50-v2.h5 output=/tmp/output.tar input_spec=/tmp/resnet50-v2.yaml
+  python -m arachne.driver.cli +tools=tvm model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output.tar model_spec_file=/tmp/resnet50-v2.yaml
 
 
 Try Tool-Specific Configurations
@@ -77,7 +77,7 @@ To understand what options are available, you just add `--help` to the previous 
 
 .. code:: bash
 
-  python -m arachne.driver.cli +tools=tvm input=/tmp/resnet50-v2.h5 output=/tmp/output.tar input_spec=/tmp/resnet50-v2.yaml --help
+  python -m arachne.driver.cli +tools=tvm model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output.tar model_spec_file=/tmp/resnet50-v2.yaml --help
 
 
 Here, we only explain a simple usage to compile for TensorRT and CUDA targets for space problem. Please refer to the API documentation for `arachne.tools` to know details.
@@ -85,7 +85,7 @@ To compile for TensorRT and CUDA targets, you should set `tools.tvm.***` options
 
 .. code:: bash
 
-  python -m arachne.driver.cli +tools=tvm input=/tmp/resnet50-v2.h5 output=/tmp/output.tar input_spec=/tmp/resnet50-v2.yaml tools.tvm.composite_target=[tensorrt,cuda]
+  python -m arachne.driver.cli +tools=tvm model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output.tar model_spec_file=/tmp/resnet50-v2.yaml tools.tvm.composite_target=[tensorrt,cuda]
 
 
 Pre-defined Configs for TVM Target
@@ -97,7 +97,7 @@ For example, you can pass `+tvm_target=dgx-1` for Nvidia DGX-1 instead of specif
 
 .. code:: bash
 
-  python -m arachne.driver.cli +tools=tvm input=/tmp/resnet50-v2.h5 output=/tmp/output.tar input_spec=/tmp/resnet50-v2.yaml +tvm_target=dgx-1
+  python -m arachne.driver.cli +tools=tvm model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output.tar model_spec_file=/tmp/resnet50-v2.yaml +tvm_target=dgx-1
 
 
 Check Output TAR File

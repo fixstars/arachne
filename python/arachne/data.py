@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Optional
 
 
@@ -30,6 +31,20 @@ class ModelSpec:
     outputs: List[TensorSpec]
 
 
+class ModelFormat(Enum):
+    """This contains DNN model formats supported in arachne.
+    """
+    TVM = 0
+    TF_PB = 1
+    KERAS_H5 = 2
+    TF_SAVED_MODEL = 3
+    TFLITE = 4
+    PYTORCH = 5
+    ONNX = 6
+    OPENVINO = 7
+    CAFFE = 8
+
+
 @dataclass
 class Model:
     """This represents DNN models in arachne.
@@ -40,4 +55,5 @@ class Model:
     """
 
     path: str
+    format: ModelFormat
     spec: Optional[ModelSpec] = None

@@ -8,9 +8,9 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from arachne.data import Model, ModelSpec, TensorSpec
+from arachne.data import Model, ModelFormat, ModelSpec, TensorSpec
 from arachne.tools.tflite_converter import TFLiteConverter, TFLiteConverterConfig
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_dir, init_from_file
 from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 params = {
@@ -75,12 +75,12 @@ def test_tflite_converter(model_format, ptq_method):
         input_shape = [1, 224, 224, 3]
         if model_format == "h5":
             model.save("tmp.h5")
-            input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
+            input = init_from_file("tmp.h5")
             output = TFLiteConverter.run(input=input, cfg=cfg)
 
         elif model_format == "saved_model":
             model.save("saved_model")
-            input = Model("saved_model", spec=get_model_spec("saved_model"))
+            input = init_from_dir("saved_model")
             output = TFLiteConverter.run(input=input, cfg=cfg)
         elif model_format == "pb":
             wrapper = tf.function(lambda x: model(x))
@@ -115,7 +115,7 @@ def test_tflite_converter(model_format, ptq_method):
                 )
             spec = ModelSpec(inputs=inputs, outputs=outputs)
 
-            input = Model("frozen_graph.pb", spec=spec)
+            input = Model("frozen_graph.pb", format=ModelFormat.TF_PB, spec=spec)
             output = TFLiteConverter.run(input=input, cfg=cfg)
         else:
             assert False
@@ -139,8 +139,8 @@ def test_cli():
                 "-m",
                 "arachne.driver.cli",
                 "+tools=tflite_converter",
-                "input=saved_model",
-                "output=output.tar",
+                "model_dir=saved_model",
+                "output_path=output.tar",
             ]
         )
 

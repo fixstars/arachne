@@ -1,4 +1,5 @@
 import dataclasses
+import os
 import tarfile
 import tempfile
 from dataclasses import asdict
@@ -12,7 +13,7 @@ import tvm
 import yaml
 from omegaconf import DictConfig, OmegaConf
 
-from ..data import Model, ModelSpec, TensorSpec
+from ..data import Model, ModelFormat, ModelSpec, TensorSpec
 from .onnx_utils import get_onnx_model_spec
 from .tf_utils import get_keras_model_spec, get_saved_model_spec, get_tflite_model_spec
 from .version_utils import (
@@ -23,28 +24,104 @@ from .version_utils import (
 )
 
 
-def get_model_spec(model_path: str) -> Optional[ModelSpec]:
-    """The function to get the model information about the tensor specification
+def init_from_file(model_file: str) -> Model:
+    """The function to initialize arachne.data.Model from a model file
 
     Args:
-        model_path (str):  path to a model file
+        model_file (str):  path to a model file
 
     Returns:
-        (:obj:`ModelSpec`, optional): the tensor information of the model or None
+        Model: a model instance
     """
-    if model_path.endswith(".tflite"):
-        return get_tflite_model_spec(model_path)
-    elif model_path.endswith(".h5"):
-        return get_keras_model_spec(model_path)
-    elif model_path.endswith("saved_model"):
-        return get_saved_model_spec(model_path)
-    elif model_path.endswith(".onnx"):
-        return get_onnx_model_spec(model_path)
-    elif model_path.endswith(".pb"):
-        return None
-    elif model_path.endswith(".pth") or model_path.endswith(".pt"):
-        return None
-    return None
+    format: ModelFormat
+    spec: Optional[ModelSpec]
+    if model_file.endswith(".tflite"):
+        format = ModelFormat.TFLITE
+        spec = get_tflite_model_spec(model_file)
+    elif model_file.endswith(".h5"):
+        format = ModelFormat.KERAS_H5
+        spec = get_keras_model_spec(model_file)
+    elif model_file.endswith(".onnx"):
+        format = ModelFormat.ONNX
+        spec = get_onnx_model_spec(model_file)
+    elif model_file.endswith(".pb"):
+        format = ModelFormat.TF_PB
+        spec = None
+    elif model_file.endswith(".pth") or model_file.endswith(".pt"):
+        format = ModelFormat.PYTORCH
+        spec = None
+    else:
+        raise RuntimeError("Fail to detect a model format for " + model_file)
+
+    return Model(path=model_file, format=format, spec=spec)
+
+
+def __is_saved_model_dir(model_dir: str):
+    found_pb = False
+    found_assets = False
+    found_variables = False
+    for f in os.listdir(model_dir):
+        if f.endswith(".pb"):
+            found_pb = True
+        if f == "assets":
+            found_assets = True
+        if f == "variables":
+            found_variables = True
+    return found_pb & found_assets & found_variables
+
+
+def __is_openvino_model_dir(model_dir: str):
+    found_bin = False
+    found_xml = False
+    found_mapping = False
+
+    for f in os.listdir(model_dir):
+        if f.endswith(".bin"):
+            found_bin = True
+        if f.endswith(".xml"):
+            found_xml = True
+        if f.endswith(".mapping"):
+            found_mapping = True
+    return found_bin & found_xml & found_mapping
+
+
+def __is_caffe_model_dir(model_dir: str):
+    found_caffemodel = False
+    found_prototxt = False
+
+    for f in os.listdir(model_dir):
+        if f.endswith(".caffemodel"):
+            found_caffemodel = True
+        if f.endswith(".prototxt"):
+            found_prototxt = True
+    return found_caffemodel & found_prototxt
+
+
+def init_from_dir(model_dir: str) -> Model:
+    """The function to initialize arachne.data.Model from a model directory
+
+    Args:
+        model_dir (str):  path to a model directory
+
+    Returns:
+        Model: a model instance
+    """
+    format: ModelFormat
+    spec: Optional[ModelSpec]
+
+    if __is_saved_model_dir(model_dir):
+        format = ModelFormat.TF_SAVED_MODEL
+        spec = get_saved_model_spec(model_dir)
+    elif __is_openvino_model_dir(model_dir):
+        format = ModelFormat.OPENVINO
+        spec = None
+    elif __is_caffe_model_dir(model_dir):
+        format = ModelFormat.CAFFE
+        spec = None
+    else:
+        raise RuntimeError("Fail to detect a model format for " + model_dir)
+
+    return Model(path=model_dir, format=format, spec=spec)
 
 
 def load_model_spec(spec_file_path: str) -> ModelSpec:

@@ -9,7 +9,12 @@ from omegaconf import MISSING, DictConfig, OmegaConf
 
 from arachne.data import Model
 from arachne.tools import ToolFactory
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
+from arachne.utils.model_utils import (
+    init_from_dir,
+    init_from_file,
+    load_model_spec,
+    save_model,
+)
 
 logger = getLogger(__name__)
 
@@ -20,6 +25,9 @@ def main(cfg: DictConfig) -> None:
     This is a main function for `arachne.driver.cli`.
     """
 
+    logger.info(OmegaConf.to_yaml(cfg))
+
+    # Check the specified tool is valid
     tools = list(cfg.tools.keys())
 
     try:
@@ -30,21 +38,29 @@ def main(cfg: DictConfig) -> None:
 
     tool = tools[0]
 
-    logger.info(OmegaConf.to_yaml(cfg))
+    # Setup the input DNN model
 
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
+    if not cfg.model_file and not cfg.model_dir:
+        raise RuntimeError("User must specify either model_file or model_dir.")
+    if cfg.model_file and cfg.model_dir:
+        raise RuntimeError("User must specify either model_file or model_dir.")
 
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
+    input_model: Model
+    if cfg.model_file:
+        input_model = init_from_file(to_absolute_path(cfg.model_file))
+    else:
+        input_model = init_from_dir(to_absolute_path(cfg.model_dir))
 
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
-
-    assert input_model.spec is not None
+    if cfg.model_spec_file:
+        # if a YAML file describing the model specification is provided, overwrite input_model.spec
+        input_model.spec = load_model_spec(to_absolute_path(cfg.model_spec_file))
 
     output_model = ToolFactory.get(tool).run(input=input_model, cfg=cfg.tools.get(tool))
-    save_model(model=output_model, output_path=output_path, tvm_cfg=cfg.tools.get(tool))
+    save_model(
+        model=output_model,
+        output_path=to_absolute_path(cfg.output_path),
+        tvm_cfg=cfg.tools.get(tool),
+    )
 
 
 if __name__ == "__main__":

@@ -75,7 +75,7 @@ You can optimize a TF model with FP32 precision by the following command.
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=tftrt input=/tmp/saved_model output=/tmp/output.tar
+    python -m arachne.driver.cli +tools=tftrt model_dir=/tmp/saved_model output_path=/tmp/output.tar
 
 
 Optimize with FP16 precision
@@ -85,7 +85,7 @@ To optimize with FP16 precision, specify `FP16` to the `tools.tftrt.precision_mo
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=tftrt input=/tmp/saved_model output=/tmp/output.tar tools.tftrt.precision_mode=FP16
+    python -m arachne.driver.cli +tools=tftrt model_dir=/tmp/saved_model output_path=/tmp/output.tar tools.tftrt.precision_mode=FP16
 
 
 Optimize with INT8 Precision
@@ -108,7 +108,7 @@ Next, specify `INT8` to the `tools.tftrt.precision_mode` option and pass the NPY
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=tftrt input=/tmp/saved_model output=/tmp/output.tar \
+    python -m arachne.driver.cli +tools=tftrt model_dir=/tmp/saved_model output_path=/tmp/output.tar \
         tools.tftrt.precision_mode=INT8 \
         tools.tftrt.representative_dataset=/tmp/calib_dataset.npy
 
@@ -121,12 +121,11 @@ The details are described in :ref:`arachne.tools.tftrt <api-tools-tftrt>`.
 
 .. code:: python
 
-    from arachne.data import Model
-    from arachne.utils.model_utils import get_model_spec, save_model
+    from arachne.utils.model_utils import init_from_dir, save_model
     from arachne.tools.tftrt import TFTRT, TFTRTConfig
 
-    model_file_path = "/tmp/saved_model"
-    input = Model(path=model_file_path, spec=get_model_spec(model_file_path))
+    model_dir_path = "/tmp/saved_model"
+    input = init_from_dir(model_dir_path)
 
     cfg = TFTRTConfig()
 
