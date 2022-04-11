@@ -31,7 +31,7 @@ You can convert a model by the following command:
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=onnx_tf input=./resnet18.onnx output=./output.tar
+    python -m arachne.driver.cli +tools=onnx_tf model_file=./resnet18.onnx output_path=./output.tar
 
 
 Run onnx-tf from Arachne Python Interface
@@ -41,12 +41,11 @@ The following code shows an example of using the tool from Arachne Python interf
 
 .. code:: python
 
-    from arachne.data import Model
-    from arachne.utils.model_utils import save_model, get_model_spec
+    from arachne.utils.model_utils import init_from_file, save_model
     from arachne.tools.onnx_tf import ONNXTf, ONNXTfConfig
 
     model_file_path = "./resnet18.onnx"
-    input = Model(path=model_file_path, spec=get_model_spec(model_file_path))
+    input_model = init_from_file(model_path)
 
     cfg = ONNXTfConfig()
 

@@ -11,7 +11,7 @@ import torch
 import torchvision
 import yaml
 
-from arachne.data import Model, ModelSpec, TensorSpec
+from arachne.data import Model, ModelFormat, ModelSpec, TensorSpec
 from arachne.tools.torch2onnx import Torch2ONNX, Torch2ONNXConfig
 
 
@@ -24,7 +24,7 @@ def check_torch2onnx_output(torch_model, input_shape, onnx_model_path):
     sess = ort.InferenceSession(onnx_model_path, providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     aout = sess.run(output_names=None, input_feed={input_name: input_data})[0]
-    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
 
 
 def test_torch2onnx():
@@ -37,7 +37,7 @@ def test_torch2onnx():
             inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
             outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
         )
-        input_model = Model(path="resnet18.pt", spec=spec)
+        input_model = Model(path="resnet18.pt", format=ModelFormat.PYTORCH, spec=spec)
         cfg = Torch2ONNXConfig()
         output = Torch2ONNX.run(input_model, cfg)
         check_torch2onnx_output(resnet18, [1, 3, 224, 224], output.path)
@@ -66,9 +66,9 @@ def test_cli():
                 "-m",
                 "arachne.driver.cli",
                 "+tools=torch2onnx",
-                f"input={model_path}",
-                "input_spec=spec.yaml",
-                "output=output.tar",
+                f"model_file={model_path}",
+                "model_spec_file=spec.yaml",
+                "output_path=output.tar",
             ]
         )
 

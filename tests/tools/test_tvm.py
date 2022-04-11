@@ -18,10 +18,10 @@ from tvm.contrib import graph_executor
 from tvm.contrib.download import download
 from tvm.contrib.graph_executor import GraphModule
 
-from arachne.data import Model, ModelSpec, TensorSpec
+from arachne.data import Model, ModelFormat, ModelSpec, TensorSpec
 from arachne.runtime.module.tvm import _open_module_file
 from arachne.tools.tvm import TVM, TVMConfig, get_predefined_config
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_file
 from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 params = {
@@ -84,7 +84,7 @@ def check_tvm_output(
     aout = module.get_output(0).numpy()
     del module
 
-    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+    np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -103,7 +103,7 @@ def test_tvm(model_format, composite_target):
         if model_format == "h5":
             model = tf.keras.applications.mobilenet.MobileNet()
             model.save("tmp.h5")
-            input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
+            input = init_from_file("tmp.h5")
             input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
             input.spec.outputs[0].shape = [1, 1000]  # type: ignore
             output = TVM.run(input=input, cfg=cfg)
@@ -115,7 +115,7 @@ def test_tvm(model_format, composite_target):
 
             model_path = "mobilenet.tflite"
             download(url, model_path)
-            input = Model(model_path, spec=get_model_spec(model_path))
+            input = init_from_file(model_path)
             output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output(
@@ -157,7 +157,7 @@ def test_tvm(model_format, composite_target):
                 )
             spec = ModelSpec(inputs=inputs, outputs=outputs)
 
-            input = Model("frozen_graph.pb", spec=spec)
+            input = Model("frozen_graph.pb", format=ModelFormat.TF_PB, spec=spec)
             output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output("tmp.h5", model_format, [1, 224, 224, 3], output.path, device_type)
@@ -167,7 +167,7 @@ def test_tvm(model_format, composite_target):
 
             model_path = "resnet18.onnx"
             download(url, model_path)
-            input = Model(model_path, spec=get_model_spec(model_path))
+            input = init_from_file(model_path)
             output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output(
@@ -184,7 +184,7 @@ def test_tvm(model_format, composite_target):
                 inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
                 outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
             )
-            input = Model("./model.pth", spec=spec)
+            input = Model("./model.pth", format=ModelFormat.PYTORCH, spec=spec)
             output = TVM.run(input=input, cfg=cfg)
 
             check_tvm_output("model.pth", model_format, [1, 3, 224, 224], output.path, device_type)
@@ -201,7 +201,7 @@ def test_predefined_config(target):
 
         model = tf.keras.applications.mobilenet.MobileNet()
         model.save("tmp.h5")
-        input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
+        input = init_from_file("tmp.h5")
         input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
         input.spec.outputs[0].shape = [1, 1000]  # type: ignore
         TVM.run(input=input, cfg=cfg)
@@ -224,8 +224,8 @@ def test_cli():
                 "-m",
                 "arachne.driver.cli",
                 "+tools=tvm",
-                "input=resnet18.onnx",
-                "output=output.tar",
+                "model_file=resnet18.onnx",
+                "output_path=output.tar",
             ]
         )
 

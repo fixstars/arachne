@@ -12,7 +12,7 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_file
 from arachne.utils.torch_utils import get_torch_dtype_from_string
 
 from ..data import Model
@@ -100,4 +100,5 @@ class Torch2ONNX(ToolBase):
             dynamic_axes=cfg.dynamic_axes,
             custom_opsets=cfg.custom_opsets,
         )
-        return Model(filename, spec=get_model_spec(filename))
+
+        return init_from_file(filename)

@@ -13,7 +13,12 @@ from omegaconf import MISSING, DictConfig, OmegaConf
 from arachne.config.base import BaseConfig
 from arachne.data import Model
 from arachne.tools import ToolConfigFactory, ToolFactory
-from arachne.utils.model_utils import get_model_spec, load_model_spec, save_model
+from arachne.utils.model_utils import (
+    init_from_dir,
+    init_from_file,
+    load_model_spec,
+    save_model,
+)
 
 logger = getLogger(__name__)
 
@@ -102,20 +107,27 @@ def main(cfg: DictConfig) -> None:
 
     logger.info(OmegaConf.to_yaml(cfg))
 
-    input_model_path = to_absolute_path(cfg.input)
-    output_path = to_absolute_path(cfg.output)
+    # Setup the input DNN model
 
-    input_model = Model(path=input_model_path, spec=get_model_spec(input_model_path))
+    if not cfg.model_file and not cfg.model_dir:
+        raise RuntimeError("User must specify either model_file or model_dir.")
+    if cfg.model_file and cfg.model_dir:
+        raise RuntimeError("User must specify either model_file or model_dir.")
 
-    # overwrite model spec if input_spec is specified
-    if cfg.input_spec:
-        input_model.spec = load_model_spec(to_absolute_path(cfg.input_spec))
+    input_model: Model
+    if cfg.model_file:
+        input_model = init_from_file(to_absolute_path(cfg.model_file))
+    else:
+        input_model = init_from_dir(to_absolute_path(cfg.model_dir))
 
-    assert input_model.spec is not None
+    if cfg.model_spec_file:
+        # if a YAML file describing the model specification is provided, overwrite input_model.spec
+        input_model.spec = load_model_spec(to_absolute_path(cfg.model_spec_file))
 
     output_model = run(input_model, cfg)  # type: ignore
-
-    save_model(model=output_model, output_path=output_path, tvm_cfg=cfg.tools.tvm)
+    save_model(
+        model=output_model, output_path=to_absolute_path(cfg.output_path), tvm_cfg=cfg.tools.tvm
+    )
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ from arachne.tools.factory import (
 )
 from arachne.utils.torch_utils import get_torch_dtype_from_string
 
-from ..data import Model
+from ..data import Model, ModelFormat
 
 _FACTORY_KEY = "torch2trt"
 
@@ -139,4 +139,4 @@ class Torch2TRT(ToolBase):
         )
 
         torch.save(model_trt.state_dict(), filename)
-        return Model(filename, spec=input.spec)
+        return Model(path=filename, format=ModelFormat.PYTORCH, spec=input.spec)

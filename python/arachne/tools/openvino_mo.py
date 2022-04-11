@@ -10,7 +10,7 @@ from arachne.tools.factory import (
     ToolFactory,
 )
 
-from ..data import Model
+from ..data import Model, ModelFormat
 
 _FACTORY_KEY = "openvino_mo"
 
@@ -62,4 +62,4 @@ class OpenVINOModelOptimizer(ToolBase):
 
         ret = subprocess.run(cmd)
         assert ret.returncode == 0
-        return Model(path=output_dir, spec=input.spec)
+        return Model(path=output_dir, format=ModelFormat.OPENVINO, spec=input.spec)

@@ -8,9 +8,8 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from arachne.data import Model
 from arachne.tools.tftrt import TFTRT, TFTRTConfig
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_dir
 from arachne.utils.tf_utils import make_tf_gpu_usage_growth
 
 
@@ -34,9 +33,9 @@ def check_tftrt_output(tf_model, input_shape, precision, tftrt_model_path):
     aout = infer(tf.constant(input_data))["predictions"].numpy()
 
     if precision == "FP32":
-        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
     elif precision == "FP16":
-        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)  # type: ignore
     elif precision == "INT8":
         # skip dummy int8
         pass
@@ -49,7 +48,7 @@ def test_tftrt(precision):
         model = tf.keras.applications.mobilenet.MobileNet()
         model.save("saved_model")
 
-        input_model = Model(path="saved_model", spec=get_model_spec("saved_model"))
+        input_model = init_from_dir("saved_model")
         cfg = TFTRTConfig()
         cfg.precision_mode = precision
         if precision == "INT8":
@@ -75,8 +74,8 @@ def test_cli():
                 "-m",
                 "arachne.driver.cli",
                 "+tools=tftrt",
-                "input=saved_model",
-                "output=output.tar",
+                "model_dir=saved_model",
+                "output_path=output.tar",
             ]
         )
 

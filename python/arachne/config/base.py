@@ -9,11 +9,13 @@ class BaseConfig:
     """This is a base configuration class for arachne.driver.cli and arachne.driver.pipeline.
 
     Attributes:
-        input (str): A path for input model.
-        input_spec (:obj:`str`, optional): A path for a YAML file showing the tensor specification of the input model. Default value is None.
-        output (str): A path for output model.
+        model_file (:obj:`str`, optional): A path to a input model file.
+        model_dir (:obj:`str`, optional): A path to a input model directory.
+        model_spec_file (:obj:`str`, optional): A path for a YAML file showing the tensor specification of the input model. Default value is None.
+        output_file (str): A path for saveing output model.
     """
 
-    input: str = MISSING
-    input_spec: Optional[str] = None
-    output: str = MISSING
+    model_file: Optional[str] = None
+    model_dir: Optional[str] = None
+    model_spec_file: Optional[str] = None
+    output_path: str = MISSING

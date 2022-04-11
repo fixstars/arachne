@@ -34,13 +34,12 @@ def test_tvm_runtime_rpc(pytestconfig):
         import tensorflow as tf
         from omegaconf import OmegaConf
 
-        from arachne.data import Model
         from arachne.tools import ToolFactory
         from arachne.tools.tvm import TVMConfig, get_predefined_config
-        from arachne.utils.model_utils import get_model_spec, save_model
+        from arachne.utils.model_utils import init_from_file, save_model
 
         def compile_model(cfg, package_path):
-            input = Model("tmp.h5", spec=get_model_spec("tmp.h5"))
+            input = init_from_file("tmp.h5")
             input.spec.inputs[0].shape = [1, 224, 224, 3]  # type: ignore
             input.spec.outputs[0].shape = [1, 1000]  # type: ignore
 

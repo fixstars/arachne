@@ -13,7 +13,7 @@ import torchvision
 import yaml
 from torch2trt import TRTModule
 
-from arachne.data import Model, ModelSpec, TensorSpec
+from arachne.data import Model, ModelFormat, ModelSpec, TensorSpec
 from arachne.tools.torch2trt import Torch2TRT, Torch2TRTConfig
 
 
@@ -42,9 +42,9 @@ def check_torch2trt_output(torch_model, input_shape, precision, torch_trt_model_
     aout = aout.to("cpu").detach().numpy().copy()
 
     if precision == "FP32":
-        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)
+        np.testing.assert_allclose(aout, dout, atol=1e-5, rtol=1e-5)  # type: ignore
     elif precision == "FP16":
-        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)
+        np.testing.assert_allclose(aout, dout, atol=0.1, rtol=0)  # type: ignore
 
 
 @pytest.mark.parametrize("precision", ["FP32", "FP16"])
@@ -58,7 +58,7 @@ def test_torch2trt(precision):
             inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
             outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
         )
-        input_model = Model(path="resnet18.pt", spec=spec)
+        input_model = Model(path="resnet18.pt", format=ModelFormat.PYTORCH, spec=spec)
         cfg = Torch2TRTConfig()
         if precision == "FP16":
             cfg.fp16_mode = True
@@ -79,7 +79,7 @@ def test_torch2trt_int8(calib_algo):
             inputs=[TensorSpec(name="input0", shape=[1, 3, 224, 224], dtype="float32")],
             outputs=[TensorSpec(name="output0", shape=[1, 1000], dtype="float32")],
         )
-        input_model = Model(path="resnet18.pt", spec=spec)
+        input_model = Model(path="resnet18.pt", format=ModelFormat.PYTORCH, spec=spec)
         cfg = Torch2TRTConfig()
         cfg.int8_mode = True
         cfg.int8_calib_algorithm = calib_algo
@@ -111,9 +111,9 @@ def test_cli():
                 "-m",
                 "arachne.driver.cli",
                 "+tools=torch2trt",
-                f"input={model_path}",
-                "input_spec=spec.yaml",
-                "output=output.tar",
+                f"model_file={model_path}",
+                "model_spec_file=spec.yaml",
+                "output_path=output.tar",
             ]
         )
 

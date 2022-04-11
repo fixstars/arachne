@@ -13,7 +13,7 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_file
 
 from ..data import Model, TensorSpec
 
@@ -143,4 +143,4 @@ class TFLiteConverter(ToolBase):
         with open(output_path, "wb") as w:
             w.write(tflite_model)
 
-        return Model(path=output_path, spec=get_model_spec(output_path))
+        return init_from_file(output_path)

@@ -27,16 +27,15 @@ Initialize `arachne.data.Model`
 
 In Arachne, DNN models are managed by `arachne.data.Model` data objects which keeps the model file path and the tensor specification of the model.
 Each tool takes the object as its input and outputs another `Model` as a result.
-`arachne.utils.model_utils.get_model_spec` is a helper function to get the tensor specification of the passed model.
+`arachne.utils.model_utils.init_from_file` is a helper function to initialize a `Model` instance from a model file.
 
 .. code:: python
 
-  from arachne.data import Model
-  from arachne.utils.model_utils import get_model_spec
+  from arachne.utils.model_utils import init_from_file
 
 
   model_file_path = "/tmp/resnet50-v2.h5"
-  input = Model(path=model_file_path, spec=get_model_spec(model_file_path))
+  input = init_from_file(model_file_path)
 
   print(input)
 

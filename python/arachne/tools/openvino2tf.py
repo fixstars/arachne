@@ -10,7 +10,7 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_dir
 
 from ..data import Model
 
@@ -76,4 +76,5 @@ class OpenVINO2TF(ToolBase):
 
         ret = subprocess.run(cmd)
         assert ret.returncode == 0
-        return Model(path=output_dir, spec=get_model_spec(output_dir))
+
+        return init_from_dir(output_dir)

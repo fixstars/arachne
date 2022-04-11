@@ -23,7 +23,7 @@ from arachne.tools.factory import (
     ToolFactory,
 )
 
-from ..data import Model
+from ..data import Model, ModelFormat
 
 _FACTORY_KEY = "tvm"
 
@@ -93,17 +93,26 @@ def _load_as_tvmc_model(input: Model) -> TVMCModel:
     input_shape_dict = {}
     for ti in input.spec.inputs:
         input_shape_dict[ti.name] = list(ti.shape)
-    if input.path.endswith(".pb"):
+    if input.format == ModelFormat.TF_PB:
         outputs = [out.name for out in input.spec.outputs]
         model = load_model(
             path=input.path,
             shape_dict=input_shape_dict,
             outputs=outputs,
         )
-    elif input.path.endswith(".onnx"):
+    elif input.format == ModelFormat.ONNX:
         model = load_model(path=input.path, shape_dict=input_shape_dict, freeze_params=True)
-    elif input.path.endswith(".tar"):
+    elif input.format == ModelFormat.TVM:
         model = TVMCModel(model_path=input.path)
+    elif input.format == ModelFormat.CAFFE:
+        caffe_model = None
+        for f in os.listdir(input.path):
+            if f.endswith(".caffemodel"):
+                caffe_model = f
+                break
+        assert caffe_model
+
+        model = load_model(path=input.path + "/" + caffe_model, shape_dict=input_shape_dict)
     else:
         model = load_model(path=input.path, shape_dict=input_shape_dict)
 
@@ -270,4 +279,4 @@ class TVM(ToolBase):
 
         _save_relay(graph_module=graph_module, module=module, module_path=package_path)
 
-        return Model(path=package_path, spec=input.spec)
+        return Model(path=package_path, format=ModelFormat.TVM, spec=input.spec)

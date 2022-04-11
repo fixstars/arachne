@@ -13,7 +13,7 @@ from arachne.tools.factory import (
     ToolFactory,
 )
 
-from ..data import Model, TensorSpec
+from ..data import Model, ModelFormat, TensorSpec
 
 _FACTORY_KEY = "tftrt"
 
@@ -101,4 +101,6 @@ class TFTRT(ToolBase):
         converter.convert(calibration_input_fn=calibration_input_fn)
         output_saved_model_dir = f"tftrt-{idx}-saved_model"
         converter.save(output_saved_model_dir)
-        return Model(path=output_saved_model_dir, spec=input.spec)
+        return Model(
+            path=output_saved_model_dir, format=ModelFormat.TF_SAVED_MODEL, spec=input.spec
+        )

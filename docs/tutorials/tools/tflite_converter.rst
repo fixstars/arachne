@@ -77,7 +77,7 @@ You can convert a TF model into a TFLite mode without the post-training quantiza
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=tflite_converter input=/tmp/resnet50-v2.h5 output=/tmp/output_fp32.tar
+    python -m arachne.driver.cli +tools=tflite_converter model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output_fp32.tar
 
 
 To check the converted model, please unpack the output TAR file and inspect the tflite model file by a model viewer like the Netron.
@@ -96,10 +96,10 @@ To convert with the dynamic range or FP16 precision, just set `dynamic_range` or
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=tflite_converter input=/tmp/resnet50-v2.h5 output=/tmp/output_dr.tar \
+    python -m arachne.driver.cli +tools=tflite_converter model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output_dr.tar \
         tools.tflite_converter.ptq.method=dynamic_range
 
-    python -m arachne.driver.cli +tools=tflite_converter input=/tmp/resnet50-v2.h5 output=/tmp/output_fp16.tar \
+    python -m arachne.driver.cli +tools=tflite_converter model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output_fp16.tar \
         tools.tflite_converter.ptq.method=fp16
 
 
@@ -126,7 +126,7 @@ Next, specify `int8` to the `tools.tflite_converter.ptq.method` option and pass 
 
 .. code:: bash
 
-    python -m arachne.driver.cli +tools=tflite_converter input=/tmp/resnet50-v2.h5 output=/tmp/output_int8.tar \
+    python -m arachne.driver.cli +tools=tflite_converter model_file=/tmp/resnet50-v2.h5 output_path=/tmp/output_int8.tar \
         tools.tflite_converter.ptq.method=int8 tools.tflite_converter.ptq.representative_dataset=/tmp/calib_dataset.npy
 
 
@@ -138,12 +138,11 @@ The details of the API are described in :ref:`arachne.tools.tflite_converter <ap
 
 .. code:: python
 
-    from arachne.data import Model
-    from arachne.utils.model_utils import get_model_spec, save_model
+    from arachne.utils.model_utils import init_from_file, save_model
     from arachne.tools.tflite_converter import TFLiteConverter, TFLiteConverterConfig
 
     model_file_path = "/tmp/resnet50-v2.h5"
-    input = Model(path=model_file_path, spec=get_model_spec(model_file_path))
+    input = init_from_file(model_file_path)
 
     cfg = TFLiteConverterConfig()
 

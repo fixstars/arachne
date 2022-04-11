@@ -12,7 +12,7 @@ from arachne.tools.factory import (
     ToolConfigFactory,
     ToolFactory,
 )
-from arachne.utils.model_utils import get_model_spec
+from arachne.utils.model_utils import init_from_file
 
 from ..data import Model
 
@@ -123,4 +123,4 @@ class ONNXSimplifier(ToolBase):
         assert check_ok, "Simplified model validation failed"
         onnx.save(model_opt, filename)
 
-        return Model(filename, spec=get_model_spec(filename))
+        return init_from_file(filename)

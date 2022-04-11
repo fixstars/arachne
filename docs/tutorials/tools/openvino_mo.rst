@@ -11,9 +11,9 @@ Using from CLI
 .. code:: bash
 
     python -m arachne.tools.openvino_mo \
-        input=/path/to/model \
-        input_spec=/path/to/model_spec.yaml \
-        output=output.tar
+        model_file=/path/to/model \
+        model_spec_file=/path/to/model_spec.yaml \
+        output_path=output.tar
 
 
 Using from your code
@@ -21,13 +21,12 @@ Using from your code
 
 .. code:: python
 
-    from arachne.data import Model, ModelSpec, TensorSpec
-    from aracune.utils import get_model_spec
+    from aracune.utils import init_from_file
     import arachne.tools.openvino_mo
 
     # Setup an input model
     model_path = "resnet18.onnx"
-    input_model = Model(path=model_path, spec=get_model_spec(model_path))
+    input_model = init_from_file(model_path)
 
     # Run the openvino model optimizer
     cfg = arachne.tools.openvino_mo.OpenVINOModelOptConfig()
