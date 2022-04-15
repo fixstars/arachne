@@ -8,5 +8,9 @@
     },
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.extraPaths": [
+        "/workspaces/arachne/.venv/lib/python3.6/site-packages/"
+    ],
+    "files.insertFinalNewline": true,
     "restructuredtext.confPath": "${workspaceFolder}/docs",
 }
