@@ -1,10 +1,11 @@
+import json
 import os
 
 import grpc
 
 from arachne.runtime import init
 from arachne.runtime.rpc.logger import Logger
-from arachne.runtime.rpc.protobuf import tvmruntime_pb2_grpc
+from arachne.runtime.rpc.protobuf import runtime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 from arachne.runtime.rpc.utils.nparray import generator_to_np_array
 
@@ -15,12 +16,12 @@ logger = Logger.logger()
 
 
 @RuntimeServicerBaseFactory.register("tvm")
-class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServicer):
+class TVMRuntimeServicer(RuntimeServicerBase, runtime_pb2_grpc.RuntimeServicer):
     """Servicer for TVMRuntime"""
 
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
-        tvmruntime_pb2_grpc.add_TVMRuntimeServicer_to_server(TVMRuntimeServicer(), server)
+        runtime_pb2_grpc.add_RuntimeServicer_to_server(TVMRuntimeServicer(), server)
 
     def __init__(self):
         pass
@@ -35,7 +36,8 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
         Returns:
             MsgResponse
         """
-        package_path = request.package_path
+        package_path = json.loads(request.args_json)["package_path"]
+        print(package_path)
         if package_path is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("model_path should not be None")

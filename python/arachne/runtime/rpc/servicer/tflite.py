@@ -1,10 +1,11 @@
+import json
 import os
 
 import grpc
 
 from arachne.runtime import init
 from arachne.runtime.rpc.logger import Logger
-from arachne.runtime.rpc.protobuf import tfliteruntime_pb2_grpc
+from arachne.runtime.rpc.protobuf import runtime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 
 from .factory import RuntimeServicerBaseFactory
@@ -14,12 +15,12 @@ logger = Logger.logger()
 
 
 @RuntimeServicerBaseFactory.register("tflite")
-class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRuntimeServicer):
+class TfLiteRuntimeServicer(RuntimeServicerBase, runtime_pb2_grpc.RuntimeServicer):
     """Servicer for TfLiteRuntime"""
 
     @staticmethod
     def register_servicer_to_server(server: grpc.Server):
-        tfliteruntime_pb2_grpc.add_TfLiteRuntimeServicer_to_server(TfLiteRuntimeServicer(), server)
+        runtime_pb2_grpc.add_RuntimeServicer_to_server(TfLiteRuntimeServicer(), server)
 
     def __init__(self):
         pass
@@ -35,7 +36,7 @@ class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRu
         Returns:
             MsgResponse
         """
-        model_path = request.model_path
+        model_path = json.loads(request.args_json)["model_path"]
         if model_path is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("model_path should not be None")

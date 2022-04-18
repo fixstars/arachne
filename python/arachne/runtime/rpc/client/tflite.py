@@ -1,8 +1,9 @@
+import json
 from pathlib import Path
 
 import grpc
 
-from arachne.runtime.rpc.protobuf import tfliteruntime_pb2, tfliteruntime_pb2_grpc
+from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_pb2_grpc
 
 from .client import RuntimeClientBase
 
@@ -16,10 +17,9 @@ class TfliteRuntimeClient(RuntimeClientBase):
             model_path (str): path to :code:`.tflite` model file
             num_threads (int, optional): :code:`num_threads` to set tfliteInterpreter. Defaults to 1.
         """
-        stub = tfliteruntime_pb2_grpc.TfLiteRuntimeStub(channel)
+        stub = runtime_pb2_grpc.RuntimeStub(channel)
         super().__init__(channel, stub)
         response = self.file_stub_mgr.upload(Path(model_path))
-        req = tfliteruntime_pb2.TfLiteInitRequest(
-            model_path=response.filepath, num_threads=num_threads
-        )
+        args_json = json.dumps({"model_path": response.filepath, "num_threads": num_threads})
+        req = runtime_message_pb2.InitRequest(args_json=args_json)
         self.stub.Init(req)
