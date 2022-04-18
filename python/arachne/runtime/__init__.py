@@ -112,6 +112,7 @@ def init(
             logger.warning("Some environment dependencies are not satisfied")
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     return RuntimeModuleFactory.get(name=runtime, model=model_file, **env, **kwargs)
 =======
     if runtime == "tvm":
@@ -128,3 +129,6 @@ def init(
     else:
         assert False, f"Unsupported model format ({model_file}) for runtime"
 >>>>>>> Rename factory methods
+=======
+    return RuntimeModuleFactory.get(name=runtime, model=model_file, **env, **kwargs)
+>>>>>>> Cleanup arachne.runtime

@@ -1791,14 +1791,6 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "pip"
-version = "21.3.1"
-description = "The PyPA recommended tool for installing Python packages."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[[package]]
-name = "pip"
 version = "22.0.4"
 description = "The PyPA recommended tool for installing Python packages."
 category = "main"
@@ -1807,11 +1799,11 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "pip-tools"
-version = "6.4.0"
+version = "6.5.1"
 description = "pip-tools keeps your pinned dependencies fresh."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 click = ">=7"
@@ -1830,7 +1822,7 @@ version = "6.6.0"
 description = "pip-tools keeps your pinned dependencies fresh."
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.6"
 
 [package.dependencies]
 click = ">=7"
@@ -4118,8 +4110,6 @@ pillow = [
     {file = "Pillow-8.4.0.tar.gz", hash = "sha256:b8e2f83c56e141920c39464b852de3719dfbfb6e3c99a2d8da0edf4fb33176ed"},
 ]
 pip = [
-    {file = "pip-21.3.1-py3-none-any.whl", hash = "sha256:deaf32dcd9ab821e359cd8330786bcd077604b5c5730c0b096eda46f95c24a2d"},
-    {file = "pip-21.3.1.tar.gz", hash = "sha256:fd11ba3d0fdb4c07fbc5ecbba0b1b719809420f25038f8ee3cd913d3faa3033a"},
     {file = "pip-22.0.4-py3-none-any.whl", hash = "sha256:c6aca0f2f081363f689f041d90dab2a07a9a07fb840284db2218117a52da800b"},
     {file = "pip-22.0.4.tar.gz", hash = "sha256:b3a9de2c6ef801e9247d1527a4b16f92f2cc141cd1489f3fffaf6a9e96729764"},
 ]
