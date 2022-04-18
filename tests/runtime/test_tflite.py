@@ -34,7 +34,9 @@ def test_tflite_runtime():
 
         # Arachne Runtime
         tflite_interpreter_opts = {"num_threads": 4}
-        runtime_module = arachne.runtime.init(model_file=model_path, **tflite_interpreter_opts)
+        runtime_module = arachne.runtime.init(
+            runtime="tflite", model_file=model_path, **tflite_interpreter_opts
+        )
         runtime_module.set_input(0, input_data)
         runtime_module.run()
         aout = runtime_module.get_output(0)

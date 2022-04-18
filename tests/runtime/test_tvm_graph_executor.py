@@ -37,7 +37,7 @@ def test_tvm_runtime():
         del module
 
         # Arachne Runtime
-        runtime_module = arachne.runtime.init(package_tar=tvm_package_path)
+        runtime_module = arachne.runtime.init(runtime="tvm", package_tar=tvm_package_path)
         runtime_module.set_input(0, input_data)
         runtime_module.run()
         aout = runtime_module.get_output(0)

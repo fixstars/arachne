@@ -12,7 +12,7 @@ from tvm.contrib.debugger import debug_executor
 from tvm.contrib.graph_executor import GraphModule
 from tvm.runtime.module import Module as TVMModule
 
-from . import RuntimeModule
+from .factory import RuntimeModuleBase, RuntimeModuleFactory
 
 
 def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], TVMModule]:
@@ -32,7 +32,8 @@ def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], TV
     return graph, params, lib
 
 
-class TVMRuntimeModule(RuntimeModule):
+@RuntimeModuleFactory.register("tvm")
+class TVMRuntimeModule(RuntimeModuleBase):
     def __init__(self, model: str, device_type: str, model_spec: dict, **kwargs):
         tvm_device = tvm.runtime.device(device_type, 0)
         graph, params, lib = _open_module_file(model)

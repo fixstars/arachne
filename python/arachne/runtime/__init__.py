@@ -11,12 +11,7 @@ from ..utils.version_utils import (
     get_cudnn_version,
     get_tensorrt_version,
 )
-from .module import RuntimeModule
-from .module.onnx import ONNXRuntimeModule
-from .module.tflite import TFLiteRuntimeModule
-from .module.tvm import TVMRuntimeModule
-
-logger = getLogger(__name__)
+from .module import RuntimeModuleBase, RuntimeModuleFactory, logger
 
 
 def validate_environment(env: dict) -> bool:
@@ -70,11 +65,12 @@ def validate_environment(env: dict) -> bool:
 
 
 def init(
+    runtime: str,
     package_tar: Optional[str] = None,
     model_file: Optional[str] = None,
     env_file: Optional[str] = None,
     **kwargs,
-) -> RuntimeModule:
+) -> RuntimeModuleBase:
     """Initialize RuntimeModule.
 
     The arguments to be passed as model file are different for runtime:
@@ -113,13 +109,17 @@ def init(
         if not validate_environment(env):
             logger.warning("Some environment dependencies are not satisfied")
 
-    if model_file.endswith(".tar"):
-        return TVMRuntimeModule(
-            model=model_file, device_type=env["tvm_device"], model_spec=env["model_spec"]
+    ## RuntiimeModuleFactory.get(runtime).init(**args)
+    if runtime == "tvm":
+        return RuntimeModuleFactory.create_runtime_module(
+            name="tvm",
+            model=model_file,
+            device_type=env["tvm_device"],
+            model_spec=env["model_spec"],
         )
-    elif model_file.endswith(".tflite"):
-        return TFLiteRuntimeModule(model=model_file, **kwargs)
-    elif model_file.endswith(".onnx"):
-        return ONNXRuntimeModule(model=model_file, **kwargs)
+    elif runtime == "tflite":
+        return RuntimeModuleFactory.create_runtime_module(name="tflite", model=model_file, **kwargs)
+    elif runtime == "onnx":
+        return RuntimeModuleFactory.create_runtime_module(name="onnx", model=model_file, **kwargs)
     else:
         assert False, f"Unsupported model format ({model_file}) for runtime"

@@ -25,7 +25,7 @@ def test_tvm_runtime_rpc(rpc_port=5051):
         dummy_input = np.array(np.random.random_sample([1, 224, 224, 3]), dtype=np.float32)  # type: ignore
 
         # local run
-        rtmodule = arachne.runtime.init(package_tar=tvm_package_path)
+        rtmodule = arachne.runtime.init(runtime="tvm", package_tar=tvm_package_path)
         assert rtmodule
         rtmodule.set_input(0, dummy_input)
         rtmodule.run()
@@ -69,7 +69,7 @@ def test_tvm_runtime_rpc2(rpc_port=5051):
         assert model_file is not None
         assert env_file is not None
         # local run
-        rtmodule = arachne.runtime.init(model_file=model_file, env_file=env_file)
+        rtmodule = arachne.runtime.init(runtime="tvm", model_file=model_file, env_file=env_file)
         assert rtmodule
         rtmodule.set_input(0, dummy_input)
         rtmodule.run()
@@ -100,7 +100,7 @@ def test_tflite_runtime_rpc(rpc_port=5051):
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
         download(url, model_path)
 
-        rtmodule = arachne.runtime.init(model_file=model_path)
+        rtmodule = arachne.runtime.init(runtime="tflite", model_file=model_path)
         assert rtmodule
 
         # local
@@ -139,7 +139,7 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         ort_opts = {"providers": ["CPUExecutionProvider"]}
 
         # local run
-        rtmodule = arachne.runtime.init(model_file=model_path, **ort_opts)
+        rtmodule = arachne.runtime.init(runtime="onnx", model_file=model_path, **ort_opts)
         assert rtmodule
         rtmodule.set_input(0, dummy_input)
         rtmodule.run()

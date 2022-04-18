@@ -27,7 +27,9 @@ def test_onnx_runtime():
 
         # Arachne Runtime
         ort_opts = {"providers": ["CPUExecutionProvider"]}
-        runtime_module = arachne.runtime.init(model_file=onnx_model_path, **ort_opts)
+        runtime_module = arachne.runtime.init(
+            runtime="onnx", model_file=onnx_model_path, **ort_opts
+        )
         runtime_module.set_input(0, input_data)
         runtime_module.run()
         aout = runtime_module.get_output(0)
