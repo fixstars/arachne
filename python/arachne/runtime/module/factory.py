@@ -84,8 +84,6 @@ class RuntimeModuleFactory:
         runtime = runtime_class(**kwargs)
         return runtime
 
-    # TODO: Need get method?
-
     @classmethod
     def list(cls) -> List[str]:
         return list(cls.registry.keys())
