@@ -1,10 +1,8 @@
 import os
-from multiprocessing.spawn import import_main_path
 
 import grpc
 
 from arachne.runtime import init
-from arachne.runtime.module.onnx import ONNXRuntimeModule
 from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import onnxruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -51,5 +49,4 @@ class ONNXRuntimeServicer(RuntimeServicerBase, onnxruntime_pb2_grpc.ONNXRuntimeS
         self.module = init(
             runtime="onnx", model_file=request.model_path, providers=request.providers
         )
-        assert isinstance(self.module, ONNXRuntimeModule)
         return MsgResponse(msg="Init")

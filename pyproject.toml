@@ -31,6 +31,8 @@ ipykernel = "5.5.6"
 isort = "^5.10.1"
 onnx-tf = "1.8.0"
 tensorflow-addons = "0.14.0"
+grpcio = "^1.45.0"
+grpcio-tools = "^1.45.0"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^4.3.2"

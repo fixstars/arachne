@@ -3,7 +3,6 @@ import os
 import grpc
 
 from arachne.runtime import init
-from arachne.runtime.module.tvm import TVMRuntimeModule
 from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import tvmruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -48,7 +47,6 @@ class TVMRuntimeServicer(RuntimeServicerBase, tvmruntime_pb2_grpc.TVMRuntimeServ
 
         logger.info("loading " + package_path)
         self.module = init(runtime="tvm", package_tar=package_path)
-        assert isinstance(self.module, TVMRuntimeModule)
         return MsgResponse(msg="Init")
 
     def SetInput(self, request_iterator, context):

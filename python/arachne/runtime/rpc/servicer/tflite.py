@@ -3,7 +3,6 @@ import os
 import grpc
 
 from arachne.runtime import init
-from arachne.runtime.module.tflite import TFLiteRuntimeModule
 from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import tfliteruntime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
@@ -48,5 +47,4 @@ class TfLiteRuntimeServicer(RuntimeServicerBase, tfliteruntime_pb2_grpc.TfLiteRu
 
         logger.info("loading " + model_path)
         self.module = init(runtime="tflite", model_file=model_path)
-        assert isinstance(self.module, TFLiteRuntimeModule)
         return MsgResponse(msg="Init")

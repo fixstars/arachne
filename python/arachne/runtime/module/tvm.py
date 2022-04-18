@@ -34,15 +34,13 @@ def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], TV
 
 @RuntimeModuleFactory.register("tvm")
 class TVMRuntimeModule(RuntimeModuleBase):
-    def __init__(self, model: str, device_type: str, model_spec: dict, **kwargs):
-        tvm_device = tvm.runtime.device(device_type, 0)
+    def __init__(self, model: str, tvm_device: str, model_spec: dict, **kwargs):
+        device = tvm.runtime.device(tvm_device, 0)
         graph, params, lib = _open_module_file(model)
         if "TVM_DEBUG_EXECUTOR" in os.environ:
-            module: GraphModule = debug_executor.create(
-                graph, lib, tvm_device, dump_root="./tvm_dbg"
-            )
+            module: GraphModule = debug_executor.create(graph, lib, device, dump_root="./tvm_dbg")
         else:
-            module: GraphModule = graph_executor.create(graph, lib, tvm_device)
+            module: GraphModule = graph_executor.create(graph, lib, device)
         module.load_params(params)
 
         self.input_details = []
@@ -55,7 +53,7 @@ class TVMRuntimeModule(RuntimeModuleBase):
             print("input_details and output_details are not set")
 
         self.module: GraphModule = module
-        self.tvm_device = tvm_device
+        self.tvm_device = device
 
     def run(self):
         self.module.run()
