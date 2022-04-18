@@ -109,17 +109,16 @@ def init(
         if not validate_environment(env):
             logger.warning("Some environment dependencies are not satisfied")
 
-    ## RuntiimeModuleFactory.get(runtime).init(**args)
     if runtime == "tvm":
-        return RuntimeModuleFactory.create_runtime_module(
+        return RuntimeModuleFactory.get(
             name="tvm",
             model=model_file,
             device_type=env["tvm_device"],
             model_spec=env["model_spec"],
         )
     elif runtime == "tflite":
-        return RuntimeModuleFactory.create_runtime_module(name="tflite", model=model_file, **kwargs)
+        return RuntimeModuleFactory.get(name="tflite", model=model_file, **kwargs)
     elif runtime == "onnx":
-        return RuntimeModuleFactory.create_runtime_module(name="onnx", model=model_file, **kwargs)
+        return RuntimeModuleFactory.get(name="onnx", model=model_file, **kwargs)
     else:
         assert False, f"Unsupported model format ({model_file}) for runtime"
