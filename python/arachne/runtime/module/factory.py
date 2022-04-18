@@ -1,10 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
-<<<<<<< HEAD
 from typing import Callable, Dict, List
-=======
-from typing import Callable, Dict, List, Optional
->>>>>>> Update runtime/module to use factory method
 
 import numpy as np
 
@@ -81,19 +77,14 @@ class RuntimeModuleFactory:
         return inner_wrapper
 
     @classmethod
-<<<<<<< HEAD
     def get(cls, name: str, **kwargs) -> RuntimeModuleBase:
         if name not in cls.registry:
             raise Exception(f"RuntimeModule {name} not exists in the registry")
-=======
-    def create_runtime_module(cls, name: str, **kwargs) -> Optional[RuntimeModuleBase]:
-        if name not in cls.registry:
-            logger.warning(f"RuntimeModule {name} not exists in the registry")
-            return None
->>>>>>> Update runtime/module to use factory method
         runtime_class = cls.registry[name]
         runtime = runtime_class(**kwargs)
         return runtime
+
+    # TODO: Need get method?
 
     @classmethod
     def list(cls) -> List[str]:
