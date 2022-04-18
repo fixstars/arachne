@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Type
 import grpc
 
 from arachne.runtime.module import RuntimeModuleBase
-from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_message_pb2_grpc
+from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 from arachne.runtime.rpc.utils.nparray import (
     generator_to_np_array,
@@ -13,7 +13,7 @@ from arachne.runtime.rpc.utils.nparray import (
 )
 
 
-class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
+class RuntimeServicerBase(runtime_pb2_grpc.RuntimeServicer):
     """Base class of runtime servicer"""
 
     @staticmethod
@@ -48,7 +48,7 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
             MsgResponse
         """
         assert self.module
-        index = next(request_iterator).index
+        index = next(request_iterator).index.index_i
         if index is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("index should not be None")

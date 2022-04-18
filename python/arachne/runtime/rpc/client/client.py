@@ -55,7 +55,8 @@ class RuntimeClientBase(metaclass=ABCMeta):
         """
 
         def request_generator(idx, np_arr):
-            yield runtime_message_pb2.SetInputRequest(index=idx)
+            index = runtime_message_pb2.Index(index_i=idx)
+            yield runtime_message_pb2.SetInputRequest(index=index)
             for piece in nparray_piece_generator(np_arr):
                 chunk = stream_data_pb2.Chunk(buffer=piece)
                 yield runtime_message_pb2.SetInputRequest(np_arr_chunk=chunk)

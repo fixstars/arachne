@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Union
 
@@ -5,9 +6,9 @@ import grpc
 import numpy as np
 
 from arachne.runtime.rpc.protobuf import (
+    runtime_message_pb2,
+    runtime_pb2_grpc,
     stream_data_pb2,
-    tvmruntime_pb2,
-    tvmruntime_pb2_grpc,
 )
 from arachne.runtime.rpc.utils.nparray import nparray_piece_generator
 
@@ -27,10 +28,12 @@ class TVMRuntimeClient(RuntimeClientBase):
             channel (grpc.Channel): channel to connect server
             package_path (str): path to :code:`.tar` package file
         """
-        stub = tvmruntime_pb2_grpc.TVMRuntimeStub(channel)
+        stub = runtime_pb2_grpc.RuntimeStub(channel)
         super().__init__(channel, stub)
         upload_response = self.file_stub_mgr.upload(Path(package_path))
-        req = tvmruntime_pb2.TVMInitRequest(package_path=upload_response.filepath)
+        package_path = upload_response.filepath
+        args_json = json.dumps({"package_path": package_path})
+        req = runtime_message_pb2.InitRequest(args_json=args_json)
         self.stub.Init(req)
 
     def set_input(self, idx: Union[int, str], value: np.ndarray):
@@ -43,13 +46,13 @@ class TVMRuntimeClient(RuntimeClientBase):
 
         def request_generator(idx, value):
             if isinstance(idx, int):
-                idx = tvmruntime_pb2.Index(index_i=idx)
+                idx = runtime_message_pb2.Index(index_i=idx)
             elif isinstance(idx, str):
-                idx = tvmruntime_pb2.Index(index_s=idx)
-            yield tvmruntime_pb2.TVMSetInputRequest(index=idx)
+                idx = runtime_message_pb2.Index(index_s=idx)
+            yield runtime_message_pb2.SetInputRequest(index=idx)
 
             for piece in nparray_piece_generator(value):
                 chunk = stream_data_pb2.Chunk(buffer=piece)
-                yield tvmruntime_pb2.TVMSetInputRequest(np_arr_chunk=chunk)
+                yield runtime_message_pb2.SetInputRequest(np_arr_chunk=chunk)
 
         self.stub.SetInput(request_generator(idx, value))

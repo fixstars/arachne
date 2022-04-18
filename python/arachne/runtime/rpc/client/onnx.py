@@ -1,9 +1,10 @@
+import json
 from pathlib import Path
 from typing import List
 
 import grpc
 
-from arachne.runtime.rpc.protobuf import onnxruntime_pb2, onnxruntime_pb2_grpc
+from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_pb2_grpc
 
 from .client import RuntimeClientBase
 
@@ -22,11 +23,10 @@ class ONNXRuntimeClient(RuntimeClientBase):
             model_path (str): path to :code:`.onnx` model file
             providers (list, optional): :code:`providers` to set onnxruntime.InferenceSession. Defaults to ["CPUExecutionProvider"].
         """
-        stub = onnxruntime_pb2_grpc.ONNXRuntimeStub(channel)
+        stub = runtime_pb2_grpc.RuntimeStub(channel)
         super().__init__(channel, stub)
         # 'provider_options' and 'session_options' are not supported
         upload_response = self.file_stub_mgr.upload(Path(model_path))
-        req = onnxruntime_pb2.ONNXInitRequest(
-            model_path=upload_response.filepath, providers=providers
-        )
+        args_json = json.dumps({"model_path": upload_response.filepath, "providers": providers})
+        req = runtime_message_pb2.InitRequest(args_json=args_json)
         self.stub.Init(req)
