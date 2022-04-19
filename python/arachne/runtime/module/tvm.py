@@ -1,21 +1,21 @@
+import importlib
 import os
 import tarfile
 import tempfile
 import time
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import numpy as np
-import tvm
-import tvm.rpc
-from tvm.contrib import graph_executor
-from tvm.contrib.debugger import debug_executor
-from tvm.contrib.graph_executor import GraphModule
-from tvm.runtime.module import Module as TVMModule
 
 from .factory import RuntimeModuleBase, RuntimeModuleFactory
 
+tvm = None  # dynamic import
 
-def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], TVMModule]:
+
+def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], Any]:
+    global tvm
+    if tvm is None:
+        tvm = importlib.import_module("tvm")
     with tempfile.TemporaryDirectory() as tmp_dir:
         with tarfile.open(file) as t:
             t.extractall(tmp_dir)
@@ -27,7 +27,7 @@ def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], TV
         params_path = os.path.join(tmp_dir, "mod.params")
         if os.path.exists(params_path):
             params = bytearray(open(params_path, "rb").read())
-        lib = tvm.runtime.load_module(tmp_dir + "/mod.tar")
+        lib = tvm.runtime.load_module(tmp_dir + "/mod.tar")  # type: ignore
 
     return graph, params, lib
 
@@ -35,6 +35,13 @@ def _open_module_file(file: str) -> Tuple[Optional[str], Optional[bytearray], TV
 @RuntimeModuleFactory.register("tvm")
 class TVMRuntimeModule(RuntimeModuleBase):
     def __init__(self, model: str, tvm_device: str, model_spec: dict, **kwargs):
+        global tvm
+        if tvm is None:
+            tvm = importlib.import_module("tvm")
+        from tvm.contrib import graph_executor
+        from tvm.contrib.debugger import debug_executor
+        from tvm.contrib.graph_executor import GraphModule
+
         device = tvm.runtime.device(tvm_device, 0)
         graph, params, lib = _open_module_file(model)
         if "TVM_DEBUG_EXECUTOR" in os.environ:
