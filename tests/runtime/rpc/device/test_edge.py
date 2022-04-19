@@ -56,7 +56,7 @@ def test_tvm_runtime_rpc(pytestconfig):
         cfg.composite_target = ["cpu"]
         host_package_path = tmp_dir + "/host_mobilenet.tar"
         compile_model(cfg, host_package_path)
-        rtmodule = arachne.runtime.init(package_tar=host_package_path)
+        rtmodule = arachne.runtime.init(runtime="tvm", package_tar=host_package_path)
         assert rtmodule
         input_data = get_input_data()
         rtmodule.set_input(0, input_data)
@@ -93,7 +93,7 @@ def test_tflite_runtime_rpc(pytestconfig):
         url = "https://arachne-public-pkgs.s3.ap-northeast-1.amazonaws.com/models/test/mobilenet.tflite"
         download(url, model_path)
 
-        rtmodule = arachne.runtime.init(model_file=model_path)
+        rtmodule = arachne.runtime.init(runtime="tflite", model_file=model_path)
         assert rtmodule
 
         # host
@@ -137,7 +137,7 @@ def test_onnx_runtime_rpc(pytestconfig):
         ort_opts = {"providers": ["CPUExecutionProvider"]}
 
         # host
-        rtmodule = arachne.runtime.init(model_file=model_path, **ort_opts)
+        rtmodule = arachne.runtime.init(runtime="onnx", model_file=model_path, **ort_opts)
         assert rtmodule
         rtmodule.set_input(0, input_data)
         rtmodule.run()
