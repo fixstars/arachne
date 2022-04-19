@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 import onnxruntime as ort
 
-from . import RuntimeModule
+from .factory import RuntimeModuleBase, RuntimeModuleFactory
 
 
 def onnx_tensor_type_to_np_dtype(ottype: str):
@@ -16,7 +16,8 @@ def onnx_tensor_type_to_np_dtype(ottype: str):
     return dtype
 
 
-class ONNXRuntimeModule(RuntimeModule):
+@RuntimeModuleFactory.register("onnx")
+class ONNXRuntimeModule(RuntimeModuleBase):
     def __init__(self, model: str, providers: List[str] = ["CPUExecutionProvider"], **kwargs):
         self.module: ort.InferenceSession = ort.InferenceSession(
             model, providers=providers, **kwargs

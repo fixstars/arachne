@@ -3,10 +3,11 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from . import RuntimeModule
+from .factory import RuntimeModuleBase, RuntimeModuleFactory
 
 
-class TFLiteRuntimeModule(RuntimeModule):
+@RuntimeModuleFactory.register("tflite")
+class TFLiteRuntimeModule(RuntimeModuleBase):
     def __init__(self, model: str, **kwargs):
         self.module: tf.lite.Interpreter = tf.lite.Interpreter(model_path=model, **kwargs)
         self.module.allocate_tensors()

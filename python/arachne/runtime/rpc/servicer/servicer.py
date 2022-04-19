@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Type
 
 import grpc
 
-from arachne.runtime.module import RuntimeModule
+from arachne.runtime.module import RuntimeModuleBase
 from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_message_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 from arachne.runtime.rpc.utils.nparray import (
@@ -29,7 +29,7 @@ class RuntimeServicerBase(runtime_message_pb2_grpc.RuntimeServicer):
         pass
 
     def __init__(self):
-        self.module: RuntimeModule  #: runtime module for inference
+        self.module: RuntimeModuleBase  #: runtime module for inference
 
     @abstractmethod
     def Init(self, request, context):

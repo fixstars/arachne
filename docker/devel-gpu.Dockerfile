@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-dev \
     sudo \
     curl \
-    git
+    git \
+    ssh
 
 # python -> python3
 RUN ln -s $(which python3) /usr/local/bin/python
