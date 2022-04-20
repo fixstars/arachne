@@ -26,9 +26,6 @@ class RuntimeServicer(runtime_pb2_grpc.RuntimeServicer):
         """abstract method to initialize runtime module."""
         runtime = request.runtime
         args = json.loads(request.args_json)
-        print("*****************")
-        print(args)
-        print("*****************")
         path = None
         if "package_path" in args:
             path = args.pop("package_path")
