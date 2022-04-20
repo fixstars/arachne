@@ -1,30 +1,20 @@
 import tarfile
 from typing import Optional
 
-from .client import (
-    ONNXRuntimeClient,
-    RuntimeClientBase,
-    TfliteRuntimeClient,
-    TVMRuntimeClient,
-)
+from .client import RuntimeClient
 from .server import create_channel, create_server, start_server
-from .servicer import (
-    FileServicer,
-    ONNXRuntimeServicer,
-    ServerStatusServicer,
-    TfLiteRuntimeServicer,
-    TVMRuntimeServicer,
-)
+from .servicer import FileServicer, RuntimeServicer
 
 
 def init(
+    runtime: str,
     package_tar: Optional[str] = None,
     model_file: Optional[str] = None,
     env_file: Optional[str] = None,
     rpc_host: str = "localhost",
     rpc_port: int = 5051,
     **kwargs,
-) -> RuntimeClientBase:
+) -> RuntimeClient:
     """Initialize RuntimeClient to send requests to the server.
 
     The arguments to be passed as model file are different for runtime:
@@ -65,10 +55,11 @@ def init(
             with tarfile.open(package_tar, "w:gz") as tar:
                 tar.add(model_file, arcname=model_file.split("/")[-1])
                 tar.add(env_file, arcname="env.yaml")
-        return TVMRuntimeClient(channel, package_tar, **kwargs)
-    elif model_file.endswith(".tflite"):
-        return TfliteRuntimeClient(channel, model_file, **kwargs)
-    elif model_file.endswith(".onnx"):
-        return ONNXRuntimeClient(channel, model_file, **kwargs)
-    else:
-        assert False, f"Unsupported model format ({model_file}) for runtime"
+
+    args = {}
+    if package_tar is not None:
+        args["package_path"] = package_tar
+    if model_file is not None:
+        args["model_path"] = model_file
+
+    return RuntimeClient(channel, runtime, **args, **kwargs)

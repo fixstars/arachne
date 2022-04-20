@@ -1,10 +1,11 @@
-from abc import abstractmethod
-from collections import OrderedDict
-from typing import Dict, List, Optional, Type
+import json
+import os
 
 import grpc
 
+import arachne.runtime
 from arachne.runtime.module import RuntimeModuleBase
+from arachne.runtime.rpc.logger import Logger
 from arachne.runtime.rpc.protobuf import runtime_message_pb2, runtime_pb2_grpc
 from arachne.runtime.rpc.protobuf.msg_response_pb2 import MsgResponse
 from arachne.runtime.rpc.utils.nparray import (
@@ -12,28 +13,42 @@ from arachne.runtime.rpc.utils.nparray import (
     nparray_piece_generator,
 )
 
+logger = Logger.logger()
 
-class RuntimeServicerBase(runtime_pb2_grpc.RuntimeServicer):
+
+class RuntimeServicer(runtime_pb2_grpc.RuntimeServicer):
     """Base class of runtime servicer"""
-
-    @staticmethod
-    @abstractmethod
-    def register_servicer_to_server(server: grpc.Server):
-        """Register servicer to server using grpc generated function
-
-        :code:`<runtime name>_pb2_grpc.add_<runtime name>RuntimeServicer_to_server`
-
-        Args:
-            server(grpc.Server): server to register servicer
-        """
-        pass
 
     def __init__(self):
         self.module: RuntimeModuleBase  #: runtime module for inference
 
-    @abstractmethod
     def Init(self, request, context):
         """abstract method to initialize runtime module."""
+        runtime = request.runtime
+        args = json.loads(request.args_json)
+        print("*****************")
+        print(args)
+        print("*****************")
+        path = None
+        if "package_path" in args:
+            path = args.pop("package_path")
+            args["package_tar"] = path
+        elif "model_path" in args:
+            path = args.pop("model_path")
+            args["model_file"] = path
+
+        if path is None:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("model_path should not be None")
+            return MsgResponse()
+        elif not os.path.exists(path):
+            context.set_code(grpc.StatusCode.RESOURCE_EXHAUSTED)
+            context.set_details(f"model_path {path} does not exist")
+            return MsgResponse()
+        logger.info("loading " + path)
+
+        self.module = arachne.runtime.init(runtime=runtime, **args)
+        return MsgResponse(msg=f"Init {runtime} runtime")
 
     def SetInput(self, request_iterator, context):
         """Set input parameter to runtime module.
@@ -48,7 +63,9 @@ class RuntimeServicerBase(runtime_pb2_grpc.RuntimeServicer):
             MsgResponse
         """
         assert self.module
-        index = next(request_iterator).index.index_i
+        index = next(request_iterator).index
+        # select index from 'oneof' structure
+        index = index.index_i if index.index_i is not None else index.index_s
         if index is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("index should not be None")
@@ -119,19 +136,3 @@ class RuntimeServicerBase(runtime_pb2_grpc.RuntimeServicer):
         np_array = self.module.get_output(index)
         for piece in nparray_piece_generator(np_array):
             yield runtime_message_pb2.GetOutputResponse(np_data=piece)
-
-
-class RuntimeServicerRegistry:
-    def __init__(self):
-        self._registries: Dict[str, Type[RuntimeServicerBase]] = OrderedDict()
-
-    def register(self, key: str, value: Type[RuntimeServicerBase], override=False):
-        assert override or key not in self._registries.keys()
-        self._registries[key] = value
-        return value
-
-    def get(self, key: str) -> Optional[Type[RuntimeServicerBase]]:
-        return self._registries.get(key)
-
-    def list(self) -> List[str]:
-        return list(self._registries.keys())

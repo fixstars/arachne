@@ -9,7 +9,6 @@ from tvm.contrib.download import download
 import arachne.runtime
 import arachne.runtime.rpc
 import arachne.tools.tvm
-from arachne.runtime.rpc import ONNXRuntimeClient, TfliteRuntimeClient, TVMRuntimeClient
 
 
 def get_input_data():
@@ -69,11 +68,11 @@ def test_tvm_runtime_rpc(pytestconfig):
         edge_package_path = tmp_dir + "/edge_mobilenet.tar"
         compile_model(cfg, edge_package_path)
         client = arachne.runtime.rpc.init(
+            runtime="tvm",
             package_tar=edge_package_path,
             rpc_host=rpc_host,
             rpc_port=rpc_port,
         )
-        assert isinstance(client, TVMRuntimeClient)
         client.set_input(0, input_data)
         client.run()
         edge_output = client.get_output(0)
@@ -106,11 +105,11 @@ def test_tflite_runtime_rpc(pytestconfig):
 
         # edge
         client = arachne.runtime.rpc.init(
+            runtime="tflite",
             model_file=model_path,
             rpc_host=rpc_host,
             rpc_port=rpc_port,
         )
-        assert isinstance(client, TfliteRuntimeClient)
         client.set_input(0, input_data)
         client.run()
         rpc_output = client.get_output(0)
@@ -145,12 +144,12 @@ def test_onnx_runtime_rpc(pytestconfig):
         local_result = np.argmax(local_output)
         # edge
         client = arachne.runtime.rpc.init(
+            runtime="onnx",
             model_file=model_path,
             rpc_host=rpc_host,
             rpc_port=rpc_port,
             **ort_opts,
         )
-        assert isinstance(client, ONNXRuntimeClient)
         client.set_input(0, input_data)
         client.run()
         rpc_output = client.get_output(0)

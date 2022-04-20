@@ -1,11 +1,16 @@
+import json
+import pathlib
 import warnings
-from abc import ABCMeta
 from typing import Dict
 
 import grpc
 import numpy as np
 
-from arachne.runtime.rpc.protobuf import runtime_message_pb2, stream_data_pb2
+from arachne.runtime.rpc.protobuf import (
+    runtime_message_pb2,
+    runtime_pb2_grpc,
+    stream_data_pb2,
+)
 from arachne.runtime.rpc.utils.nparray import (
     generator_to_np_array,
     nparray_piece_generator,
@@ -14,13 +19,13 @@ from arachne.runtime.rpc.utils.nparray import (
 from .stubmgr import FileStubManager, ServerStatusStubManager
 
 
-class RuntimeClientBase(metaclass=ABCMeta):
+class RuntimeClient:
     """Base class of runtime client.
 
     Method interface is almost the same as arachne.runtime.module.
     """
 
-    def __init__(self, channel: grpc.Channel, stub):
+    def __init__(self, channel: grpc.Channel, runtime: str, **kwargs):
         """
 
         Args:
@@ -31,7 +36,18 @@ class RuntimeClientBase(metaclass=ABCMeta):
         self.stats_stub_mgr = ServerStatusStubManager(channel)
         self.stats_stub_mgr.trylock()
         self.file_stub_mgr = FileStubManager(channel)
-        self.stub = stub
+        self.stub = runtime_pb2_grpc.RuntimeStub(channel)
+        if "model_path" in kwargs:
+            model_path = kwargs["model_path"]
+            upload_response = self.file_stub_mgr.upload(pathlib.Path(model_path))
+            kwargs["model_path"] = upload_response.filepath
+        if "package_path" in kwargs:
+            package_path = kwargs["package_path"]
+            upload_response = self.file_stub_mgr.upload(pathlib.Path(package_path))
+            kwargs["package_path"] = upload_response.filepath
+        args = json.dumps(kwargs)
+        req = runtime_message_pb2.InitRequest(runtime=runtime, args_json=args)
+        self.stub.Init(req)
 
     def finalize(self):
         """Request to unlock server."""
@@ -55,8 +71,12 @@ class RuntimeClientBase(metaclass=ABCMeta):
         """
 
         def request_generator(idx, np_arr):
-            index = runtime_message_pb2.Index(index_i=idx)
-            yield runtime_message_pb2.SetInputRequest(index=index)
+            if isinstance(idx, int):
+                idx = runtime_message_pb2.Index(index_i=idx)
+            elif isinstance(idx, str):
+                idx = runtime_message_pb2.Index(index_s=idx)
+            yield runtime_message_pb2.SetInputRequest(index=idx)
+
             for piece in nparray_piece_generator(np_arr):
                 chunk = stream_data_pb2.Chunk(buffer=piece)
                 yield runtime_message_pb2.SetInputRequest(np_arr_chunk=chunk)

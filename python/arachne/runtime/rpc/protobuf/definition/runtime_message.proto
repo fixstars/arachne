@@ -3,7 +3,8 @@ syntax = "proto3";
 import "stream_data.proto";
 
 message InitRequest{
-    string args_json = 1;
+    string runtime = 1;
+    string args_json = 2;
 }
 
 message Index{

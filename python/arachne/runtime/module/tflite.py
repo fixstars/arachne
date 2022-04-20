@@ -24,6 +24,8 @@ class TFLiteRuntimeModule(RuntimeModuleBase):
             idx (int): layer index to set data
             np_arr (np.ndarray): input data
         """
+        if not isinstance(idx, int):
+            raise Exception("idx should be int")
         self.module.set_tensor(self.input_details[idx]["index"], value)
 
     def get_output(self, idx):
