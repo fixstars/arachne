@@ -81,6 +81,7 @@ def init(
     - TVM: set :code:`package_tar` or set both :code:`model_file` and :code:`env_file`
 
     Args:
+        runtime (str): runtime name
         package_tar (Optional[str], optional): TVM package filepath archived by arachne.tools.tvm. Defaults to None.
         model_file (Optional[str], optional): ONNX/TfLite/TVM model filepath. Defaults to None.
         env_file (Optional[str], optional): environment file :code:`env.yaml`. Defaults to None.

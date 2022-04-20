@@ -27,10 +27,9 @@ def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:
 
 
 def create_server(port: int):
-    """Create the server by specifying the runtime.
+    """Create a server.
 
     Args:
-        runtime_name (str): The servicer corresponding to the specified runtime is registered with the server.
         port (int):
 
     Returns:

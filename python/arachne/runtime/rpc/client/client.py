@@ -20,7 +20,7 @@ from .stubmgr import FileStubManager, ServerStatusStubManager
 
 
 class RuntimeClient:
-    """Base class of runtime client.
+    """runtime client.
 
     Method interface is almost the same as arachne.runtime.module.
     """
@@ -30,6 +30,7 @@ class RuntimeClient:
 
         Args:
             channel (grpc.Channel): channel to connect server
+            runtime (str): runtime name of the server
             stub : stub instance of gRPC generated stub class
         """
         self.finalized = False

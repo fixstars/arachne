@@ -17,13 +17,13 @@ logger = Logger.logger()
 
 
 class RuntimeServicer(runtime_pb2_grpc.RuntimeServicer):
-    """Base class of runtime servicer"""
+    """runtime servicer"""
 
     def __init__(self):
         self.module: RuntimeModuleBase  #: runtime module for inference
 
     def Init(self, request, context):
-        """abstract method to initialize runtime module."""
+        """initialize the runtime module."""
         runtime = request.runtime
         args = json.loads(request.args_json)
         path = None
