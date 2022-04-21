@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 from tvm.contrib.download import download
 
-from arachne.runtime.rpc import RuntimeClient, create_channel, create_server
+from arachne.runtime.rpc import RuntimeClient, create_channel
+from arachne.runtime.rpc.server import create_server
 
 
 @pytest.mark.xfail
@@ -23,9 +24,9 @@ def test_prohibit_multiple_client(rpc_port=5051):
         channel = create_channel(port=rpc_port)
         client1 = None
         try:
-            client1 = RuntimeClient(channel, runtime="tflite", model_path=model_path)
+            client1 = RuntimeClient(channel, runtime="tflite", model_file=model_path)
             # cannot create multiple clients
-            _ = RuntimeClient(channel, runtime="tflite", model_path=model_path)
+            _ = RuntimeClient(channel, runtime="tflite", model_file=model_path)
         finally:
             if client1 is not None:
                 client1.finalize()
@@ -46,12 +47,12 @@ def test_conitnue_first_client(rpc_port=5051):
         server.start()
 
         channel = create_channel(port=rpc_port)
-        client1 = RuntimeClient(channel, runtime="tflite", model_path=model_path)
+        client1 = RuntimeClient(channel, runtime="tflite", model_file=model_path)
 
         try:
             client1.set_input(0, dummy_input)
             # cannot create multiple clients
-            _ = RuntimeClient(channel, runtime="tflite", model_path=model_path)
+            _ = RuntimeClient(channel, runtime="tflite", model_file=model_path)
         except grpc.RpcError:
             # client1 can continue to be used
             client1.run()

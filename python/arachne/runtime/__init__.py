@@ -70,6 +70,7 @@ def init(
     runtime: str,
     package_tar: Optional[str] = None,
     model_file: Optional[str] = None,
+    model_dir: Optional[str] = None,
     env_file: Optional[str] = None,
     **kwargs,
 ) -> RuntimeModuleBase:
@@ -90,8 +91,11 @@ def init(
         RuntimeModule: ONNX/TfLite/TVM RuntimeModule
     """
     assert (
-        package_tar is not None or model_file is not None
-    ), "package_tar or model_file should not be None"
+        package_tar is not None or model_file is not None or model_dir is not None
+    ), "package_tar, model_file, model_dir should not be None"
+
+    if model_dir is not None:
+        return RuntimeModuleFactory.get(name=runtime, model=model_dir, **kwargs)
 
     if package_tar is not None:
         with tarfile.open(package_tar, "r:gz") as tar:

@@ -1,5 +1,7 @@
 import json
 import os
+import tarfile
+import tempfile
 
 import grpc
 
@@ -26,21 +28,28 @@ class RuntimeServicer(runtime_pb2_grpc.RuntimeServicer):
         """initialize the runtime module."""
         runtime = request.runtime
         args = json.loads(request.args_json)
+
         path = None
-        if "package_path" in args:
-            path = args.pop("package_path")
-            args["package_tar"] = path
-        elif "model_path" in args:
-            path = args.pop("model_path")
-            args["model_file"] = path
+        if "package_tar" in args:
+            path = args["package_tar"]
+        elif "model_file" in args:
+            path = args["model_file"]
+        elif "model_dir" in args:
+            path = args["model_dir"]
+            _, tmpdir = tempfile.mkdtemp()
+            with tarfile.open(path, "r") as f:
+                f.extractall(tmpdir)
+            args["model_dir"] = tempfile
 
         if path is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details("model_path should not be None")
+            context.set_details(
+                "At leaset one of package_tar or model_file or model_dir must not be None"
+            )
             return MsgResponse()
         elif not os.path.exists(path):
             context.set_code(grpc.StatusCode.RESOURCE_EXHAUSTED)
-            context.set_details(f"model_path {path} does not exist")
+            context.set_details(f"path {path} does not exist")
             return MsgResponse()
         logger.info("loading " + path)
 

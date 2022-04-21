@@ -7,7 +7,7 @@ from tvm.contrib.download import download
 import arachne.runtime
 import arachne.runtime.rpc
 import arachne.tools.tvm
-from arachne.runtime.rpc import create_server
+from arachne.runtime.rpc.server import create_server
 
 
 def test_tvm_runtime_rpc(rpc_port=5051):

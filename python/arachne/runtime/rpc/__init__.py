@@ -2,14 +2,14 @@ import tarfile
 from typing import Optional
 
 from .client import RuntimeClient
-from .server import create_channel, create_server, start_server
-from .servicer import FileServicer, RuntimeServicer
+from .server import create_channel
 
 
 def init(
     runtime: str,
     package_tar: Optional[str] = None,
     model_file: Optional[str] = None,
+    model_dir: Optional[str] = None,
     env_file: Optional[str] = None,
     rpc_host: str = "localhost",
     rpc_port: int = 5051,
@@ -33,10 +33,6 @@ def init(
         RuntimeClientBase: ONNX/TfLite/TVM RuntimeClient
     """
 
-    assert (
-        package_tar is not None or model_file is not None
-    ), "package_tar or model_file should not be None"
-
     if package_tar is not None:
         with tarfile.open(package_tar, "r:gz") as tar:
             for m in tar.getmembers():
@@ -44,11 +40,9 @@ def init(
                     model_file = m.name
             tar.extractall(".")
 
-    assert model_file is not None
-
     channel = create_channel(rpc_host, rpc_port)
 
-    if model_file.endswith(".tar"):
+    if model_file is not None and model_file.endswith(".tar"):
         if package_tar is None:
             assert env_file is not None
             package_tar = "./package.tar"
@@ -58,8 +52,9 @@ def init(
 
     args = {}
     if package_tar is not None:
-        args["package_path"] = package_tar
+        args["package_tar"] = package_tar
     if model_file is not None:
-        args["model_path"] = model_file
-
+        args["model_file"] = model_file
+    if model_dir is not None:
+        args["model_dir"] = model_dir
     return RuntimeClient(channel, runtime, **args, **kwargs)

@@ -1,5 +1,7 @@
 import json
 import pathlib
+import tarfile
+import tempfile
 import warnings
 from typing import Dict
 
@@ -38,14 +40,22 @@ class RuntimeClient:
         self.stats_stub_mgr.trylock()
         self.file_stub_mgr = FileStubManager(channel)
         self.stub = runtime_pb2_grpc.RuntimeStub(channel)
-        if "model_path" in kwargs:
-            model_path = kwargs["model_path"]
-            upload_response = self.file_stub_mgr.upload(pathlib.Path(model_path))
-            kwargs["model_path"] = upload_response.filepath
-        if "package_path" in kwargs:
-            package_path = kwargs["package_path"]
-            upload_response = self.file_stub_mgr.upload(pathlib.Path(package_path))
-            kwargs["package_path"] = upload_response.filepath
+
+        if "package_tar" in kwargs:
+            package_tar = kwargs["package_tar"]
+            upload_response = self.file_stub_mgr.upload(pathlib.Path(package_tar))
+            kwargs["package_tar"] = upload_response.filepath
+        if "model_file" in kwargs:
+            model_file = kwargs["model_file"]
+            upload_response = self.file_stub_mgr.upload(pathlib.Path(model_file))
+            kwargs["model_file"] = upload_response.filepath
+        if "model_dir" in kwargs:
+            model_dir = kwargs["model_dir"]
+            with tempfile.NamedTemporaryFile() as f, tarfile.open(fileobj=f, mode="x:gz") as tf:
+                tf.add(model_dir)
+                upload_response = self.file_stub_mgr.upload(pathlib.Path(f.name))
+                kwargs["model_dir"] = upload_response.filepath
+
         args = json.dumps(kwargs)
         req = runtime_message_pb2.InitRequest(runtime=runtime, args_json=args)
         self.stub.Init(req)
