@@ -1,30 +1,20 @@
 import tarfile
 from typing import Optional
 
-from .client import (
-    ONNXRuntimeClient,
-    RuntimeClientBase,
-    TfliteRuntimeClient,
-    TVMRuntimeClient,
-)
-from .server import create_channel, create_server, start_server
-from .servicer import (
-    FileServicer,
-    ONNXRuntimeServicer,
-    ServerStatusServicer,
-    TfLiteRuntimeServicer,
-    TVMRuntimeServicer,
-)
+from .client import RuntimeClient
+from .server import create_channel
 
 
 def init(
+    runtime: str,
     package_tar: Optional[str] = None,
     model_file: Optional[str] = None,
+    model_dir: Optional[str] = None,
     env_file: Optional[str] = None,
     rpc_host: str = "localhost",
     rpc_port: int = 5051,
     **kwargs,
-) -> RuntimeClientBase:
+) -> RuntimeClient:
     """Initialize RuntimeClient to send requests to the server.
 
     The arguments to be passed as model file are different for runtime:
@@ -43,10 +33,6 @@ def init(
         RuntimeClientBase: ONNX/TfLite/TVM RuntimeClient
     """
 
-    assert (
-        package_tar is not None or model_file is not None
-    ), "package_tar or model_file should not be None"
-
     if package_tar is not None:
         with tarfile.open(package_tar, "r:gz") as tar:
             for m in tar.getmembers():
@@ -54,21 +40,17 @@ def init(
                     model_file = m.name
             tar.extractall(".")
 
-    assert model_file is not None
-
     channel = create_channel(rpc_host, rpc_port)
 
-    if model_file.endswith(".tar"):
+    if model_file is not None and model_file.endswith(".tar"):
         if package_tar is None:
             assert env_file is not None
             package_tar = "./package.tar"
             with tarfile.open(package_tar, "w:gz") as tar:
                 tar.add(model_file, arcname=model_file.split("/")[-1])
                 tar.add(env_file, arcname="env.yaml")
-        return TVMRuntimeClient(channel, package_tar, **kwargs)
-    elif model_file.endswith(".tflite"):
-        return TfliteRuntimeClient(channel, model_file, **kwargs)
-    elif model_file.endswith(".onnx"):
-        return ONNXRuntimeClient(channel, model_file, **kwargs)
-    else:
-        assert False, f"Unsupported model format ({model_file}) for runtime"
+
+    kwargs["package_tar"] = package_tar
+    kwargs["model_file"] = model_file
+    kwargs["model_dir"] = model_dir
+    return RuntimeClient(channel, runtime, **{k: v for k, v in kwargs.items() if v is not None})

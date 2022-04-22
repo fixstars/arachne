@@ -5,8 +5,8 @@ import grpc
 
 from arachne.runtime.rpc.logger import Logger
 
-from .protobuf import fileserver_pb2_grpc, server_status_pb2_grpc
-from .servicer import FileServicer, RuntimeServicerBaseFactory, ServerStatusServicer
+from .protobuf import fileserver_pb2_grpc, runtime_pb2_grpc, server_status_pb2_grpc
+from .servicer import FileServicer, RuntimeServicer, ServerStatusServicer
 
 logger = Logger.logger()
 
@@ -26,11 +26,10 @@ def create_channel(host: str = "localhost", port: int = 5051) -> grpc.Channel:
     return channel
 
 
-def create_server(runtime_name: str, port: int):
-    """Create the server by specifying the runtime.
+def create_server(port: int):
+    """Create a server.
 
     Args:
-        runtime_name (str): The servicer corresponding to the specified runtime is registered with the server.
         port (int):
 
     Returns:
@@ -42,10 +41,7 @@ def create_server(runtime_name: str, port: int):
 
     server_status_pb2_grpc.add_ServerStatusServicer_to_server(ServerStatusServicer(), server)
     fileserver_pb2_grpc.add_FileServiceServicer_to_server(FileServicer(), server)
-
-    servicer_class = RuntimeServicerBaseFactory.get(runtime_name)
-    assert servicer_class is not None
-    servicer_class.register_servicer_to_server(server)
+    runtime_pb2_grpc.add_RuntimeServicer_to_server(RuntimeServicer(), server)
 
     server.add_insecure_port("[::]:" + str(port))
     return server
@@ -61,9 +57,8 @@ def start_server(server: grpc.Server, port: int):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=5051)
-    parser.add_argument("--runtime", type=str, choices=RuntimeServicerBaseFactory.list())
 
     args = parser.parse_args()
 
-    server = create_server(args.runtime, args.port)
+    server = create_server(args.port)
     start_server(server, args.port)

@@ -1,16 +1,22 @@
 syntax = "proto3";
 
-import "msg_response.proto";
 import "stream_data.proto";
 
-
 message InitRequest{
-    string model_path = 1;
+    string runtime = 1;
+    string args_json = 2;
+}
+
+message Index{
+    oneof index{
+        int32 index_i = 1;
+        string index_s = 2;
+    }
 }
 
 message SetInputRequest{
     oneof data{
-        int32 index = 1;
+        Index index = 1;
         Chunk np_arr_chunk = 2;
     }
 }
@@ -36,13 +42,4 @@ message GetOutputRequest{
 
 message GetOutputResponse{
     bytes np_data = 1;
-}
-
-//Runtime Base Interface: servicer is not implemented.
-service Runtime{
-    rpc Init(InitRequest) returns (MsgResponse) {}
-    rpc SetInput (stream SetInputRequest) returns (MsgResponse) {}
-    rpc Run (RunRequest) returns (MsgResponse) {}
-    rpc Benchmark (BenchmarkRequest) returns (BenchmarkResponse) {}
-    rpc GetOutput (GetOutputRequest) returns (stream GetOutputResponse) {}
 }

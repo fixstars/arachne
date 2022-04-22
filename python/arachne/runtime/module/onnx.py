@@ -38,6 +38,8 @@ class ONNXRuntimeModule(RuntimeModuleBase):
             idx (int): layer index to set data
             value (np.ndarray): input data
         """
+        if not isinstance(idx, int):
+            raise Exception("idx should be int")
         self._inputs[self.input_details[idx].name] = value
 
     def get_output(self, idx):

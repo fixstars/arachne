@@ -1,11 +1,18 @@
+import json
+import pathlib
+import tarfile
+import tempfile
 import warnings
-from abc import ABCMeta
 from typing import Dict
 
 import grpc
 import numpy as np
 
-from arachne.runtime.rpc.protobuf import runtime_message_pb2, stream_data_pb2
+from arachne.runtime.rpc.protobuf import (
+    runtime_message_pb2,
+    runtime_pb2_grpc,
+    stream_data_pb2,
+)
 from arachne.runtime.rpc.utils.nparray import (
     generator_to_np_array,
     nparray_piece_generator,
@@ -14,24 +21,46 @@ from arachne.runtime.rpc.utils.nparray import (
 from .stubmgr import FileStubManager, ServerStatusStubManager
 
 
-class RuntimeClientBase(metaclass=ABCMeta):
-    """Base class of runtime client.
+class RuntimeClient:
+    """runtime client.
 
     Method interface is almost the same as arachne.runtime.module.
     """
 
-    def __init__(self, channel: grpc.Channel, stub):
+    def __init__(self, channel: grpc.Channel, runtime: str, **kwargs):
         """
 
         Args:
             channel (grpc.Channel): channel to connect server
+            runtime (str): runtime name of the server
             stub : stub instance of gRPC generated stub class
         """
         self.finalized = False
         self.stats_stub_mgr = ServerStatusStubManager(channel)
         self.stats_stub_mgr.trylock()
         self.file_stub_mgr = FileStubManager(channel)
-        self.stub = stub
+        self.stub = runtime_pb2_grpc.RuntimeStub(channel)
+
+        if kwargs.get("package_tar"):
+            package_tar = kwargs["package_tar"]
+            upload_response = self.file_stub_mgr.upload(pathlib.Path(package_tar))
+            kwargs["package_tar"] = upload_response.filepath
+        if kwargs.get("model_file"):
+            model_file = kwargs["model_file"]
+            upload_response = self.file_stub_mgr.upload(pathlib.Path(model_file))
+            kwargs["model_file"] = upload_response.filepath
+        if kwargs.get("model_dir"):
+            model_dir = kwargs["model_dir"]
+            with tempfile.NamedTemporaryFile() as f:
+                with tarfile.open(f.name, mode="w:gz") as tf:
+                    tf.add(model_dir, arcname="")
+
+                upload_response = self.file_stub_mgr.upload(pathlib.Path(f.name))
+                kwargs["model_dir"] = upload_response.filepath
+
+        args = json.dumps(kwargs)
+        req = runtime_message_pb2.InitRequest(runtime=runtime, args_json=args)
+        self.stub.Init(req)
 
     def finalize(self):
         """Request to unlock server."""
@@ -55,7 +84,12 @@ class RuntimeClientBase(metaclass=ABCMeta):
         """
 
         def request_generator(idx, np_arr):
+            if isinstance(idx, int):
+                idx = runtime_message_pb2.Index(index_i=idx)
+            elif isinstance(idx, str):
+                idx = runtime_message_pb2.Index(index_s=idx)
             yield runtime_message_pb2.SetInputRequest(index=idx)
+
             for piece in nparray_piece_generator(np_arr):
                 chunk = stream_data_pb2.Chunk(buffer=piece)
                 yield runtime_message_pb2.SetInputRequest(np_arr_chunk=chunk)

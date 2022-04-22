@@ -1,18 +1,10 @@
 syntax = "proto3";
 
-import "msg_response.proto";
 import "runtime_message.proto";
+import "msg_response.proto";
 
-package tfliteruntime;
-
-message TfLiteInitRequest{
-    string model_path = 1;
-    int32 num_threads = 2;
-}
-
-
-service TfLiteRuntime{
-    rpc Init(TfLiteInitRequest) returns (MsgResponse) {}
+service Runtime{
+    rpc Init(InitRequest) returns (MsgResponse) {}
     rpc SetInput (stream SetInputRequest) returns (MsgResponse) {}
     rpc Run (RunRequest) returns (MsgResponse) {}
     rpc Benchmark (BenchmarkRequest) returns (BenchmarkResponse) {}

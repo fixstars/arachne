@@ -12,11 +12,11 @@ Currently, the arachne runtime supports the onnx, tflite, and tvm model.
 
     # Run MobileNet by arachne.runtime
 
-    # Init runtime by the tar files that arachne.tools output
-    runtime_module = arachne.runtime.init(package_tar="package.tar")
+    # Init runtime by runtime name and the tar files that arachne.tools output
+    runtime_module = arachne.runtime.init(runtime="tvm", package_tar="package.tar")
 
     # or init runtime by specific model files and environment files
-    # runtime_module = arachne.runtime.init(model_file="tvm_package.tar", env_file="env.yaml")
+    # runtime_module = arachne.runtime.init(runtime="tvm", model_file="tvm_package.tar", env_file="env.yaml")
 
     # Set an input
     input_data = np.array(np.random.random_sample([1, 224, 224, 3]), dtype=np.float32)
@@ -40,11 +40,11 @@ RPC: Run Your Model on Remote devices
 .. code:: python
 
     client = arachne.runtime.rpc.init(
+        runtime="onnx",
         model_file="resnet18.onnx",
         rpc_host="192.168.xx.xx",
         rpc_port=5051
     )
-    assert isinstance(client, ONNXRuntimeClient)
     client.set_input(0, input_data)
     client.run()
     rpc_output = client.get_output(0)
@@ -59,15 +59,14 @@ Start RPC server
 ----------------
 
 | Please refer to the :doc:`setup_device` for device environment setup.
-| Start the rpc server using the created venv and arachne: :code:`./setup.sh <env_dirname> <runtime_name> <port>`.
-| You can specify either :code:`tvm, tflite, onnx` to :code:`<runtime_name>`.
+| Start the rpc server using the created venv and arachne: :code:`./setup.sh <env_dirname> <port>`.
 
-The following example shows the TVM runtime server running on JetPack 4.6 on port 5051.
+The following example shows the runtime server running on JetPack 4.6 on port 5051.
 
 .. code:: shell
 
     cd arachne/device
-    ./setup.sh jp46 tvm 5051
+    ./setup.sh jp46 5051
 
 Or, you can also start server as the following:
 
@@ -75,14 +74,14 @@ Or, you can also start server as the following:
 
     cd arachne/device
     source jp46/.venv/bin/activate
-    python -m arachne.runtime.rpc.server --port 5051 --runtime tvm
+    python -m arachne.runtime.rpc.server --port 5051
 
 
 Test
 ----
 
 :code:`tests/runtime/rpc/device/test_edge.py` is test script that the results of the local execution and the RPC execution are correct.
-Before running test, start rpc server on the edge device with :code:`./setup.sh [env dirname] [tvm|tflite|onnx] 5051`
+Before running test, start rpc server on the edge device with :code:`./setup.sh [env dirname] 5051`
 
 TVM runtime test
 ~~~~~~~~~~~~~~~~

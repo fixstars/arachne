@@ -7,12 +7,7 @@ from tvm.contrib.download import download
 import arachne.runtime
 import arachne.runtime.rpc
 import arachne.tools.tvm
-from arachne.runtime.rpc import (
-    ONNXRuntimeClient,
-    TfliteRuntimeClient,
-    TVMRuntimeClient,
-    create_server,
-)
+from arachne.runtime.rpc.server import create_server
 
 
 def test_tvm_runtime_rpc(rpc_port=5051):
@@ -32,11 +27,12 @@ def test_tvm_runtime_rpc(rpc_port=5051):
         local_output = rtmodule.get_output(0)
 
         # rpc run
-        server = create_server("tvm", rpc_port)
+        server = create_server(rpc_port)
         server.start()
         try:
-            client = arachne.runtime.rpc.init(package_tar=tvm_package_path, rpc_port=rpc_port)
-            assert isinstance(client, TVMRuntimeClient)
+            client = arachne.runtime.rpc.init(
+                runtime="tvm", package_tar=tvm_package_path, rpc_port=rpc_port
+            )
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
@@ -76,13 +72,12 @@ def test_tvm_runtime_rpc2(rpc_port=5051):
         local_output = rtmodule.get_output(0)
 
         # rpc run
-        server = create_server("tvm", rpc_port)
+        server = create_server(rpc_port)
         server.start()
         try:
             client = arachne.runtime.rpc.init(
-                model_file=model_file, env_file=env_file, rpc_port=rpc_port
+                runtime="tvm", model_file=model_file, env_file=env_file, rpc_port=rpc_port
             )
-            assert isinstance(client, TVMRuntimeClient)
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
@@ -110,11 +105,12 @@ def test_tflite_runtime_rpc(rpc_port=5051):
         local_output = rtmodule.get_output(0)
 
         # rpc
-        server = create_server("tflite", rpc_port)
+        server = create_server(rpc_port)
         server.start()
         try:
-            client = arachne.runtime.rpc.init(model_file=model_path, rpc_port=rpc_port)
-            assert isinstance(client, TfliteRuntimeClient)
+            client = arachne.runtime.rpc.init(
+                runtime="tflite", model_file=model_path, rpc_port=rpc_port
+            )
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)
@@ -145,11 +141,12 @@ def test_onnx_runtime_rpc(rpc_port=5051):
         rtmodule.run()
         local_output = rtmodule.get_output(0)
         # rpc run
-        server = create_server("onnx", rpc_port)
+        server = create_server(rpc_port)
         server.start()
         try:
-            client = arachne.runtime.rpc.init(model_file=model_path, rpc_port=rpc_port, **ort_opts)
-            assert isinstance(client, ONNXRuntimeClient)
+            client = arachne.runtime.rpc.init(
+                runtime="onnx", model_file=model_path, rpc_port=rpc_port, **ort_opts
+            )
             client.set_input(0, dummy_input)
             client.run()
             rpc_output = client.get_output(0)

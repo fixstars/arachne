@@ -2,13 +2,12 @@
 
 set -euo pipefail
 
-if [ $# -ne 3 ]; then
-    echo "Usage: . setup.sh <env_dirname> <runtime_name> <port>"
+if [ $# -ne 2 ]; then
+    echo "Usage: . setup.sh <env_dirname> <port>"
     exit 1
 fi
 env_dirname=$1
-runtime_name=$2
-rpc_port=$3
+rpc_port=$2
 script_dir=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd)
 tvm_dir=${script_dir}/../3rdparty/tvm
 build_dir=${script_dir}/../build/tvm
@@ -18,4 +17,4 @@ source ${script_dir}/${env_dirname}/.venv/bin/activate
 export LD_LIBRARY_PATH=${build_dir}:${LD_LIBRARY_PATH:=""}
 export PYTHONPATH=${tvm_dir}/python:${arachne_root}/python:${PYTHONPATH:=""}
 export PATH=/usr/local/cuda/bin:${PATH}
-python -m arachne.runtime.rpc.server --port ${rpc_port} --runtime ${runtime_name}
+python -m arachne.runtime.rpc.server --port ${rpc_port}
