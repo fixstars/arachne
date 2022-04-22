@@ -27,7 +27,7 @@ class RuntimeModuleBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_output(self, idx) -> np.ndarray:
+    def get_output(self, idx, **kwargs) -> np.ndarray:
         pass
 
     @abstractmethod

@@ -36,10 +36,10 @@ class RuntimeServicer(runtime_pb2_grpc.RuntimeServicer):
             path = args["model_file"]
         elif "model_dir" in args:
             path = args["model_dir"]
-            _, tmpdir = tempfile.mkdtemp()
+            tmpdir = tempfile.mkdtemp()
             with tarfile.open(path, "r") as f:
                 f.extractall(tmpdir)
-            args["model_dir"] = tempfile
+            args["model_dir"] = tmpdir
 
         if path is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)

@@ -51,9 +51,11 @@ class RuntimeClient:
             kwargs["model_file"] = upload_response.filepath
         if "model_dir" in kwargs:
             model_dir = kwargs["model_dir"]
-            with tempfile.NamedTemporaryFile() as f, tarfile.open(fileobj=f, mode="x:gz") as tf:
-                tf.add(model_dir)
-                upload_response = self.file_stub_mgr.upload(pathlib.Path(f.name))
+            with tempfile.NamedTemporaryFile() as f:
+                with tarfile.open(f.name, mode="w:gz") as tf:
+                    tf.add(model_dir, arcname="")
+
+                upload_response = self.file_stub_mgr.upload(pathlib.Path(tf.name))
                 kwargs["model_dir"] = upload_response.filepath
 
         args = json.dumps(kwargs)
