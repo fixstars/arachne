@@ -55,7 +55,7 @@ class RuntimeClient:
                 with tarfile.open(f.name, mode="w:gz") as tf:
                     tf.add(model_dir, arcname="")
 
-                upload_response = self.file_stub_mgr.upload(pathlib.Path(tf.name))
+                upload_response = self.file_stub_mgr.upload(pathlib.Path(f.name))
                 kwargs["model_dir"] = upload_response.filepath
 
         args = json.dumps(kwargs)
