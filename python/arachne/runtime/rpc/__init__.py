@@ -50,11 +50,7 @@ def init(
                 tar.add(model_file, arcname=model_file.split("/")[-1])
                 tar.add(env_file, arcname="env.yaml")
 
-    args = {}
-    if package_tar is not None:
-        args["package_tar"] = package_tar
-    if model_file is not None:
-        args["model_file"] = model_file
-    if model_dir is not None:
-        args["model_dir"] = model_dir
-    return RuntimeClient(channel, runtime, **args, **kwargs)
+    kwargs["package_tar"] = package_tar
+    kwargs["model_file"] = model_file
+    kwargs["model_dir"] = model_dir
+    return RuntimeClient(channel, runtime, **{k: v for k, v in kwargs.items() if v is not None})

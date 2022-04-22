@@ -41,15 +41,15 @@ class RuntimeClient:
         self.file_stub_mgr = FileStubManager(channel)
         self.stub = runtime_pb2_grpc.RuntimeStub(channel)
 
-        if "package_tar" in kwargs:
+        if kwargs.get("package_tar"):
             package_tar = kwargs["package_tar"]
             upload_response = self.file_stub_mgr.upload(pathlib.Path(package_tar))
             kwargs["package_tar"] = upload_response.filepath
-        if "model_file" in kwargs:
+        if kwargs.get("model_file"):
             model_file = kwargs["model_file"]
             upload_response = self.file_stub_mgr.upload(pathlib.Path(model_file))
             kwargs["model_file"] = upload_response.filepath
-        if "model_dir" in kwargs:
+        if kwargs.get("model_dir"):
             model_dir = kwargs["model_dir"]
             with tempfile.NamedTemporaryFile() as f:
                 with tarfile.open(f.name, mode="w:gz") as tf:

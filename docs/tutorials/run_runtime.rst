@@ -40,12 +40,11 @@ RPC: Run Your Model on Remote devices
 .. code:: python
 
     client = arachne.runtime.rpc.init(
-        runtime="tvm",
+        runtime="onnx",
         model_file="resnet18.onnx",
         rpc_host="192.168.xx.xx",
         rpc_port=5051
     )
-    assert isinstance(client, ONNXRuntimeClient)
     client.set_input(0, input_data)
     client.run()
     rpc_output = client.get_output(0)
