@@ -2,7 +2,6 @@ import time
 from typing import List
 
 import numpy as np
-import onnxruntime as ort
 
 from .factory import RuntimeModuleBase, RuntimeModuleFactory
 
@@ -19,6 +18,8 @@ def onnx_tensor_type_to_np_dtype(ottype: str):
 @RuntimeModuleFactory.register("onnx")
 class ONNXRuntimeModule(RuntimeModuleBase):
     def __init__(self, model: str, providers: List[str] = ["CPUExecutionProvider"], **kwargs):
+        import onnxruntime as ort
+
         self.module: ort.InferenceSession = ort.InferenceSession(
             model, providers=providers, **kwargs
         )
